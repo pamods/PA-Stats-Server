@@ -7,7 +7,7 @@ To run your own server you need a postgres database. PA Stats uses a few postgre
 The PA Stats Server itself is a packaged as war and run inside a jetty webserver.
 
 Configuration steps:
-
+=====
 PA Stats was build to use a database called rbztest for testing and rbz for production use. These names can be configured, but for simplicity this 
 info will use them. Search the project for those names if you want to change them.
 
@@ -33,6 +33,9 @@ uimod/pa_stats_loader.js
 /PA-Stats-Server/src/main/resources/props/production.default.props
 
 6.) If you change the database schema read the readme under jooq_code_generation. It tells you how to create new java classes (found under src/main/java/info.nanodesu.genereated) that are used to build sql statements in the project.
+
+Code overview
+==
 
 A little overview about the packages in src/main/scala/info/nanodesu/:
 
