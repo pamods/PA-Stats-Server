@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>PA Stats</title>
+<link rel="shortcut icon" type="image/x-icon"
+	href="/static/img/favicon.ico">
+</head>
+<body>
+	<div class="container">
+		
+		<div data-lift="embed?what=/templates-hidden/default-head-imports"></div>
+		
+		<noscript>
+			<div class="error">This page needs javascript to work, please enable javascript!</div>
+		</noscript>
+
+		<div class="column span-24" style="text-align: center">
+			<h1 class="alt ">PA Stats</h1>
+		</div>
+
+		<div class="column span-24 topbar">
+			<span data-lift="Menu.builder"></span>
+			<hr />
+		</div>
+
+		<div class="column span-24">
+			<div id="content">The main content will get bound here</div>
+		</div>
+
+		<hr />
+
+		<div class="lift:Msgs?showAll=true"></div>
+
+		<div class="column span-24" style="text-align: center">
+			<h4 class="alt" >
+				Your current time is <span id="abc" data-lift="LocalTime.time">Time goes here</span><br />
+				powered by <a href="http://www.liftweb.net"><i>Lift</i></a>, <a
+					href="http://knockoutjs.com"><i>Knockout</i></a>, <a
+					href="http://code.shutterstock.com/rickshaw/"><i>Rickshaw</i></a>
+				and <a href="http://www.blueprintcss.org">blueprint</a>. Also try <a href="http://nanodesu.info/snake/">Snake</a> :)
+			</h4>
+		</div>
+	</div>
+</body>
+</html>

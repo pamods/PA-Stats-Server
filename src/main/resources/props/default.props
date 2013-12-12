@@ -1,0 +1,32 @@
+dbName=rbztest
+
+queryUrl=http://127.0.0.1:8080/report/get
+
+minGameLength=0
+deletionInterval=11111
+
+minDataPointsToKeep = 0
+
+liveGameThreshold=16000
+
+#less pages than on the prod system as the ping to the test db sucks from my local system
+listGamesPageSize = 5;
+
+jslibs=jquery jqueryui knockout globalize d3 d3layout rickshaw
+csslibs=jqueryuicss rickshawcss
+
+
+
+imagebase=/static/outsourced/img/
+
+jqueryuicss=/static/outsourced/lib/ui/jquery-ui-1.10.3.min.css
+rickshawcss=/static/outsourced/lib/rickshaw.a.min.css
+
+jquery=/static/outsourced/lib/jquery-1.10.2.min.js
+jqueryui=/static/outsourced/lib/ui/jquery-ui-1.10.3.min.js
+knockout=/static/outsourced/lib/knockout-min-2.3.0.js
+globalize=/static/outsourced/lib/globalize-0.1.1.min.js
+
+d3=/static/outsourced/lib/d3.a.min.js
+d3layout=/static/outsourced/lib/d3.layout.a.min.js
+rickshaw=/static/outsourced/lib/rickshaw.a.min.js

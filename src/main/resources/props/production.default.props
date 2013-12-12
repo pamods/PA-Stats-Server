@@ -1,0 +1,31 @@
+dbName=rbz
+
+queryUrl=http://www.nanodesu.info/pastats/report/get
+
+minGameLength=5
+deletionInterval=5
+
+minDataPointsToKeep = 12;
+
+liveGameThreshold=16000
+
+listGamesPageSize = 35;
+
+jslibs=jquery jqueryui knockout globalize d3 d3layout rickshaw
+csslibs=jqueryuicss rickshawcss
+
+
+
+imagebase=http://nanodesu.info/static/img/
+
+jqueryuicss=http://nanodesu.info/static/lib/ui/jquery-ui-1.10.3.min.css
+rickshawcss=http://nanodesu.info/static/lib/rickshaw.a.min.css
+
+jquery=http://nanodesu.info/static/lib/jquery-1.10.2.min.js
+jqueryui=http://nanodesu.info/static/lib/ui/jquery-ui-1.10.3.min.js
+knockout=http://nanodesu.info/static/lib/knockout-min-2.3.0.js
+globalize=http://nanodesu.info/static/lib/globalize-0.1.1.min.js
+
+d3=http://nanodesu.info/static/lib/d3.a.min.js
+d3layout=http://nanodesu.info/static/lib/d3.layout.a.min.js
+rickshaw=http://nanodesu.info/static/lib/rickshaw.a.min.js

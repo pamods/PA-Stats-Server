@@ -1,0 +1,77 @@
+<!DocType html>
+<html>
+<body data-lift-content-id="gameinfo">
+	<div id="gameinfo">
+		<div class="greybox">
+			<div class="shiny_comet" data-lift="CometInit.gameGeneralInfo">
+				<div style="float: left">
+					<img id="planetimg" alt="planet biome"
+						src="/static/img/planets/unknown.png" width=auto, height=150px,
+						title="Biome: " />
+					<div class="planetemblem" id="planetname"></div>
+				</div>
+
+				<div style="margin-left: 150px;">
+					<div id="gameheader">
+						<span id="gamenum">Game #</span><br /> <span id="players"></span>
+					</div>
+					<table class="greyborder" id="gameinfotable">
+						<tbody>
+							<tr>
+								<td id="version">PA: v.</td>
+								<td id="temp">Temperature: </td>
+							</tr>
+							<tr id="infline">
+								<td id="planetseed">Seed: </td>
+								<td id="winner">Winner: </td>
+							</tr>
+							<tr>
+								<td id="radius">Radius: </td>
+								<td id="size">Size: </td>
+							</tr>
+							<tr>
+								<td id="heightrange">Heightrange: </td>
+								<td id="start">Start: </td>
+							</tr>
+							<tr>
+								<td id="waterheight">Waterheight: </td>
+								<td id="length">Duration: </td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+			</div>
+			<div class="shiny_comet" data-lift="CometInit.playerGameInfo">
+				<table id="playerstatstable">
+					<thead id="gametable">
+						<tr>
+							<th>Player</th>
+							<th title="average of the build speed">Build efficiency Avg</th>
+							<th title="Total sum of all metal collected">All metal</th>
+							<th
+								title="sum(metal actually used) / sum (metal collected) low values mean high amount of metal wasting">Metal
+								used</th>
+							<th title="Total sum of all energy collected">All energy</th>
+							<th
+								title="sum(energy actually used) / sum (energy collected) low values mean high amount of energy wasting">Energy
+								used</th>
+							<th title="Average actions per minute">APM Avg</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr id="pstatline">
+							<td class="playername"></td>
+							<td class="avgbuildspeed"></td>
+							<td class="summetal"></td>
+							<td class="metalused"></td>
+							<td class="sumenergy"></td>
+							<td class="energyused"></td>
+							<td class="apmavg"></td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</div>
+</body>
+</html>

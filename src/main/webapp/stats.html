@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+<body data-lift-content-id="download">
+	<div data-lift="surround?with=default&at=content" id="download">
+		<h2 class="alt">Some numbers</h2>
+		<div data-lift="Stats.general">
+			<span id="users"></span> Users<br/>
+			<span id="gamecount"></span> Games<br /> <span id="datapointcnt"></span>
+			points of data<br /> overall game length <span id="gamelength"></span><br />
+			average game length <span id="avglen"></span>
+		</div>
+		<hr />
+		<h2 class="alt">Memorable achievements</h2>
+
+		<div data-lift="Stats.highscore" class="column span-24">
+			<div class="column span-7">
+				<div class="alt">Most units alive</div>
+				<div>
+					<a class="playerlink" id="maxUnitsName"></a><br />with <span
+						id="maxUnitCount"></span> units in game <a id="maxUnitGame">#</a>
+				</div>
+			</div>
+			<div class="column span-7">
+
+				<div class="alt">Most metal income</div>
+				<div>
+					<a class="playerlink" id="maxMetalName"></a><br />with <span
+						id="maxMetalSum"></span> metal/s in game <a id="maxMetalGame">#</a>
+				</div>
+			</div>
+			<div class="column span-7-last">
+
+				<div class="alt">Most energy income</div>
+				<div>
+					<a class="playerlink" id="maxEnergyName"></a><br />with <span
+						id="maxEnergySum"></span> energy/s in game <a id="maxEnergyGame">#</a>
+				</div>
+			</div>
+		</div>
+		<hr />
+		<div>
+			<h2 class="alt">Top 10 most playtime</h2>
+			<table class="clicktable" id="gametable"
+				data-lift="Stats.contributers">
+				<thead>
+					<tr>
+						<th>#</th>
+						<th>Name</th>
+						<th>Games</th>
+						<th>Playtime</th>
+						<th>Avg game length</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr id="line">
+						<td class="placecnt">0</td>
+						<td class="playernlst">1</td>
+						<td class="gamecnt">2</td>
+						<td class="playtime">3</td>
+						<td class="avgtime">4</td>
+					</tr>
+				</tbody>
+			</table>
+			<script src="/static/js/clickTable.js"></script>
+		</div>
+		<hr />
+		<h2 class="alt">Runtime stuff</h2>
+		<div data-lift="Stats.technical">
+		maxMemory(): <span id="maxMemory"></span><br/>
+		totalMemory(): <span id="totalmem"></span><br/>
+		freeMemory(): <span id="freemem"></span><br/>
+		availableProcessors(): <span id="cores"></span><br/>
+		pg_database_size(): <span id="tablessize"></span><br/>
+		Uptime: <span id="uptime"></span><br/>
+		idle connections: <span id="idlesql"></span>
+		busy connections: <span id="busysql"></span>
+		all connections: <span id="allsql"></span>
+		</div>
+	</div>
+</body>

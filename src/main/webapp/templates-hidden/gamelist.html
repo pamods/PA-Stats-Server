@@ -1,0 +1,28 @@
+<!DocType html>
+<html>
+<body data-lift-content-id="thegamelist">
+		<div id="thegamelist" class="column span-24">
+			<div class="pages" data-lift="ListGames.pages" class="column span-24"></div>
+			<table class="clicktable" id="gametable">
+				<thead>
+					<tr>
+						<th id="gameIdColumn">Game</th>
+						<th>Players</th>
+						<th >Game started</th>
+						<th id="gameDurationColumn">Duration</th>
+					</tr>
+				</thead>
+				<tbody data-lift="ListGames.list">
+					<tr id="line">
+						<td class="gamenum">#</td>
+						<td class="gameplayers">Cola_Colin</td>
+						<td class="gamestart">Today, 3A</td>
+						<td class="gametime">30:12+</td>
+					</tr>
+				</tbody>
+			</table>
+			<script src="/static/js/clickTable.js"></script>
+			<div class="pages" data-lift="ListGames.pages" class="column span-24"></div>
+		</div>
+</body>
+</html>

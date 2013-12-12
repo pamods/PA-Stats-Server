@@ -1,0 +1,36 @@
+<Configure class="org.eclipse.jetty.webapp.WebAppContext">
+	<New id="rbz" class="org.eclipse.jetty.plus.jndi.Resource">
+		<Arg></Arg>
+		<Arg>jdbc/rbz</Arg>
+		<Arg>
+			<New class="com.mchange.v2.c3p0.ComboPooledDataSource">
+				<Set name="driverClass">org.postgresql.Driver</Set>
+				<Set name="jdbcUrl">jdbc:postgresql://127.0.0.1/rbz</Set>
+				<Set name="user">xxx</Set>
+				<Set name="password">xxx</Set>
+				<Set name="maxPoolSize">15</Set>
+				<Set name="testConnectionOnCheckin">true</Set>
+				<Set name="maxIdleTimeExcessConnections">240</Set>
+				<Set name="idleConnectionTestPeriod">600</Set>
+				<Set name="preferredTestQuery">SELECT 1</Set>
+			</New>
+		</Arg>
+	</New>
+	<New id="rbztest" class="org.eclipse.jetty.plus.jndi.Resource">
+		<Arg></Arg>
+		<Arg>jdbc/rbztest</Arg>
+		<Arg>
+			<New class="com.mchange.v2.c3p0.ComboPooledDataSource">
+				<Set name="driverClass">org.postgresql.Driver</Set>
+				<Set name="jdbcUrl">jdbc:postgresql://10.8.0.1/rbztest</Set>
+				<Set name="user">xxx</Set>
+				<Set name="password">xxx</Set>
+				<Set name="maxPoolSize">3</Set>
+				<Set name="testConnectionOnCheckin">true</Set>
+				<Set name="maxIdleTimeExcessConnections">240</Set>
+				<Set name="idleConnectionTestPeriod">600</Set>
+				<Set name="preferredTestQuery">SELECT 1</Set>
+			</New>
+		</Arg>
+	</New>
+</Configure> 

@@ -1,0 +1,12 @@
+~; container:start; container:reload /
+
+$ sudo -u postgres pg_dump -Fc coolProject > coolProject.dump
+$ sudo -u postgres pg_restore -d coolProjectClone coolProject.dump
+
+select 'drop table if exists "' || tablename || '" cascade;'
+  from pg_tables
+ where schemaname = 'public';
+
+places to fill in database-passwords:
+/PA-Stats-Server/src/main/webapp/WEB-INF/jetty-env.xml to run the deployment
+/PA-Stats-Server/jooq_code_generation/conf.xml for code generation from a database if you changed something

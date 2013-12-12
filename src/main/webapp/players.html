@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+<body data-lift-content-id="players">
+	<div data-lift="surround?with=default&at=content" id="players">
+		<div data-lift="PlayerSearch.input">
+			<form name="search" method="get">
+				Search for display name (including history): <input type="text" name="search" id="searchfield" />
+				<input type="submit" value="Search"/>
+			</form>
+		</div>
+		<hr />
+		
+		<div>
+			<table class="clicktable" id="gametable" data-lift="PlayerSearch.list">
+				<tbody>
+					<tr id="line">
+						<td class="namelink">player here</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+	</div>
+</body>
+</html>
