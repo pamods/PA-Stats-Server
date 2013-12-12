@@ -71,6 +71,10 @@ Tests
 There are tests under src/test/scala
 You can run them as junit tests or from within sbt with "test"
 
+
+Misc
+===
+
 Generally the master ui-mod and the master server should work together.
 
 Feel free to ask me questions about this. If somebody actually reads until this point ;)
