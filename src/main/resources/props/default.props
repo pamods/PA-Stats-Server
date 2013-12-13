@@ -9,8 +9,7 @@ minDataPointsToKeep = 0
 
 liveGameThreshold=16000
 
-#less pages than on the prod system as the ping to the test db sucks from my local system
-listGamesPageSize = 5;
+listGamesPageSize = 35;
 
 jslibs=jquery jqueryui knockout globalize d3 d3layout rickshaw
 csslibs=jqueryuicss rickshawcss

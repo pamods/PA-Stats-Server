@@ -11,7 +11,7 @@ package info.nanodesu.generated.tables;
 @java.lang.SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class V2Game extends org.jooq.impl.TableImpl<info.nanodesu.generated.tables.records.V2GameRecord> {
 
-	private static final long serialVersionUID = -1993919893;
+	private static final long serialVersionUID = 144477554;
 
 	/**
 	 * The singleton instance of <code>public.v2_game</code>
@@ -60,6 +60,11 @@ public class V2Game extends org.jooq.impl.TableImpl<info.nanodesu.generated.tabl
 	 * The column <code>public.v2_game.winner</code>. 
 	 */
 	public final org.jooq.TableField<info.nanodesu.generated.tables.records.V2GameRecord, java.lang.String> WINNER = createField("winner", org.jooq.impl.SQLDataType.VARCHAR.defaulted(true), this);
+
+	/**
+	 * The column <code>public.v2_game.winner_team</code>. 
+	 */
+	public final org.jooq.TableField<info.nanodesu.generated.tables.records.V2GameRecord, java.lang.Integer> WINNER_TEAM = createField("winner_team", org.jooq.impl.SQLDataType.INTEGER, this);
 
 	/**
 	 * Create a <code>public.v2_game</code> table reference

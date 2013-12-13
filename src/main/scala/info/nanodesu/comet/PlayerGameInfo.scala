@@ -37,8 +37,14 @@ class PlayerGameInfo extends GameComet {
 	      for (p <- activeReporters.selectActiveReportersWithName(db, gId)) yield {
 	        val inf = GameAndPlayerInfoCollector(db, p.id, gId)
 	        
+	        val playerNameStyleAddition = {
+	          if (p.primaryColor != null && p.secondaryColor != null) 
+	            s"color:${p.primaryColor};border-bottom: 1px solid ${p.secondaryColor};" 
+	          else ""
+	        } 
+	          
 	        ".playername *" #> p.name &
-	          ".playername [style]" #> (s"color:${p.primaryColor};border-bottom: 1px solid ${p.secondaryColor};font-weight:bold;") &
+	          ".playername [style]" #> (playerNameStyleAddition+"font-weight:bold;") &
 	          ".avgbuildspeed *" #> inf.buildSpeed &
 	          ".summetal *" #> inf.sumMetal &
 	          ".metalused *" #> inf.metalUseAvg &

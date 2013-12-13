@@ -298,10 +298,14 @@ $(function() {
 						y : val
 					});
 				}
+				var teamColor = palette.color();
+				if (playerInfo[playerName].color) {
+					teamColor = playerInfo[playerName].color;
+				}
 				tableData.push({
 					name : playerInfo[playerName].name,
 					data : playerData,
-					color : playerInfo[playerName].color,
+					color : teamColor,
 				});
 			}
 

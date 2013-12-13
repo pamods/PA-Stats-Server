@@ -31,7 +31,8 @@ CREATE TABLE v2_game (
 	end_time timestamp NOT NULL,
 	planet integer references v2_planet (id) NOT NULL,
 	pa_version varchar default 'unknown',
-	winner varchar default 'unknown'
+	winner varchar default 'unknown',
+	winner_team integer
 );
 
 CREATE TABLE v2_player_display_name (

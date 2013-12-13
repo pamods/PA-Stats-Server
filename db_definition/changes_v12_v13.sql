@@ -7,8 +7,10 @@ CREATE TABLE v2_teams (
 
 alter table v2_player_game_rel add column t integer REFERENCES v2_teams(id) ON DELETE CASCADE;
 
+alter table v2_game add column winner_team integer;
+
 CREATE SEQUENCE team_id start 2;
-insert into v2_teams (id, primary_color, secondary_color) VALUES (1, 'rgb(255,0,0)', 'rgb(0,0,0)');
+insert into v2_teams (id, primary_color, secondary_color) VALUES (1);
 
 update v2_player_game_rel set t = 1;
 alter table v2_player_game_rel alter column t set not null;

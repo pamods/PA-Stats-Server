@@ -30,6 +30,8 @@ import org.jooq.impl.DSL._
 import org.jooq.scala.Conversions._
 import java.sql.Timestamp
 import info.nanodesu.model.db.collectors.gameinfo.ChartDataCollector
+import java.math.BigInteger
+import java.lang.Long
 
 object StatisticsReportService extends RestHelper with Loggable {
 
@@ -37,8 +39,53 @@ object StatisticsReportService extends RestHelper with Loggable {
     LiftRules.statelessDispatch append StatisticsReportService
   }
 
-  case class GameShortInfo(id: Int, start: Long, reporters: List[String])
+  case class Player(playerId: Int, playerName: String)
+  case class Team(teamId: Int, players: List[Player])
+  case class Game(gameId: Int, teams: List[Team], winner: Int)
+  serve {
+    case "report" :: "winners" :: Nil Get _ =>
 
+      val gameList = for (
+        start <- Helpers.tryo(S.param("start").map(Long.valueOf).get);
+        duration <- Helpers.tryo(S.param("duration").map(Long.valueOf).get)
+      ) yield {
+        val startTime = BigInteger.valueOf(start)
+        val endTime = startTime.add(BigInteger.valueOf(duration))
+
+        CookieBox withSession { db =>
+          val result = db.select(teams.INGAME_ID, playerGameRels.P, names.DISPLAY_NAME, games.WINNER_TEAM, games.ID).
+            from(playerGameRels).
+            join(games).onKey().
+            join(stats).on(stats.PLAYER_GAME === playerGameRels.ID). // limit to rows that have some stats => reporters
+            join(players).onKey().
+            join(names).onKey().
+            join(teams).onKey().
+            where(games.WINNER_TEAM.isNotNull()).
+            and(epoch(games.START_TIME).gt(startTime)).
+            and(epoch(games.START_TIME).lt(endTime)).
+            groupBy(teams.INGAME_ID, playerGameRels.P, names.DISPLAY_NAME, games.WINNER_TEAM, games.ID).orderBy(games.ID).fetch()
+
+          val lst = result.asScala.toList
+          val byGames = lst.groupBy(_.getValue(games.ID))
+
+          byGames.map(x => {
+            val byTeam = x._2.groupBy(_.getValue(teams.INGAME_ID))
+            val teamsWithPlayers = byTeam.map(t => {
+              val playersInTeam = t._2.map(foo => Player(foo.getValue(playerGameRels.P), foo.getValue(names.DISPLAY_NAME)))
+              Team(t._1, playersInTeam)
+            }).toList
+            Game(x._1, teamsWithPlayers, x._2.head.getValue(games.WINNER_TEAM))
+          }).toList
+        }
+      }
+      
+      gameList match {
+        case Full(x) => Extraction decompose x
+        case _ => BadResponse()
+      }
+  }
+
+  case class GameShortInfo(id: Int, start: Long, reporters: List[String])
   serve {
     case "report" :: "games" :: Nil Get _ =>
 
@@ -70,7 +117,7 @@ object StatisticsReportService extends RestHelper with Loggable {
       OkResponse()
   }
 
-  case class VictorNotification(gameLink: Int, victor: String) {}
+  case class VictorNotification(gameLink: Int, victor: String, teamIndex: Int) {}
   object VictorNotification {
     private implicit val formats = net.liftweb.json.DefaultFormats
     def apply(in: JValue): Box[VictorNotification] = Helpers.tryo(in.extract[VictorNotification])
@@ -79,10 +126,13 @@ object StatisticsReportService extends RestHelper with Loggable {
   serve {
     case "report" :: "winner" :: Nil JsonPut VictorNotification(data) -> _ =>
 
+      val winnerTeam = if (data.teamIndex != -1) data.teamIndex: Integer else null
+
       for (gameId <- ReportDataC.getGameIdForLink(data.gameLink)) {
         CookieBox withSession { db =>
           db.update(games).
             set(games.WINNER, data.victor).
+            set(games.WINNER_TEAM, winnerTeam).
             where(games.ID === gameId).
             execute()
         }

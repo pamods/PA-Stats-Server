@@ -14,11 +14,6 @@ package info.nanodesu.generated;
 public class Tables {
 
 	/**
-	 * The table public.player_game_rel_summary
-	 */
-	public static final info.nanodesu.generated.tables.PlayerGameRelSummary PLAYER_GAME_REL_SUMMARY = info.nanodesu.generated.tables.PlayerGameRelSummary.PLAYER_GAME_REL_SUMMARY;
-
-	/**
 	 * The table public.v2_display_name_history
 	 */
 	public static final info.nanodesu.generated.tables.V2DisplayNameHistory V2_DISPLAY_NAME_HISTORY = info.nanodesu.generated.tables.V2DisplayNameHistory.V2_DISPLAY_NAME_HISTORY;

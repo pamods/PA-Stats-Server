@@ -12,7 +12,6 @@ import info.nanodesu.lib.Formattings._
 import info.nanodesu.lib.db.CookieFunc._
 import info.nanodesu.model.db.updaters.reporting.GenerateNewPlayer
 import java.sql.Timestamp
-import info.nanodesu.generated.tables.PlayerGameRelSummary
 import net.liftweb.json.JValue
 import net.liftweb.json.Extraction
 
