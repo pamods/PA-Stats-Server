@@ -68,6 +68,7 @@ class Boot extends Loggable {
     val entries = List(
       Menu.i("Info") / "index",
       Menu.i("Installation") / "download",
+      Menu.i("Updates") / "updates",
       Menu.i("Games") / "listgames",
       Menu.i("Players") / PlayerSearchPage.pageName,
       Menu.i("Extra") / StatsPage.pageName,

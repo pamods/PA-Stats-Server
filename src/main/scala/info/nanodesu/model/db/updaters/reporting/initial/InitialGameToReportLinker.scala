@@ -202,7 +202,7 @@ object InitialGameToReport {
         where(playerGameRels.T === teamId).
         and(playerGameRels.G === gameId).
         and(names.DISPLAY_NAME === displayName).
-        and(players.UBER_NAME.isNull()).fetch().intoArray(0, classOf[Int])
+        and(players.UBER_NAME.isNull()).fetch(0, classOf[Int])
 
       // TODO there has to be a better way to do this, but I don't feel like doing more complex joins right now
       def hasOnlyASingleGame(playerId: Int) = {

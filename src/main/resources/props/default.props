@@ -9,7 +9,7 @@ minDataPointsToKeep = 0
 
 liveGameThreshold=16000
 
-listGamesPageSize = 35;
+listGamesPageSize = 5;
 
 jslibs=jquery jqueryui knockout globalize d3 d3layout rickshaw
 csslibs=jqueryuicss rickshawcss
