@@ -13,14 +13,11 @@ object SmallGamesCleaner extends RefreshRunner{
 	
 	var minDataPointsToKeep = 0;
 	var minGameLength = 0
-	var deleteSinglePlayerGames = false
 	  
 	override def initLoad() = {
 	  minGameLength = Props.getInt("minGameLength", 5)
-	  deleteSinglePlayerGames = Props.getBool("deleteSinglePlayerGames", true)
 	  minDataPointsToKeep = Props.getInt("minDataPointsToKeep", 5);
 	  logger info "will delete games below a length of " + minGameLength + " minutes"
-	  logger info "deleteSinglePlayerGames = "+deleteSinglePlayerGames
 	  logger info "will delete datapoints if player has less than " + minDataPointsToKeep + " datapoints"
 	}
 	

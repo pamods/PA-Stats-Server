@@ -16,6 +16,7 @@ import org.jooq.util.postgres.PostgresDataType
 import java.sql.Date
 import net.liftweb.common.Empty
 import info.nanodesu.model.db.collectors.playerinfo.loader.CountGamesForPlayerLoader
+import info.nanodesu.model.db.collectors.playerinfo.loader.IsReporterLoader
 
 class PlayerInfoCollector(db: DSLContext, player: Int, gameId: Option[Int]) 
 	extends GameAndPlayerInfoCollector(db, player, gameId) {
@@ -24,13 +25,16 @@ class PlayerInfoCollector(db: DSLContext, player: Int, gameId: Option[Int])
   val gamesCount = if (gameId.isEmpty) getPlayerGamesCount(db, player) else 0
   val playerGameTime = if (gameId.isEmpty) prettyTime(getPlayerGameTimeSum(db, player)) else ""
   val playerGameTimeAvg = if (gameId.isEmpty) prettyTime(getPlayerGameTimeAvg(db, player)) else ""
-  val currentDisplayName = getCurrentDisplayName(db, player)
+  val currentDisplayName = selectCurrentDisplayName(db, player)
+  val isReporter = selectIsReporter(db, player)
 }
 
 object PlayerInfoCollector extends GameAndPlayerInfoCollectorBase{
   def apply(db: DSLContext, playerId: Int, gameId: Box[Int] = Empty) = new PlayerInfoCollector(db, playerId, gameId)
   
-  private def getCurrentDisplayName(db: DSLContext, player: Int) = {
+  private def selectIsReporter(db: DSLContext, player: Int) = new IsReporterLoader().selectIsReporter(db, player)
+  
+  private def selectCurrentDisplayName(db: DSLContext, player: Int) = {
     db.select(names.DISPLAY_NAME).
     	from(players).
     	join(names).onKey().

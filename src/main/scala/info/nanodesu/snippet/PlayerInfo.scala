@@ -30,18 +30,20 @@ object PlayerInfo extends DispatchSnippet with Loggable {
     val inf = CookieBox withSession { db =>
       PlayerInfoCollector(db, selectedPlayer)
     }
-
-    val p = selectedPlayer
-    "#playerName *" #> inf.currentDisplayName &
-      "#gamesplayed *" #> inf.gamesCount &
-      "#gametimesum *" #> inf.playerGameTime &
-      "#gametimeavg *" #> inf.playerGameTimeAvg &
-      "#avgapm *" #> inf.apmAvg &
-      "#summetal *" #> inf.sumMetal &
-      "#sumenergy *" #> inf.sumEnergy &
-      "#metalusageavg *" #> inf.metalUseAvg &
-      "#energyusageavg *" #> inf.energyUseAvg &
-      "#avgbuildspeed *" #> inf.buildSpeed
+    if (inf.isReporter) {
+      "#playerName *" #> inf.currentDisplayName &
+        "#gamesplayed *" #> inf.gamesCount &
+        "#gametimesum *" #> inf.playerGameTime &
+        "#gametimeavg *" #> inf.playerGameTimeAvg &
+        "#avgapm *" #> inf.apmAvg &
+        "#summetal *" #> inf.sumMetal &
+        "#sumenergy *" #> inf.sumEnergy &
+        "#metalusageavg *" #> inf.metalUseAvg &
+        "#energyusageavg *" #> inf.energyUseAvg &
+        "#avgbuildspeed *" #> inf.buildSpeed
+    } else {
+      "#playerName *" #> "unknown player ID!"
+    }
   }
 
   private def doNameHistory = "#line" #> {

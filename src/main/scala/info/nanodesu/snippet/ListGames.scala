@@ -29,6 +29,7 @@ import info.nanodesu.snippet.lib.PagedSnippet
 import info.nanodesu.model.db.collectors.gameinfo.loader.CountGamesLoader
 import info.nanodesu.model.db.collectors.playerinfo.loader.CountGamesForPlayerLoader
 import info.nanodesu.pages._
+import info.nanodesu.model.db.collectors.playerinfo.loader.IsReporterLoader
 
 /**
  * Snippet lists games, either all of them or limited to one player.
@@ -57,7 +58,13 @@ object ListGames extends DispatchSnippet with PagedSnippet {
 
   private def doList = "#line" #> {
     val ourPlayer = selectedPlayer
-    val games = (CookieBox withSession (GameListCollector(_))).getGameList(offset, pageMaxSize, ourPlayer)
+    val games = CookieBox withSession { db =>
+      if (ourPlayer.isEmpty || new IsReporterLoader().selectIsReporter(db, ourPlayer.getOrElse(-1))) {
+        GameListCollector(db).getGameList(offset, pageMaxSize, ourPlayer)
+      } else {
+        Nil
+      }
+    }
 
     games.map(x => {
       ".gamenum *" #> (<a>#{ x.id }</a> % GamePage.makeLinkAttribute(GameIdParam(x.id))) &
