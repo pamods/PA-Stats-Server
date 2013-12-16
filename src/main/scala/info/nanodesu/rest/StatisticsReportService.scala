@@ -113,6 +113,9 @@ object StatisticsReportService extends RestHelper with Loggable {
             where(playerGameRels.ID === link).
             execute()
         }
+        for (gameId <- ReportDataC.getGameIdForLink(link)) {
+          GameCometServer ! GameDataUpdate(gameId)
+        }
       }
       OkResponse()
   }
