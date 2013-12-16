@@ -3,7 +3,7 @@ dbName=rbz
 queryUrl=http://www.nanodesu.info/pastats/report/get
 
 minGameLength=5
-deletionInterval=5
+deletionInterval=10
 
 minDataPointsToKeep = 12;
 

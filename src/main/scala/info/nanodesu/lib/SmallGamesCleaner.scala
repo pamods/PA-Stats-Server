@@ -7,7 +7,7 @@ import info.nanodesu.model.db.updaters.cleaners.ForceUnlocker
 import info.nanodesu.model.db.updaters.cleaners.ObserverDataCleaner
 
 object SmallGamesCleaner extends RefreshRunner{
-	override val firstLoadDelay = 1000 * 60
+	override val firstLoadDelay = 1000 * 60 * 3
 	override def RUN_INTERVAL = 1000 * 60 * Props.getInt("deletionInterval", 5)
 	val processName = "small games cleaner"
 	

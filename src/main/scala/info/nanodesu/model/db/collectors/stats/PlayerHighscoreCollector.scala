@@ -12,8 +12,8 @@ import info.nanodesu.lib.db.CookieFunc._
 
 class PlayerHighscoreCollector {
   val maxUnitsPlayer = PlayerHighscoreCollector.maxUnitsPlayer
-  val maxMetalPlayer = PlayerHighscoreCollector.maxMetalPlayer
-  val maxEnergyPlayer = PlayerHighscoreCollector.maxEnergyPlayer
+  //val maxMetalPlayer = PlayerHighscoreCollector.maxMetalPlayer
+  //val maxEnergyPlayer = PlayerHighscoreCollector.maxEnergyPlayer
 }
 
 case class PlayerHighscore(name: String, pid: Int, score: Int, game: Int)
@@ -21,8 +21,8 @@ case class PlayerHighscore(name: String, pid: Int, score: Int, game: Int)
 object PlayerHighscoreCollector extends RefreshRunner {
   def apply() = new PlayerHighscoreCollector()
 
-  override val firstLoadDelay = 60 * 1000
-  override val RUN_INTERVAL = 1000 * 60 * 20
+  override val firstLoadDelay = 60 * 1000 * 5
+  override val RUN_INTERVAL = 1000 * 60 * 60 // once per hour, these are slow queries
   val processName = "worker: " + getClass().getName()
 
   private var maxUnitsPlayer: Option[PlayerHighscore] = None
@@ -32,13 +32,15 @@ object PlayerHighscoreCollector extends RefreshRunner {
 
   def runQuery() = CookieBox withSession { db =>
     maxUnitsPlayer = Some(queryMaxScorePlayer(db, stats.ARMY_COUNT))
-    maxMetalPlayer = Some(queryMaxScorePlayer(db, stats.METAL_INCOME))
-    maxEnergyPlayer = Some(queryMaxScorePlayer(db, stats.ENERGY_INCOME))
+   // maxMetalPlayer = Some(queryMaxScorePlayer(db, stats.METAL_INCOME))
+   // maxEnergyPlayer = Some(queryMaxScorePlayer(db, stats.ENERGY_INCOME))
   }
 
   // jooq is the most epic SQL library ever, 
   // in fact it's the only kind-of-ORM lib that actually feels useful to me
   private def queryMaxScorePlayer[T](db: DSLContext, f: Field[T]) = {
+    // query does a seq scan on old timepoint stats to find the max
+    // current execution time is ~10s
     db.select(commaListDistinctField(names.DISPLAY_NAME), players.ID, f, playerGameRels.G).
       from(stats).
       join(playerGameRels).onKey().
