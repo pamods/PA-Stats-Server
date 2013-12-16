@@ -16,28 +16,87 @@ import org.jooq.util.postgres.PostgresDataType
 import java.sql.Date
 import net.liftweb.common.Empty
 import info.nanodesu.model.db.collectors.playerinfo.loader.CountGamesForPlayerLoader
+import info.nanodesu.model.db.collectors.playerinfo.loader.IsReporterLoader
+import net.liftweb.common.Loggable
+import java.math.BigInteger
 
-class PlayerInfoCollector(db: DSLContext, player: Int, gameId: Option[Int]) 
-	extends GameAndPlayerInfoCollector(db, player, gameId) {
+case class DailyValue(day: Long, value: Double)
+
+case class ValuesPoint(timepoint: Long, games: Int, metalUsage: Double, energyUsage: Double)
+case class NameValue(name: String)
+case class DailyValues(
+    data: Map[String, List[ValuesPoint]],
+    info: Map[String, NameValue]
+)
+
+class PlayerInfoCollector(db: DSLContext, player: Int, gameId: Option[Int])
+  extends GameAndPlayerInfoCollector(db, player, gameId) with Loggable {
   import PlayerInfoCollector._
 
   val gamesCount = if (gameId.isEmpty) getPlayerGamesCount(db, player) else 0
   val playerGameTime = if (gameId.isEmpty) prettyTime(getPlayerGameTimeSum(db, player)) else ""
   val playerGameTimeAvg = if (gameId.isEmpty) prettyTime(getPlayerGameTimeAvg(db, player)) else ""
-  val currentDisplayName = getCurrentDisplayName(db, player)
+  val currentDisplayName = selectCurrentDisplayName(db, player)
+  val isReporter = selectIsReporter(db, player)
+  
+  private val dailyGames = selectDailyGames(db, player)
+  private val dailyMetalUsage = selectDailyResouceUsage(db, player, stats.METAL_COLLECTED, stats.METAL_WASTED)
+  private val dailyEnergyUsage = selectDailyResouceUsage(db, player, stats.ENERGY_COLLECTED, stats.ENERGY_WASTED)
+  
+  def dailyValues = {
+    val values = for (d <- (dailyGames, dailyMetalUsage, dailyEnergyUsage).zipped.toList) yield {
+      if (!(d._1.day == d._2.day && d._2.day == d._3.day)) {
+        logger warn s"something is wrong player = $player => " + d
+      }
+      ValuesPoint(d._1.day, d._1.value.toInt, d._2.value, d._3.value)
+    }
+    
+    DailyValues(Map(player.toString -> values), Map(player.toString -> NameValue(currentDisplayName)))
+  }
 }
 
-object PlayerInfoCollector extends GameAndPlayerInfoCollectorBase{
+object PlayerInfoCollector extends GameAndPlayerInfoCollectorBase with Loggable {
   def apply(db: DSLContext, playerId: Int, gameId: Box[Int] = Empty) = new PlayerInfoCollector(db, playerId, gameId)
-  
-  private def getCurrentDisplayName(db: DSLContext, player: Int) = {
+
+  private def selectIsReporter(db: DSLContext, player: Int) = new IsReporterLoader().selectIsReporter(db, player)
+
+  private def selectCurrentDisplayName(db: DSLContext, player: Int) = {
     db.select(names.DISPLAY_NAME).
-    	from(players).
-    	join(names).onKey().
-    	where(players.ID === player).
-    fetchOne(0, classOf[String])
+      from(players).
+      join(names).onKey().
+      where(players.ID === player).
+      fetchOne(0, classOf[String])
   }
-  
+
+  private def selectDailyGames(db: DSLContext, player: Int) = {
+    db.select(
+      epoch(dayTrunk(games.START_TIME)),
+      playerGameRels.ID.countDistinct()).
+      from(playerGameRels).
+      join(stats).onKey().
+      join(games).onKey().
+      join(players).onKey().
+      where(players.ID === player).
+      and(playerGameRels.LOCKED.isFalse()).
+      groupBy(dayTrunk(games.START_TIME)).
+      orderBy(dayTrunk(games.START_TIME)).
+      fetchInto(classOf[DailyValue]).toList
+  }
+
+  private def selectDailyResouceUsage(db: DSLContext, player: Int, resCollected: Field[_ <: Number], resWasted: Field[_ <: Number]) = {
+    db.select(epoch(dayTrunk(games.START_TIME)), 
+        decode().when(sum(resCollected) > 0, -(sum(resWasted).cast(PostgresDataType.NUMERIC) / sum(resCollected)) 
+            + (new JBigDecimal(1))).otherwise(1)).
+      from(stats).
+      join(playerGameRels).onKey().
+      join(games).onKey().
+      where(playerGameRels.LOCKED.isFalse())
+      .and(playerGameRels.P === player).
+      groupBy(dayTrunk(games.START_TIME)).
+      orderBy(dayTrunk(games.START_TIME)).
+      fetchInto(classOf[DailyValue]).toList
+  }
+
   private def getPlayerGamesCount(db: DSLContext, player: Int) = new CountGamesForPlayerLoader(db).selectPlayerGamesCount(player)
   private def getPlayerGameTimeSum(db: DSLContext, player: Int) = getPlayerGameTime(db, player, _.sum).fetchOne(0, classOf[Long])
   private def getPlayerGameTimeAvg(db: DSLContext, player: Int) = getPlayerGameTime(db, player, _.avg).fetchOne(0, classOf[Long])

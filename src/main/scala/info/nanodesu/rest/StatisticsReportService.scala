@@ -32,6 +32,7 @@ import java.sql.Timestamp
 import info.nanodesu.model.db.collectors.gameinfo.ChartDataCollector
 import java.math.BigInteger
 import java.lang.Long
+import org.apache.commons.lang.StringUtils
 
 object StatisticsReportService extends RestHelper with Loggable {
 
@@ -53,17 +54,17 @@ object StatisticsReportService extends RestHelper with Loggable {
         val endTime = startTime.add(BigInteger.valueOf(duration))
 
         CookieBox withSession { db =>
-          val result = db.select(teams.INGAME_ID, playerGameRels.P, names.DISPLAY_NAME, games.WINNER_TEAM, games.ID).
+          val result = db.select(teams.INGAME_ID, playerGameRels.P, names.DISPLAY_NAME, games.WINNER_TEAM, games.ID, players.UBER_NAME).
             from(playerGameRels).
             join(games).onKey().
-            join(stats).on(stats.PLAYER_GAME === playerGameRels.ID). // limit to rows that have some stats => reporters
+            leftOuterJoin(stats).on(stats.PLAYER_GAME === playerGameRels.ID).
             join(players).onKey().
             join(names).onKey().
             join(teams).onKey().
             where(games.WINNER_TEAM.isNotNull()).
             and(epoch(games.START_TIME).gt(startTime)).
             and(epoch(games.START_TIME).lt(endTime)).
-            groupBy(teams.INGAME_ID, playerGameRels.P, names.DISPLAY_NAME, games.WINNER_TEAM, games.ID).orderBy(games.ID).fetch()
+            groupBy(teams.INGAME_ID, playerGameRels.P, names.DISPLAY_NAME, games.WINNER_TEAM, games.ID, players.UBER_NAME).orderBy(games.ID).fetch()
 
           val lst = result.asScala.toList
           val byGames = lst.groupBy(_.getValue(games.ID))
@@ -71,7 +72,12 @@ object StatisticsReportService extends RestHelper with Loggable {
           byGames.map(x => {
             val byTeam = x._2.groupBy(_.getValue(teams.INGAME_ID))
             val teamsWithPlayers = byTeam.map(t => {
-              val playersInTeam = t._2.map(foo => Player(foo.getValue(playerGameRels.P), foo.getValue(names.DISPLAY_NAME)))
+              val playersInTeam = t._2.map { foo =>
+                val uberNameIsEmpty = StringUtils.isBlank(foo.getValue(players.UBER_NAME))
+                val id: Int = if (uberNameIsEmpty) -1 else foo.getValue(playerGameRels.P)
+                val name = if (uberNameIsEmpty) "Anon" else foo.getValue(names.DISPLAY_NAME)
+                Player(id, name)
+              }
               Team(t._1, playersInTeam)
             }).toList
             Game(x._1, teamsWithPlayers, x._2.head.getValue(games.WINNER_TEAM))
@@ -112,6 +118,9 @@ object StatisticsReportService extends RestHelper with Loggable {
             set(playerGameRels.LOCKED, JFALSE).
             where(playerGameRels.ID === link).
             execute()
+        }
+        for (gameId <- ReportDataC.getGameIdForLink(link)) {
+          GameCometServer ! GameDataUpdate(gameId)
         }
       }
       OkResponse()

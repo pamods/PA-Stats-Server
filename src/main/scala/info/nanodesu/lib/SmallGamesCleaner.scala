@@ -7,20 +7,17 @@ import info.nanodesu.model.db.updaters.cleaners.ForceUnlocker
 import info.nanodesu.model.db.updaters.cleaners.ObserverDataCleaner
 
 object SmallGamesCleaner extends RefreshRunner{
-	override val firstLoadDelay = 1000 * 60
+	override val firstLoadDelay = 1000 * 60 * 3
 	override def RUN_INTERVAL = 1000 * 60 * Props.getInt("deletionInterval", 5)
 	val processName = "small games cleaner"
 	
 	var minDataPointsToKeep = 0;
 	var minGameLength = 0
-	var deleteSinglePlayerGames = false
 	  
 	override def initLoad() = {
 	  minGameLength = Props.getInt("minGameLength", 5)
-	  deleteSinglePlayerGames = Props.getBool("deleteSinglePlayerGames", true)
 	  minDataPointsToKeep = Props.getInt("minDataPointsToKeep", 5);
 	  logger info "will delete games below a length of " + minGameLength + " minutes"
-	  logger info "deleteSinglePlayerGames = "+deleteSinglePlayerGames
 	  logger info "will delete datapoints if player has less than " + minDataPointsToKeep + " datapoints"
 	}
 	

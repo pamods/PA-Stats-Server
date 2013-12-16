@@ -20,8 +20,8 @@ object MostPlaytimesCollector extends RefreshRunner {
 
   def apply() = new MostPlaytimesCollector()
 
-  override val firstLoadDelay = 30 * 1000
-  override val RUN_INTERVAL = 1000 * 60 * 20
+  override val firstLoadDelay = 60 * 1000 * 10
+  override val RUN_INTERVAL = 1000 * 60 * 60 * 6
   val processName = "worker: " + getClass().getName()
 
   @volatile

@@ -53,17 +53,17 @@ object Stats extends DispatchSnippet {
     "#maxUnitsName [href]" #> h.maxUnitsPlayer.map(toPlayerLink) &
     "#maxUnitCount" #> h.maxUnitsPlayer.map(_.score) &
     "#maxUnitGame [href]" #> h.maxUnitsPlayer.map(toGameLink) &
-    "#maxUnitGame *+" #> h.maxUnitsPlayer.map(_.game) &
-    "#maxMetalName *+" #> h.maxMetalPlayer.map(_.name) &
-    "#maxMetalName [href]" #> h.maxMetalPlayer.map(toPlayerLink) &
-    "#maxMetalSum" #> h.maxMetalPlayer.map(_.score).map(Formattings.formatKMBT(_)) &
-    "#maxMetalGame [href]" #> h.maxMetalPlayer.map(toGameLink) &
-    "#maxMetalGame *+" #> h.maxMetalPlayer.map(_.game) &
-    "#maxEnergyName *+" #> h.maxEnergyPlayer.map(_.name) &
-    "#maxEnergyName [href]" #> h.maxEnergyPlayer.map(toPlayerLink) &
-    "#maxEnergySum" #> h.maxEnergyPlayer.map(_.score).map(Formattings.formatKMBT(_))  &
-    "#maxEnergyGame [href]" #> h.maxEnergyPlayer.map(toGameLink) &
-    "#maxEnergyGame *+" #> h.maxEnergyPlayer.map(_.game)
+    "#maxUnitGame *+" #> h.maxUnitsPlayer.map(_.game) //&
+//    "#maxMetalName *+" #> h.maxMetalPlayer.map(_.name) &
+//    "#maxMetalName [href]" #> h.maxMetalPlayer.map(toPlayerLink) &
+//    "#maxMetalSum" #> h.maxMetalPlayer.map(_.score).map(Formattings.formatKMBT(_)) &
+//    "#maxMetalGame [href]" #> h.maxMetalPlayer.map(toGameLink) &
+//    "#maxMetalGame *+" #> h.maxMetalPlayer.map(_.game) &
+//    "#maxEnergyName *+" #> h.maxEnergyPlayer.map(_.name) &
+//    "#maxEnergyName [href]" #> h.maxEnergyPlayer.map(toPlayerLink) &
+//    "#maxEnergySum" #> h.maxEnergyPlayer.map(_.score).map(Formattings.formatKMBT(_))  &
+//    "#maxEnergyGame [href]" #> h.maxEnergyPlayer.map(toGameLink) &
+//    "#maxEnergyGame *+" #> h.maxEnergyPlayer.map(_.game)
   }
 
   private def doGeneral = {

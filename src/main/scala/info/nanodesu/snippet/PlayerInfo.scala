@@ -16,6 +16,9 @@ import info.nanodesu.model.db.collectors.playerinfo.PlayerInfoCollector
 import info.nanodesu.lib.db.CookieBox
 import info.nanodesu.model.db.collectors.playerinfo.PlayerHistoryInfo
 import info.nanodesu.model.db.collectors.playerinfo.PlayerHistoryEntry
+import net.liftweb.json.Extraction
+import net.liftweb.json._
+import net.liftweb.json.JsonDSL._
 
 object PlayerInfo extends DispatchSnippet with Loggable {
 
@@ -27,21 +30,34 @@ object PlayerInfo extends DispatchSnippet with Loggable {
   private def selectedPlayer = PlayerPage.getPlayerId openOr -1
 
   private def doInfo = {
+    implicit val formats = net.liftweb.json.DefaultFormats
+    
     val inf = CookieBox withSession { db =>
       PlayerInfoCollector(db, selectedPlayer)
     }
 
-    val p = selectedPlayer
-    "#playerName *" #> inf.currentDisplayName &
-      "#gamesplayed *" #> inf.gamesCount &
-      "#gametimesum *" #> inf.playerGameTime &
-      "#gametimeavg *" #> inf.playerGameTimeAvg &
-      "#avgapm *" #> inf.apmAvg &
-      "#summetal *" #> inf.sumMetal &
-      "#sumenergy *" #> inf.sumEnergy &
-      "#metalusageavg *" #> inf.metalUseAvg &
-      "#energyusageavg *" #> inf.energyUseAvg &
-      "#avgbuildspeed *" #> inf.buildSpeed
+    val graphData = 
+      <script type="text/javascript">
+{"// <![CDATA["}
+       var chartdata = {compact(render(Extraction decompose inf.dailyValues))};
+{"// ]]>"}
+      </script>
+    
+    if (inf.isReporter) {
+      "#playerName *" #> inf.currentDisplayName &
+        "#gamesplayed *" #> inf.gamesCount &
+        "#gametimesum *" #> inf.playerGameTime &
+        "#gametimeavg *" #> inf.playerGameTimeAvg &
+        "#avgapm *" #> inf.apmAvg &
+        "#summetal *" #> inf.sumMetal &
+        "#sumenergy *" #> inf.sumEnergy &
+        "#metalusageavg *" #> inf.metalUseAvg &
+        "#energyusageavg *" #> inf.energyUseAvg &
+        "#avgbuildspeed *" #> inf.buildSpeed &
+        "#timelinedatasource" #> graphData
+    } else {
+      "#playerName *" #> "unknown player ID!"
+    }
   }
 
   private def doNameHistory = "#line" #> {

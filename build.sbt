@@ -1,6 +1,6 @@
 name := "PA Stats"
 
-version := "13.0.0"
+version := "13.1.0"
 
 organization := "net.liftweb"
 

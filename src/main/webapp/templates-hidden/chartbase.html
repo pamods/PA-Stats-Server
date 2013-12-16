@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+<body data-lift-content-id="chartbase">
+	<div id="chartbase">
+		<div class="column span-24 last">
+			<div class="column span-6">
+				<ul class="stat" data-bind="foreach: stats">
+					<li
+						data-bind="text: $data.text,
+					css: {selected: $data == $root.selectedStat()}, 
+					click: $root.selectStat"></li>
+				</ul>
+			</div>
+			<div class="column span-18 last" id="fullchartcontainer">
+				<div class="column span-18 last" id="chartcontainer"></div>
+				<div class="column span-18 last" id="xaxis"></div>
+				<div class="column span-18 last" id="slider"></div>
+			</div>
+		</div>
+		<script src="/static/js/chartbase.js"></script>
+	</div>
+</body>

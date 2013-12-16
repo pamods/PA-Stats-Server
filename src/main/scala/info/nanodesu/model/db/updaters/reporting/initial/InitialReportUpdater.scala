@@ -114,11 +114,12 @@ object InitialReportUpdater {
     }
 
     def loadPlayerIdsByDisplayName(displayName: String): List[Int] = {
-      db.select(players.ID)
-        .from(players)
-        .join(names).onKey()
-        .where(names.DISPLAY_NAME === displayName)
-        .fetch().getValues(0, classOf[Int]).asScala.toList
+      db.select(players.ID).
+        from(players).
+        join(names).onKey().
+        where(names.DISPLAY_NAME === displayName).
+        and(players.UBER_NAME.isNull()).
+      fetch().getValues(0, classOf[Int]).asScala.toList
     }
 
     def linkPlayer(gameId: Int, teamId: Int, playerId: Int): Int = {

@@ -24,43 +24,61 @@
 					<span class="bigfont underline" id="playerName">Player</span>
 				</div>
 				<script>
-				// <![CDATA[
-					$('#prevnamesdialog').dialog({autoOpen: false, minWidth: 500});
+					// <![CDATA[
+					$('#prevnamesdialog').dialog({
+						autoOpen : false,
+						minWidth : 500
+					});
 					$("#playerName").click(function() {
 						$('#prevnamesdialog').dialog("open");
 					});
-				// ]]>
+					// ]]>
 				</script>
 				<div class="spacingtop bigfont">General stats</div>
 				<table>
 					<thead id="gametable">
 						<tr>
-							<th title="Number of games this player has reported">Games played</th>
-							<th title="Overall time the player spend playing while reporting">Game time</th>
-							<th title="Average time a game with this player takes">Game time Avg</th>
-							<th title="Average actions per minute over all games played">APM Avg</th>
+							<th title="Number of games this player has reported">Games
+								played</th>
+							<th title="Overall time the player spend playing while reporting">Game
+								time</th>
+							<th title="Average time a game with this player takes">Game
+								time Avg</th>
+							<th title="Average actions per minute over all games played">APM
+								Avg</th>
 							<th title="Total sum of all metal collected">All metal</th>
 							<th title="Total sum of all energy collected">All energy</th>
-							<th title="sum(metal actually used) / sum (metal collected) low values mean high amount of metal wasting">Metal usage Avg</th>
-							<th title="sum(energy actually used) / sum (energy collected) low values mean high amount of energy wasting">Energy usage Avg</th>
-							<th title="average of the build speed in all games">Build efficiency Avg</th>
+							<th
+								title="sum(metal actually used) / sum (metal collected) low values mean high amount of metal wasting">Metal
+								usage Avg</th>
+							<th
+								title="sum(energy actually used) / sum (energy collected) low values mean high amount of energy wasting">Energy
+								usage Avg</th>
+							<th title="average of the build speed in all games">Build
+								efficiency Avg</th>
 						</tr>
 					</thead>
 					<tbody>
 						<tr class="centertext">
-							<td id="gamesplayed">1</td>
-							<td id="gametimesum">2</td>
-							<td id="gametimeavg">3</td>
-							<td id="avgapm">7</td>
-							<td id="summetal">3</td>
-							<td id="sumenergy">4</td>
-							<td id="metalusageavg">5</td>
-							<td id="energyusageavg">6</td>
-							<td id="avgbuildspeed">8</td>
+							<td id="gamesplayed">0</td>
+							<td id="gametimesum">0</td>
+							<td id="gametimeavg">0</td>
+							<td id="avgapm">0</td>
+							<td id="summetal">0</td>
+							<td id="sumenergy">0</td>
+							<td id="metalusageavg">0</td>
+							<td id="energyusageavg">0</td>
+							<td id="avgbuildspeed">0</td>
 						</tr>
 					</tbody>
 				</table>
 			</div>
+
+			<div class="spacingtop bigfont">Timeline</div>
+			<div data-lift="embed?what=/templates-hidden/chartbase"></div>
+			<div id="timelinedatasource"></div>
+			<script src="/static/js/playerpage.js"></script>
+
 			<div class="spacingtop bigfont">Games</div>
 		</div>
 		<div data-lift="embed?what=/templates-hidden/gamelist"></div>

@@ -11,6 +11,10 @@ a {
 	margin-top: 10px;
 }
 
+#searchfield {
+	width: 200px;
+}
+
 .centertext {
 	text-align: center;
 }
@@ -84,6 +88,10 @@ a:hover {
 	color: #fff !important;
 }
 
+.teamsep {
+	color: white !important;
+}
+
 .pages a:hover {
 	text-decoration: none;
 	color: #fff;
@@ -99,11 +107,11 @@ a:hover {
 }
 
 tbody tr:nth-child(even) td,tbody tr.even td {
-	background-color: #ddd;
+	background-color: #ccc;
 }
 
 tbody tr:nth-child(odd) td,tbody tr.odd td {
-	background-color: #eee;
+	background-color: #ddd;
 }
 
 .topbar ul {

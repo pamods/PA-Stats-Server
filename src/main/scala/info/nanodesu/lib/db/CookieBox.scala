@@ -112,5 +112,6 @@ object CookieFunc {
   def pgDataBaseSize(db: String) = DSL.field("pg_database_size({0})", classOf[Long], DSL.inline(db))
   def commaListDistinctField(f: Field[String]) = DSL.field("array_to_string(array_agg(distinct {0}), ', ')", classOf[String], f)
   def epoch(f: Field[Timestamp]) = DSL.field("date_part('epoch', {0})", classOf[BigInteger], f)
+  def dayTrunk(f: Field[Timestamp]) = DSL.field("date_trunc('day', {0})", classOf[Timestamp], f)
 }
 

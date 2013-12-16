@@ -51,7 +51,7 @@ class GameTitleCollectorSpec extends Specification with Mockito with ScalaCheck 
   
   class GameTitleTest(val in: List[PlayerInfoForTitle], val gameId: Int = 12,
       val reporterCss: String = "bold", shouldCreateLinks: Boolean = false,
-      val linkedPlayerCss: String = "playerlink") {
+      val linkedPlayerCss: String = "playerlink", teamSepCss: String = "white") {
     def test(testFunc: (NodeSeq, GameTitleDbLayer) => MatchResult[_]) = {
       val db = mock[GameTitleDbLayer]
       db.selectPlayerInfoForGame(gameId) returns in
@@ -59,6 +59,7 @@ class GameTitleCollectorSpec extends Specification with Mockito with ScalaCheck 
       subject.reportingPlayerCss = reporterCss
       subject.shouldCreateLinks = shouldCreateLinks
       subject.linkedPlayerCss = linkedPlayerCss
+      subject.teamSepCss = teamSepCss
       val r = subject.createGameTitle(gameId)
       testFunc(r, db)
     }
@@ -115,6 +116,18 @@ class GameTitleCollectorSpec extends Specification with Mockito with ScalaCheck 
       new GameTitleTest(in) test { (nodes: NodeSeq, db: GameTitleDbLayer) =>
         val teamCnt = in.map(_.teamId).toSet.size
         sepTeams(nodes).length must_== teamCnt
+      }
+    }
+    
+    "mark the vs with the correct class" ! prop { in: List[PlayerInfoForTitle] =>
+      val teamCss = "teamCss"
+      new GameTitleTest(in, teamSepCss = "teamCss") test { (nodes: NodeSeq, db: GameTitleDbLayer) =>
+        val spans = nodes \\ "span"
+        val vsSpans = spans.filter(_.text == " vs ")
+        val matchers = for (span <- vsSpans) yield {
+          ((span \ "@class").text must_== teamCss)
+        }
+        if (matchers.isEmpty) ok else matchers.reduce(_ and _)
       }
     }
     

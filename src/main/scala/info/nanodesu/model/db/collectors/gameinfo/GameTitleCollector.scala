@@ -31,15 +31,17 @@ class GameTitleCollector(dbLayer: GameTitleDbLayer) {
   var shouldCreateLinks: Boolean = false
   var reportingPlayerCss: String = "bold"
   var linkedPlayerCss: String = "playerlink"
-
+  var teamSepCss: String = "teamsep"
+    
   def createGameTitle(gameId: Int): NodeSeq = {
     val players = dbLayer.selectPlayerInfoForGame(gameId).sortBy(x => (x.teamId, x.playerId))
     if (players.isEmpty) {
       NodeSeq.Empty
     } else {
       
+      def setClass(e: Elem, clazz: String) = e % Attribute(None, "class", Text(clazz), Null)
+      
       def markupPlayer(player: PlayerInfoForTitle): Elem = {
-        def setClass(e: Elem, clazz: String) = e % Attribute(None, "class", Text(clazz), Null)
         def baseElem = <span>{ player.playerName }</span>
         
         player.playerId match {
@@ -67,7 +69,7 @@ class GameTitleCollector(dbLayer: GameTitleDbLayer) {
         val playerElements = groupedByTeam(x).map(markupPlayer).map(x => x ++ NodeSeq.Empty)
         linkElemsWith(playerElements, playerSep)
       }
-      linkElemsWith(teamNodeSeqs, teamSep)
+      linkElemsWith(teamNodeSeqs, setClass(teamSep, teamSepCss))
     }
   }
 }
