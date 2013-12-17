@@ -7,6 +7,7 @@ import net.liftweb.util.Props
  * Formatting helpers
  */
 object Formattings {
+  def unicodeEscape(in: String): String = in.map(x => "\\u%04X".format(x.toInt)).foldRight("")((a, b) => a+b) 
   
   def formatGameDuration(start: Long, end: Long) = {
     val liveGameThreshold = Props.getInt("liveGameThreshold").openOr(15000)
