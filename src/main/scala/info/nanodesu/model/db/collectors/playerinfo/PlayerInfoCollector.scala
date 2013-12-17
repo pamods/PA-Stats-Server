@@ -20,6 +20,8 @@ import info.nanodesu.model.db.collectors.playerinfo.loader.IsReporterLoader
 import net.liftweb.common.Loggable
 import java.math.BigInteger
 import org.apache.commons.lang.StringEscapeUtils
+import info.nanodesu.lib.Formattings
+import net.liftweb.util.StringHelpers
 
 case class DailyValue(day: Long, value: Double)
 
@@ -51,7 +53,7 @@ class PlayerInfoCollector(db: DSLContext, player: Int, gameId: Option[Int])
       }
       ValuesPoint(d._1.day, d._1.value.toInt, d._2.value, d._3.value)
     }
-    
+    																			// we need to escape here or are in danger of weird illegal characters on the page :(
     DailyValues(Map(player.toString -> values), Map(player.toString -> NameValue(StringEscapeUtils.escapeHtml(currentDisplayName))))
   }
 }
