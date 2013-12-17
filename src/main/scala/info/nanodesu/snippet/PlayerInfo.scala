@@ -19,6 +19,7 @@ import info.nanodesu.model.db.collectors.playerinfo.PlayerHistoryEntry
 import net.liftweb.json.Extraction
 import net.liftweb.json._
 import net.liftweb.json.JsonDSL._
+import info.nanodesu.lib.Formattings
 
 object PlayerInfo extends DispatchSnippet with Loggable {
 
@@ -35,13 +36,11 @@ object PlayerInfo extends DispatchSnippet with Loggable {
     val inf = CookieBox withSession { db =>
       PlayerInfoCollector(db, selectedPlayer)
     }
-
+    
+    val txt = s"var chartdata = ${compact(render(Extraction decompose inf.dailyValues))}"
+    
     val graphData = 
-      <script type="text/javascript">
-{"// <![CDATA["}
-       var chartdata = {compact(render(Extraction decompose inf.dailyValues))};
-{"// ]]>"}
-      </script>
+      <script type="text/javascript">{txt}</script>
     
     if (inf.isReporter) {
       "#playerName *" #> inf.currentDisplayName &
