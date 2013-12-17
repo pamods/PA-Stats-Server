@@ -71,7 +71,7 @@ class Boot extends Loggable {
       Menu.i("Updates") / "updates",
       Menu.i("Games") / "listgames",
       Menu.i("Players") / PlayerSearchPage.pageName,
-      Menu(Loc("Ladder", ExtLink("http://spende.gamestown24.de/"), "Ladder")),
+      Menu(Loc("Ladder", ExtLink("http://pastats-ladder.gamestown24.de/"), "Ladder")),
       Menu.i("Extra") / StatsPage.pageName,
       Menu.i("Player") / PlayerPage.pageName >> Hidden,
       Menu.i("Chart") / GamePage.pageName >> Hidden,
