@@ -19,6 +19,7 @@ import info.nanodesu.model.db.collectors.playerinfo.loader.CountGamesForPlayerLo
 import info.nanodesu.model.db.collectors.playerinfo.loader.IsReporterLoader
 import net.liftweb.common.Loggable
 import java.math.BigInteger
+import org.apache.commons.lang.StringEscapeUtils
 
 case class DailyValue(day: Long, value: Double)
 
@@ -51,7 +52,7 @@ class PlayerInfoCollector(db: DSLContext, player: Int, gameId: Option[Int])
       ValuesPoint(d._1.day, d._1.value.toInt, d._2.value, d._3.value)
     }
     
-    DailyValues(Map(player.toString -> values), Map(player.toString -> NameValue(currentDisplayName)))
+    DailyValues(Map(player.toString -> values), Map(player.toString -> NameValue(StringEscapeUtils.escapeHtml(currentDisplayName))))
   }
 }
 
