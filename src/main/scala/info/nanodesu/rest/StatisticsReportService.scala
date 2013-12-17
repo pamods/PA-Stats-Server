@@ -64,7 +64,7 @@ object StatisticsReportService extends RestHelper with Loggable {
             where(games.WINNER_TEAM.isNotNull()).
             and(epoch(games.START_TIME).gt(startTime)).
             and(epoch(games.START_TIME).lt(endTime)).
-            groupBy(teams.INGAME_ID, playerGameRels.P, names.DISPLAY_NAME, games.WINNER_TEAM, games.ID, players.UBER_NAME).orderBy(games.ID).fetch()
+            groupBy(teams.INGAME_ID, playerGameRels.P, names.DISPLAY_NAME, games.WINNER_TEAM, games.ID, players.UBER_NAME).fetch()
 
           val lst = result.asScala.toList
           val byGames = lst.groupBy(_.getValue(games.ID))
@@ -81,7 +81,7 @@ object StatisticsReportService extends RestHelper with Loggable {
               Team(t._1, playersInTeam)
             }).toList
             Game(x._1, teamsWithPlayers, x._2.head.getValue(games.WINNER_TEAM))
-          }).toList
+          }).toList.sortBy(_.gameId)
         }
       }
       
