@@ -19,6 +19,11 @@ public class Sequences {
 	public static final org.jooq.Sequence<java.lang.Long> TEAM_ID = new org.jooq.impl.SequenceImpl<java.lang.Long>("team_id", info.nanodesu.generated.Public.PUBLIC, org.jooq.impl.SQLDataType.BIGINT.nullable(false));
 
 	/**
+	 * The sequence <code>public.v2_army_events_id_seq</code>
+	 */
+	public static final org.jooq.Sequence<java.lang.Long> V2_ARMY_EVENTS_ID_SEQ = new org.jooq.impl.SequenceImpl<java.lang.Long>("v2_army_events_id_seq", info.nanodesu.generated.Public.PUBLIC, org.jooq.impl.SQLDataType.BIGINT.nullable(false));
+
+	/**
 	 * The sequence <code>public.v2_display_name_history_id_seq</code>
 	 */
 	public static final org.jooq.Sequence<java.lang.Long> V2_DISPLAY_NAME_HISTORY_ID_SEQ = new org.jooq.impl.SequenceImpl<java.lang.Long>("v2_display_name_history_id_seq", info.nanodesu.generated.Public.PUBLIC, org.jooq.impl.SQLDataType.BIGINT.nullable(false));

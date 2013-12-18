@@ -14,6 +14,11 @@ package info.nanodesu.generated;
 public class Tables {
 
 	/**
+	 * The table public.v2_army_events
+	 */
+	public static final info.nanodesu.generated.tables.V2ArmyEvents V2_ARMY_EVENTS = info.nanodesu.generated.tables.V2ArmyEvents.V2_ARMY_EVENTS;
+
+	/**
 	 * The table public.v2_display_name_history
 	 */
 	public static final info.nanodesu.generated.tables.V2DisplayNameHistory V2_DISPLAY_NAME_HISTORY = info.nanodesu.generated.tables.V2DisplayNameHistory.V2_DISPLAY_NAME_HISTORY;
@@ -47,6 +52,11 @@ public class Tables {
 	 * The table public.v2_settings
 	 */
 	public static final info.nanodesu.generated.tables.V2Settings V2_SETTINGS = info.nanodesu.generated.tables.V2Settings.V2_SETTINGS;
+
+	/**
+	 * The table public.v2_spec_keys
+	 */
+	public static final info.nanodesu.generated.tables.V2SpecKeys V2_SPEC_KEYS = info.nanodesu.generated.tables.V2SpecKeys.V2_SPEC_KEYS;
 
 	/**
 	 * The table public.v2_teams

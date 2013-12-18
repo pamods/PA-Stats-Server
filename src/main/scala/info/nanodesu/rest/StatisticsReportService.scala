@@ -192,7 +192,8 @@ object StatisticsReportService extends RestHelper with Loggable {
   serve {
     case "report" :: Nil JsonPut RunningGameDataC(data) -> _ =>
       val now = new Date
-      CookieBox withTransaction { db =>
+
+      CookieBox withTransaction { db => // needs autocommit = off for batch inserts
         RunningGameStatsReporter(db).insertRunningGameData(data, now)
       }
 

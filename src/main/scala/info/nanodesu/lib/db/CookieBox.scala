@@ -107,6 +107,8 @@ object CookieFunc {
   val settings = V2_SETTINGS
   val teams = V2_TEAMS
   val teamIdSeq = Sequences.TEAM_ID
+  val armyEvents = V2_ARMY_EVENTS
+  val specKeys = V2_SPEC_KEYS
   
   // lifted functions
   def pgDataBaseSize(db: String) = DSL.field("pg_database_size({0})", classOf[Long], DSL.inline(db))

@@ -40,7 +40,7 @@ class InitialReportAcceptorSpec extends Specification with Mockito with ScalaChe
 		    } else {
 		      no(db).privatizeGame(anyInt)
 		    }
-		    val runningDat = RunningGameData(link, r._1.firstStats)
+		    val runningDat = RunningGameData(link, r._1.firstStats, r._1.armyEvents)
 		    one(statsInserter).insertRunningGameData(runningDat, r._2)
 	    }
 	  }

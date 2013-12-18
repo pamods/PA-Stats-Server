@@ -18,6 +18,7 @@ public class Keys {
 	// IDENTITY definitions
 	// -------------------------------------------------------------------------
 
+	public static final org.jooq.Identity<info.nanodesu.generated.tables.records.V2ArmyEventsRecord, java.lang.Integer> IDENTITY_V2_ARMY_EVENTS = Identities0.IDENTITY_V2_ARMY_EVENTS;
 	public static final org.jooq.Identity<info.nanodesu.generated.tables.records.V2DisplayNameHistoryRecord, java.lang.Integer> IDENTITY_V2_DISPLAY_NAME_HISTORY = Identities0.IDENTITY_V2_DISPLAY_NAME_HISTORY;
 	public static final org.jooq.Identity<info.nanodesu.generated.tables.records.V2GameRecord, java.lang.Integer> IDENTITY_V2_GAME = Identities0.IDENTITY_V2_GAME;
 	public static final org.jooq.Identity<info.nanodesu.generated.tables.records.V2PlanetRecord, java.lang.Integer> IDENTITY_V2_PLANET = Identities0.IDENTITY_V2_PLANET;
@@ -30,6 +31,7 @@ public class Keys {
 	// UNIQUE and PRIMARY KEY definitions
 	// -------------------------------------------------------------------------
 
+	public static final org.jooq.UniqueKey<info.nanodesu.generated.tables.records.V2ArmyEventsRecord> V2_ARMY_EVENTS_PKEY = UniqueKeys0.V2_ARMY_EVENTS_PKEY;
 	public static final org.jooq.UniqueKey<info.nanodesu.generated.tables.records.V2DisplayNameHistoryRecord> V2_DISPLAY_NAME_HISTORY_PKEY = UniqueKeys0.V2_DISPLAY_NAME_HISTORY_PKEY;
 	public static final org.jooq.UniqueKey<info.nanodesu.generated.tables.records.V2GameRecord> V2_GAME_PKEY = UniqueKeys0.V2_GAME_PKEY;
 	public static final org.jooq.UniqueKey<info.nanodesu.generated.tables.records.V2GameRecord> V2_GAME_IDENT_KEY = UniqueKeys0.V2_GAME_IDENT_KEY;
@@ -40,6 +42,7 @@ public class Keys {
 	public static final org.jooq.UniqueKey<info.nanodesu.generated.tables.records.V2PlayerDisplayNameRecord> V2_PLAYER_DISPLAY_NAME_DISPLAY_NAME_KEY = UniqueKeys0.V2_PLAYER_DISPLAY_NAME_DISPLAY_NAME_KEY;
 	public static final org.jooq.UniqueKey<info.nanodesu.generated.tables.records.V2PlayerGameRelRecord> V2_PLAYER_GAME_REL_PKEY = UniqueKeys0.V2_PLAYER_GAME_REL_PKEY;
 	public static final org.jooq.UniqueKey<info.nanodesu.generated.tables.records.V2PlayerGameRelRecord> V2_PLAYER_GAME_REL_G_P_KEY = UniqueKeys0.V2_PLAYER_GAME_REL_G_P_KEY;
+	public static final org.jooq.UniqueKey<info.nanodesu.generated.tables.records.V2SpecKeysRecord> V2_SPEC_KEYS_PKEY = UniqueKeys0.V2_SPEC_KEYS_PKEY;
 	public static final org.jooq.UniqueKey<info.nanodesu.generated.tables.records.V2TeamsRecord> V2_TEAMS_PKEY = UniqueKeys0.V2_TEAMS_PKEY;
 	public static final org.jooq.UniqueKey<info.nanodesu.generated.tables.records.V2TimepointStatsRecord> V2_TIMEPOINT_STATS_PKEY = UniqueKeys0.V2_TIMEPOINT_STATS_PKEY;
 
@@ -47,6 +50,7 @@ public class Keys {
 	// FOREIGN KEY definitions
 	// -------------------------------------------------------------------------
 
+	public static final org.jooq.ForeignKey<info.nanodesu.generated.tables.records.V2ArmyEventsRecord, info.nanodesu.generated.tables.records.V2SpecKeysRecord> V2_ARMY_EVENTS__V2_ARMY_EVENTS_SPEC_ID_FKEY = ForeignKeys0.V2_ARMY_EVENTS__V2_ARMY_EVENTS_SPEC_ID_FKEY;
 	public static final org.jooq.ForeignKey<info.nanodesu.generated.tables.records.V2DisplayNameHistoryRecord, info.nanodesu.generated.tables.records.V2PlayerDisplayNameRecord> V2_DISPLAY_NAME_HISTORY__V2_DISPLAY_NAME_HISTORY_NAME_ID_FKEY = ForeignKeys0.V2_DISPLAY_NAME_HISTORY__V2_DISPLAY_NAME_HISTORY_NAME_ID_FKEY;
 	public static final org.jooq.ForeignKey<info.nanodesu.generated.tables.records.V2DisplayNameHistoryRecord, info.nanodesu.generated.tables.records.V2PlayerRecord> V2_DISPLAY_NAME_HISTORY__V2_DISPLAY_NAME_HISTORY_PLAYER_ID_FKEY = ForeignKeys0.V2_DISPLAY_NAME_HISTORY__V2_DISPLAY_NAME_HISTORY_PLAYER_ID_FKEY;
 	public static final org.jooq.ForeignKey<info.nanodesu.generated.tables.records.V2GameRecord, info.nanodesu.generated.tables.records.V2PlanetRecord> V2_GAME__V2_GAME_PLANET_FKEY = ForeignKeys0.V2_GAME__V2_GAME_PLANET_FKEY;
@@ -61,6 +65,7 @@ public class Keys {
 	// -------------------------------------------------------------------------
 
 	private static class Identities0 extends org.jooq.impl.AbstractKeys {
+		public static org.jooq.Identity<info.nanodesu.generated.tables.records.V2ArmyEventsRecord, java.lang.Integer> IDENTITY_V2_ARMY_EVENTS = createIdentity(info.nanodesu.generated.tables.V2ArmyEvents.V2_ARMY_EVENTS, info.nanodesu.generated.tables.V2ArmyEvents.V2_ARMY_EVENTS.ID);
 		public static org.jooq.Identity<info.nanodesu.generated.tables.records.V2DisplayNameHistoryRecord, java.lang.Integer> IDENTITY_V2_DISPLAY_NAME_HISTORY = createIdentity(info.nanodesu.generated.tables.V2DisplayNameHistory.V2_DISPLAY_NAME_HISTORY, info.nanodesu.generated.tables.V2DisplayNameHistory.V2_DISPLAY_NAME_HISTORY.ID);
 		public static org.jooq.Identity<info.nanodesu.generated.tables.records.V2GameRecord, java.lang.Integer> IDENTITY_V2_GAME = createIdentity(info.nanodesu.generated.tables.V2Game.V2_GAME, info.nanodesu.generated.tables.V2Game.V2_GAME.ID);
 		public static org.jooq.Identity<info.nanodesu.generated.tables.records.V2PlanetRecord, java.lang.Integer> IDENTITY_V2_PLANET = createIdentity(info.nanodesu.generated.tables.V2Planet.V2_PLANET, info.nanodesu.generated.tables.V2Planet.V2_PLANET.ID);
@@ -71,6 +76,7 @@ public class Keys {
 	}
 
 	private static class UniqueKeys0 extends org.jooq.impl.AbstractKeys {
+		public static final org.jooq.UniqueKey<info.nanodesu.generated.tables.records.V2ArmyEventsRecord> V2_ARMY_EVENTS_PKEY = createUniqueKey(info.nanodesu.generated.tables.V2ArmyEvents.V2_ARMY_EVENTS, info.nanodesu.generated.tables.V2ArmyEvents.V2_ARMY_EVENTS.ID);
 		public static final org.jooq.UniqueKey<info.nanodesu.generated.tables.records.V2DisplayNameHistoryRecord> V2_DISPLAY_NAME_HISTORY_PKEY = createUniqueKey(info.nanodesu.generated.tables.V2DisplayNameHistory.V2_DISPLAY_NAME_HISTORY, info.nanodesu.generated.tables.V2DisplayNameHistory.V2_DISPLAY_NAME_HISTORY.ID);
 		public static final org.jooq.UniqueKey<info.nanodesu.generated.tables.records.V2GameRecord> V2_GAME_PKEY = createUniqueKey(info.nanodesu.generated.tables.V2Game.V2_GAME, info.nanodesu.generated.tables.V2Game.V2_GAME.ID);
 		public static final org.jooq.UniqueKey<info.nanodesu.generated.tables.records.V2GameRecord> V2_GAME_IDENT_KEY = createUniqueKey(info.nanodesu.generated.tables.V2Game.V2_GAME, info.nanodesu.generated.tables.V2Game.V2_GAME.IDENT);
@@ -81,11 +87,13 @@ public class Keys {
 		public static final org.jooq.UniqueKey<info.nanodesu.generated.tables.records.V2PlayerDisplayNameRecord> V2_PLAYER_DISPLAY_NAME_DISPLAY_NAME_KEY = createUniqueKey(info.nanodesu.generated.tables.V2PlayerDisplayName.V2_PLAYER_DISPLAY_NAME, info.nanodesu.generated.tables.V2PlayerDisplayName.V2_PLAYER_DISPLAY_NAME.DISPLAY_NAME);
 		public static final org.jooq.UniqueKey<info.nanodesu.generated.tables.records.V2PlayerGameRelRecord> V2_PLAYER_GAME_REL_PKEY = createUniqueKey(info.nanodesu.generated.tables.V2PlayerGameRel.V2_PLAYER_GAME_REL, info.nanodesu.generated.tables.V2PlayerGameRel.V2_PLAYER_GAME_REL.ID);
 		public static final org.jooq.UniqueKey<info.nanodesu.generated.tables.records.V2PlayerGameRelRecord> V2_PLAYER_GAME_REL_G_P_KEY = createUniqueKey(info.nanodesu.generated.tables.V2PlayerGameRel.V2_PLAYER_GAME_REL, info.nanodesu.generated.tables.V2PlayerGameRel.V2_PLAYER_GAME_REL.G, info.nanodesu.generated.tables.V2PlayerGameRel.V2_PLAYER_GAME_REL.P);
+		public static final org.jooq.UniqueKey<info.nanodesu.generated.tables.records.V2SpecKeysRecord> V2_SPEC_KEYS_PKEY = createUniqueKey(info.nanodesu.generated.tables.V2SpecKeys.V2_SPEC_KEYS, info.nanodesu.generated.tables.V2SpecKeys.V2_SPEC_KEYS.ID);
 		public static final org.jooq.UniqueKey<info.nanodesu.generated.tables.records.V2TeamsRecord> V2_TEAMS_PKEY = createUniqueKey(info.nanodesu.generated.tables.V2Teams.V2_TEAMS, info.nanodesu.generated.tables.V2Teams.V2_TEAMS.ID);
 		public static final org.jooq.UniqueKey<info.nanodesu.generated.tables.records.V2TimepointStatsRecord> V2_TIMEPOINT_STATS_PKEY = createUniqueKey(info.nanodesu.generated.tables.V2TimepointStats.V2_TIMEPOINT_STATS, info.nanodesu.generated.tables.V2TimepointStats.V2_TIMEPOINT_STATS.ID);
 	}
 
 	private static class ForeignKeys0 extends org.jooq.impl.AbstractKeys {
+		public static final org.jooq.ForeignKey<info.nanodesu.generated.tables.records.V2ArmyEventsRecord, info.nanodesu.generated.tables.records.V2SpecKeysRecord> V2_ARMY_EVENTS__V2_ARMY_EVENTS_SPEC_ID_FKEY = createForeignKey(info.nanodesu.generated.Keys.V2_SPEC_KEYS_PKEY, info.nanodesu.generated.tables.V2ArmyEvents.V2_ARMY_EVENTS, info.nanodesu.generated.tables.V2ArmyEvents.V2_ARMY_EVENTS.SPEC_ID);
 		public static final org.jooq.ForeignKey<info.nanodesu.generated.tables.records.V2DisplayNameHistoryRecord, info.nanodesu.generated.tables.records.V2PlayerDisplayNameRecord> V2_DISPLAY_NAME_HISTORY__V2_DISPLAY_NAME_HISTORY_NAME_ID_FKEY = createForeignKey(info.nanodesu.generated.Keys.V2_PLAYER_DISPLAY_NAME_PKEY, info.nanodesu.generated.tables.V2DisplayNameHistory.V2_DISPLAY_NAME_HISTORY, info.nanodesu.generated.tables.V2DisplayNameHistory.V2_DISPLAY_NAME_HISTORY.NAME_ID);
 		public static final org.jooq.ForeignKey<info.nanodesu.generated.tables.records.V2DisplayNameHistoryRecord, info.nanodesu.generated.tables.records.V2PlayerRecord> V2_DISPLAY_NAME_HISTORY__V2_DISPLAY_NAME_HISTORY_PLAYER_ID_FKEY = createForeignKey(info.nanodesu.generated.Keys.V2_PLAYER_PKEY, info.nanodesu.generated.tables.V2DisplayNameHistory.V2_DISPLAY_NAME_HISTORY, info.nanodesu.generated.tables.V2DisplayNameHistory.V2_DISPLAY_NAME_HISTORY.PLAYER_ID);
 		public static final org.jooq.ForeignKey<info.nanodesu.generated.tables.records.V2GameRecord, info.nanodesu.generated.tables.records.V2PlanetRecord> V2_GAME__V2_GAME_PLANET_FKEY = createForeignKey(info.nanodesu.generated.Keys.V2_PLANET_PKEY, info.nanodesu.generated.tables.V2Game.V2_GAME, info.nanodesu.generated.tables.V2Game.V2_GAME.PLANET);

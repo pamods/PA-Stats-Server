@@ -45,9 +45,9 @@ class InitialReportAcceptor(reportLinker: InitialGameToReportLinker, initReport:
       dbL.privatizeGame(link)
     }
 
-    val dataToReport = RunningGameData(link, data.firstStats)
+    val dataToReport = RunningGameData(link, data.firstStats, data.armyEvents)
     statsInserter.insertRunningGameData(dataToReport, reportDate)
-
+    
     link
   }
 }

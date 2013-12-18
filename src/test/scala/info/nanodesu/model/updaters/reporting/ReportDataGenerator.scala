@@ -62,7 +62,19 @@ object ReportDataGenerators {
     energyWastedSinceLastTick,
     apm)
   implicit val arbStatsReport: Arbitrary[StatsReportData] = Arbitrary(genStatsReportData)
-
+  
+  val genArmyEvent: Gen[ArmyEvent] = for {
+    spec <- nonEmptyString
+    x <- ix
+    y <- ix
+    z <- ix
+    planetId <- ix
+    watchType <- ix
+    time <- ix
+  } yield ArmyEvent(spec, x, y, z, planetId, watchType, time)
+  
+  implicit val arbArmyEvent = Arbitrary(genArmyEvent)
+  
   val genGameData = Gen.resultOf(RunningGameData.apply _)
   implicit val arbRunningGame: Arbitrary[RunningGameData] = Arbitrary(genGameData)
 
@@ -110,7 +122,8 @@ object ReportDataGenerators {
     planet <- genPlanet
     pv <- nonEmptyString
     live <- arbitrary[Boolean]
-  } yield ReportData(ident, playerUberName, playerName, n-1, teams, live, s, v, planet, pv))
+    events <- Gen.listOf1(genArmyEvent)
+  } yield ReportData(ident, playerUberName, playerName, n-1, teams, live, s, v, planet, pv, events))
 
   implicit val arbReport = Arbitrary(genReport)
 

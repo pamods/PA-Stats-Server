@@ -16,11 +16,12 @@ import info.nanodesu.model.db.updaters.reporting.running.RunningGameStatsReporte
 import info.nanodesu.model.StatsReportData
 import info.nanodesu.model.RunningGameData
 import java.util.Date
+import info.nanodesu.model.ArmyEvent
 
 @RunWith(classOf[JUnitRunner])
 class RunningGameUpdaterSpec extends Specification with Mockito with ThrownExpectations{
 	
-    def makeSomeData = new RunningGameData(12, new StatsReportData(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14))
+    def makeSomeData = new RunningGameData(12, new StatsReportData(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14), List(ArmyEvent("foo", 1, 2, 3, 4, 5, 110)))
   
 	"The RunningGameUpdater" should {
 	  
@@ -61,6 +62,7 @@ class RunningGameUpdaterSpec extends Specification with Mockito with ThrownExpec
 	    
 	    got {
 	      one(db).insertStatsData(dat.stats, dat.gameLink, now)
+	      one(db).insertArmyEvents(dat.armyEvents, dat.gameLink)
 	    }
 	  }
 	}
