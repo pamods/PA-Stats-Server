@@ -83,7 +83,8 @@ object RunningGameStatsReporter {
           armyEvents.Z,
           armyEvents.PLANET_ID,
           armyEvents.WATCHTYPE,
-          armyEvents.TIMEPOINT).values(0, 0, 0, 0, 0, 0, null))
+          armyEvents.PLAYER_GAME,
+          armyEvents.TIMEPOINT).values(0, 0, 0, 0, 0, 0, 0, null))
 
       def bindLoop(batch: BatchBindStep, data: List[ArmyEvent]): BatchBindStep = data match {
         case head :: tail => bindLoop(
@@ -93,6 +94,7 @@ object RunningGameStatsReporter {
 	            head.z:java.lang.Float, 
 	            head.planetId:Integer,
 	            head.watchType:Integer,
+	            link:Integer,
 	            new Timestamp(head.time)),
             tail)
         case Nil => batch

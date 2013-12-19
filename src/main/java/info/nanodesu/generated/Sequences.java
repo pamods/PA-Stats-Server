@@ -54,6 +54,11 @@ public class Sequences {
 	public static final org.jooq.Sequence<java.lang.Long> V2_PLAYER_ID_SEQ = new org.jooq.impl.SequenceImpl<java.lang.Long>("v2_player_id_seq", info.nanodesu.generated.Public.PUBLIC, org.jooq.impl.SQLDataType.BIGINT.nullable(false));
 
 	/**
+	 * The sequence <code>public.v2_spec_keys_id_seq</code>
+	 */
+	public static final org.jooq.Sequence<java.lang.Long> V2_SPEC_KEYS_ID_SEQ = new org.jooq.impl.SequenceImpl<java.lang.Long>("v2_spec_keys_id_seq", info.nanodesu.generated.Public.PUBLIC, org.jooq.impl.SQLDataType.BIGINT.nullable(false));
+
+	/**
 	 * The sequence <code>public.v2_timepoint_stats_id_seq</code>
 	 */
 	public static final org.jooq.Sequence<java.lang.Long> V2_TIMEPOINT_STATS_ID_SEQ = new org.jooq.impl.SequenceImpl<java.lang.Long>("v2_timepoint_stats_id_seq", info.nanodesu.generated.Public.PUBLIC, org.jooq.impl.SQLDataType.BIGINT.nullable(false));

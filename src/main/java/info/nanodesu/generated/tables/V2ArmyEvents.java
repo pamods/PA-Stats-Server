@@ -11,7 +11,7 @@ package info.nanodesu.generated.tables;
 @java.lang.SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class V2ArmyEvents extends org.jooq.impl.TableImpl<info.nanodesu.generated.tables.records.V2ArmyEventsRecord> {
 
-	private static final long serialVersionUID = 1121883363;
+	private static final long serialVersionUID = -1781077190;
 
 	/**
 	 * The singleton instance of <code>public.v2_army_events</code>
@@ -30,6 +30,11 @@ public class V2ArmyEvents extends org.jooq.impl.TableImpl<info.nanodesu.generate
 	 * The column <code>public.v2_army_events.id</code>. 
 	 */
 	public final org.jooq.TableField<info.nanodesu.generated.tables.records.V2ArmyEventsRecord, java.lang.Integer> ID = createField("id", org.jooq.impl.SQLDataType.INTEGER.nullable(false).defaulted(true), this);
+
+	/**
+	 * The column <code>public.v2_army_events.player_game</code>. 
+	 */
+	public final org.jooq.TableField<info.nanodesu.generated.tables.records.V2ArmyEventsRecord, java.lang.Integer> PLAYER_GAME = createField("player_game", org.jooq.impl.SQLDataType.INTEGER.nullable(false), this);
 
 	/**
 	 * The column <code>public.v2_army_events.spec_id</code>. 
@@ -109,7 +114,7 @@ public class V2ArmyEvents extends org.jooq.impl.TableImpl<info.nanodesu.generate
 	 */
 	@Override
 	public java.util.List<org.jooq.ForeignKey<info.nanodesu.generated.tables.records.V2ArmyEventsRecord, ?>> getReferences() {
-		return java.util.Arrays.<org.jooq.ForeignKey<info.nanodesu.generated.tables.records.V2ArmyEventsRecord, ?>>asList(info.nanodesu.generated.Keys.V2_ARMY_EVENTS__V2_ARMY_EVENTS_SPEC_ID_FKEY);
+		return java.util.Arrays.<org.jooq.ForeignKey<info.nanodesu.generated.tables.records.V2ArmyEventsRecord, ?>>asList(info.nanodesu.generated.Keys.V2_ARMY_EVENTS__V2_ARMY_EVENTS_PLAYER_GAME_FKEY, info.nanodesu.generated.Keys.V2_ARMY_EVENTS__V2_ARMY_EVENTS_SPEC_ID_FKEY);
 	}
 
 	/**

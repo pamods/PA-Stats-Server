@@ -11,7 +11,7 @@ CREATE TABLE v2_settings (
 	report_version integer
 );
 
-INSERT INTO v2_settings (report_version) VALUES (13);
+INSERT INTO v2_settings (report_version) VALUES (14);
 
 CREATE TABLE v2_planet (
 	id serial PRIMARY KEY,
@@ -74,7 +74,7 @@ CREATE TABLE v2_teams (
    
 CREATE TABLE v2_timepoint_stats (
 	id serial PRIMARY KEY,
-	player_game integer REFERENCES v2_player_game_rel(id) NOT NULL ON DELETE CASCADE,
+	player_game integer REFERENCES v2_player_game_rel(id) ON DELETE CASCADE NOT NULL,
 	timepoint timestamp NOT NULL,
 	army_count integer NOT NULL,
 	metal_income integer NOT NULL,
@@ -93,3 +93,22 @@ CREATE TABLE v2_timepoint_stats (
 );
 
 create index on v2_timepoint_stats (player_game);
+
+CREATE TABLE v2_spec_keys (
+	id serial PRIMARY KEY,
+	spec varchar
+);
+
+CREATE TABLE v2_army_events (
+	id serial PRIMARY KEY,
+	player_game integer REFERENCES v2_player_game_rel(id) ON DELETE CASCADE NOT NULL,
+	spec_id integer REFERENCES v2_spec_keys(id),
+	x real,
+	y real,
+	z real,
+	planet_id integer,
+	watchType integer,
+	timepoint timestamp
+);
+
+create index on v2_army_events (player_game);

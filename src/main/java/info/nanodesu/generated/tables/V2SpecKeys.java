@@ -11,7 +11,7 @@ package info.nanodesu.generated.tables;
 @java.lang.SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class V2SpecKeys extends org.jooq.impl.TableImpl<info.nanodesu.generated.tables.records.V2SpecKeysRecord> {
 
-	private static final long serialVersionUID = -46937208;
+	private static final long serialVersionUID = 1566232819;
 
 	/**
 	 * The singleton instance of <code>public.v2_spec_keys</code>
@@ -29,7 +29,7 @@ public class V2SpecKeys extends org.jooq.impl.TableImpl<info.nanodesu.generated.
 	/**
 	 * The column <code>public.v2_spec_keys.id</code>. 
 	 */
-	public final org.jooq.TableField<info.nanodesu.generated.tables.records.V2SpecKeysRecord, java.lang.Integer> ID = createField("id", org.jooq.impl.SQLDataType.INTEGER.nullable(false), this);
+	public final org.jooq.TableField<info.nanodesu.generated.tables.records.V2SpecKeysRecord, java.lang.Integer> ID = createField("id", org.jooq.impl.SQLDataType.INTEGER.nullable(false).defaulted(true), this);
 
 	/**
 	 * The column <code>public.v2_spec_keys.spec</code>. 
@@ -48,6 +48,14 @@ public class V2SpecKeys extends org.jooq.impl.TableImpl<info.nanodesu.generated.
 	 */
 	public V2SpecKeys(java.lang.String alias) {
 		super(alias, info.nanodesu.generated.Public.PUBLIC, info.nanodesu.generated.tables.V2SpecKeys.V2_SPEC_KEYS);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public org.jooq.Identity<info.nanodesu.generated.tables.records.V2SpecKeysRecord, java.lang.Integer> getIdentity() {
+		return info.nanodesu.generated.Keys.IDENTITY_V2_SPEC_KEYS;
 	}
 
 	/**

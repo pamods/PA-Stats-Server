@@ -11,7 +11,7 @@ package info.nanodesu.generated;
 @java.lang.SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Public extends org.jooq.impl.SchemaImpl {
 
-	private static final long serialVersionUID = -1820141221;
+	private static final long serialVersionUID = -673642765;
 
 	/**
 	 * The singleton instance of <code>public</code>
@@ -42,6 +42,7 @@ public class Public extends org.jooq.impl.SchemaImpl {
 			info.nanodesu.generated.Sequences.V2_PLAYER_DISPLAY_NAME_ID_SEQ,
 			info.nanodesu.generated.Sequences.V2_PLAYER_GAME_REL_ID_SEQ,
 			info.nanodesu.generated.Sequences.V2_PLAYER_ID_SEQ,
+			info.nanodesu.generated.Sequences.V2_SPEC_KEYS_ID_SEQ,
 			info.nanodesu.generated.Sequences.V2_TIMEPOINT_STATS_ID_SEQ);
 	}
 
