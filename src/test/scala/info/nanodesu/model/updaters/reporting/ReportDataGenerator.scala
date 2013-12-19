@@ -123,7 +123,8 @@ object ReportDataGenerators {
     pv <- nonEmptyString
     live <- arbitrary[Boolean]
     events <- Gen.listOf1(genArmyEvent)
-  } yield ReportData(ident, playerUberName, playerName, n-1, teams, live, s, v, planet, pv, events))
+    time <- arbitrary[Long]
+  } yield ReportData(ident, playerUberName, playerName, n-1, teams, live, s, v, planet, pv, events, time))
 
   implicit val arbReport = Arbitrary(genReport)
 

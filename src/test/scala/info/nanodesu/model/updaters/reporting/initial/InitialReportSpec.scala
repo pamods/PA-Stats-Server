@@ -38,7 +38,7 @@ class InitialReportSpec extends Specification with Mockito with ScalaCheck with 
       
       val gameId = 28376
       
-      db.insertNewGame(any, any, any, any) returns gameId
+      db.insertNewGame(any, any, any, any, any) returns gameId
       
       t.init(db)
       t.createGameAndReturnId(r._1, r._2) === gameId
@@ -59,7 +59,7 @@ class InitialReportSpec extends Specification with Mockito with ScalaCheck with 
       db.insertNewPlanet(g.planet) returns 1
       t.init(db)
       t.createGameAndReturnId(g, r._2)
-      there was one(db).insertNewGame(g.ident, g.paVersion, r._2, 1)
+      there was one(db).insertNewGame(g.ident, g.paVersion, new Timestamp(r._1.gameStartTime), r._2, 1)
     }
 
     "generate a matching number of team ids" ! prop { r: (ReportData, Timestamp) =>
@@ -114,7 +114,7 @@ class InitialReportSpec extends Specification with Mockito with ScalaCheck with 
       val t = newSubject
       val db = dbM
 
-      db.insertNewGame(any, any, any, any) returns 1
+      db.insertNewGame(any, any, any, any, any) returns 1
 
       var teamId = 0
       db.generateNewTeamId() answers { i =>
@@ -148,7 +148,7 @@ class InitialReportSpec extends Specification with Mockito with ScalaCheck with 
 
       val t = newSubject
       val db = dbM
-      db.insertNewGame(any, any, any, any) returns 1
+      db.insertNewGame(any, any, any, any, any) returns 1
       db.loadPlayerIdsByDisplayName(anyString) returns List(1, 2)
       var teamId = 0
       db.generateNewTeamId() answers { i =>

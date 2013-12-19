@@ -33,6 +33,8 @@ import info.nanodesu.model.db.collectors.gameinfo.ChartDataCollector
 import java.math.BigInteger
 import java.lang.Long
 import org.apache.commons.lang.StringUtils
+import info.nanodesu.model.db.collectors.gameinfo.ArmyEventDataCollector
+
 
 object StatisticsReportService extends RestHelper with Loggable {
 
@@ -216,6 +218,8 @@ object StatisticsReportService extends RestHelper with Loggable {
       Extraction decompose CurrentTimeMs(System.currentTimeMillis())
   }
 
+  // TODO careful redundant code incoming...
+  
   serve {
     case "report" :: "get" :: Nil Get _ =>
       try {
@@ -229,4 +233,19 @@ object StatisticsReportService extends RestHelper with Loggable {
         }
       }
   }
+  
+  serve {
+    case "report" :: "get" :: "events" :: Nil Get _ =>
+      try {
+        CookieBox withSession { db =>
+          for (id <- GamePage.getGameId) yield Extraction decompose ArmyEventDataCollector(db).collectEventsFor(id)
+        }
+      } catch {
+        case ex: Exception => {
+          logger.error(ex, ex)
+          InternalServerErrorResponse()
+        }
+      }
+  }
+  
 }

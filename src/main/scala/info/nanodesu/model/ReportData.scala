@@ -32,7 +32,8 @@ case class ReportData(
   version: Int,
   planet: ReportedPlanet,
   paVersion: String,
-  armyEvents: List[ArmyEvent])
+  armyEvents: List[ArmyEvent],
+  gameStartTime: Long)
 
 case class ReportTeam(
   index: Int,
