@@ -46,7 +46,7 @@ function BasicChart(config) {
 	self.yAxisConfig.graph = graph;
 	var yAxis = new Rickshaw.Graph.Axis.Y(self.yAxisConfig);
 	
-	graph.render;
+	graph.render();
 	
 	self.hoverConfig.graph = graph;
 	var hoverDetail = new Rickshaw.Graph.HoverDetail(self.hoverConfig);

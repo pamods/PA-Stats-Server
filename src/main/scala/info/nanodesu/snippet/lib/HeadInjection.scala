@@ -13,13 +13,16 @@ object HeadInjection extends DispatchSnippet {
 	val dispatch: DispatchIt = {
 	  case "chartpage" => injectChartPageQueryUrl 
 	  case "imports" => doImports
+	  case "imgbase" => injectImgBaseUrl
 	}
 	 
 	def injectChartPageQueryUrl = "*" #> <script data-lift="head" type="text/javascript"> 
 		var queryUrl = "{Props.get("queryUrl") openOrThrowException "you need to configure queryUrl in the props!" }";
 		var gameIsLiveOffsetGuess = {Props.getInt("liveGameThreshold").openOr(15000)};
 	</script>
+
 		
+   def injectImgBaseUrl = "*" #> <script data-lift="head" type="text/javascript">var imageBaseUrl = "{Props.get("imagebase", "error")}";</script>		
 		
    private val jslibs = resolveProperty("jslibs") split " "
    private val csslibs = resolveProperty("csslibs") split " "

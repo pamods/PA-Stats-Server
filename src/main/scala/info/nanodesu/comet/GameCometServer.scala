@@ -14,8 +14,13 @@ import info.nanodesu.lib.db.CookieBox
 import info.nanodesu.model.db.collectors.playerinfo.GameAndPlayerInfoCollector
 import info.nanodesu.lib.Formattings
 import info.nanodesu.model.db.collectors.gameinfo.loader._
+import info.nanodesu.model.db.collectors.gameinfo.ArmyEventPackage
+import info.nanodesu.model.db.collectors.gameinfo.ArmyEventDataCollector
 
 case class GameDataUpdate(gameId: Int)
+case class ForceGameDataUpdate(gameId: Int)
+
+case class GameArmyCompositionUpdate(gameId: Int, composition: ArmyEventPackage)
 
 case class GeneralGameJsCmd(gameId: Int, cmd: JsCmd)
 case class GamePlayersListJsCmd(gameId: Int, cmd: JsCmd)
@@ -46,11 +51,22 @@ object GameCometServer extends LiftActor with ListenerManager with Loggable{
 	override def lowPriority = {
 	  case GameDataUpdate(id: Int) => {
 	    if (minimumTimeForUpdateReached(id)) {
-    	  updateListeners(GeneralGameJsCmd(id, createGeneralGameUpdate(id)))
-	      updateListeners(GamePlayersListJsCmd(id, createPlayersListUpdate(id)))
+	    	doUpdateNow(id)
 	    }
 	  }
+	  case ForceGameDataUpdate(id: Int) => {
+	    doUpdateNow(id)
+	  }
 	}
+	
+	def doUpdateNow(id: Int) = {
+	  updateListeners(GeneralGameJsCmd(id, createGeneralGameUpdate(id)))
+      updateListeners(GamePlayersListJsCmd(id, createPlayersListUpdate(id)))
+      updateListeners(createArmyCompositionUpdate(id))	  
+	}
+	
+	private def createArmyCompositionUpdate(id: Int) = 
+	  GameArmyCompositionUpdate(id, CookieBox withSession (ArmyEventDataCollector(_).collectEventsFor(id)))
 	
 	private def createPlayersListUpdate(id: Int) = {
 	  import PlayerGameInfo._

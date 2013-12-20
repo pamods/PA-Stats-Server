@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+<body data-lift-content-id="armycomposition">
+	<div id="armycomposition" class="column span-24 last">
+		<div class="shiny_comet" data-lift="CometInit.gameArmyComposition">
+			<div class="army_composition_time_display">
+				<div class="army_composition_selected_time" data-bind="text: formattedSelectedTime"></div>
+				<div class="army_composition_time"
+					data-bind="slider: selectedTime, sliderOptions: timeSliderOptions"></div>
+			</div>
+			<div>
+				<div class="army_composition_box" data-bind="foreach: players">
+					<div class="army_team_box">
+						<div class="army_header_box">
+							<div class="army_team_name" data-bind="text: $data.name"></div>
+							<div class="army_primary_color" data-bind="style: {background: $data.primaryColor}">
+								<span class="army_secondary_color" data-bind="style: {background: $data.secondaryColor}"></span>
+							</div>
+						</div>
+						<div class="army_team_units_box" data-bind="foreach: $data.units">
+							<div class="army_composition_unit">
+								<img class="army_composition_img" src=""
+									data-bind="attr: {src: $data.icon }" /> 
+								<span class="army_composition_unit_count" data-bind="text: $data.count"></span>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div id="armyDataSource"></div>
+			<script src="/static/js/armycomposition.js"></script>
+		</div>
+	</div>
+</body>
+</html>

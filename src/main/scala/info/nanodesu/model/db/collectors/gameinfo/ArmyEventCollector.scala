@@ -14,12 +14,13 @@ import info.nanodesu.model.db.updaters.reporting.GenerateNewPlayer
 import java.sql.Timestamp
 import net.liftweb.json.JValue
 import net.liftweb.json.Extraction
+import info.nanodesu.model.db.collectors.gameinfo.loader.GameStartTimeLoader
 
 
 // yes currently this is practically a copy of the ArmyEvent in ReportData.
 // However I want to keep these 2 classes separate since they are used for different communication channels that may change independently from each other
 // i.e. for now this returns integer positions. They are probably accurate enough anyway.
-case class ArmyEvent(spec: String, x: Int, y: Int, z: Int, planetId: Int, watchType: Int, time: Long)
+case class ArmyEvent(id: Int, spec: String, x: Int, y: Int, z: Int, planetId: Int, watchType: Int, time: Long)
 
 case class ArmyEventPlayer(name: String, primaryColor: String, secondaryColor: String)
 
@@ -37,6 +38,7 @@ class ArmyEventDataCollector(dbLayer: ArmyEventDbLayer) {
 	  val raw = dbLayer.selectArmyEventsForGame(gameId)
 	  
 	  val perPlayer = raw.groupBy(_.playerId.toString)
+	  
 	  val perPlayerEvents = perPlayer.mapValues(_.map(_.event))
 	  val sorted = perPlayerEvents.mapValues(_.sortBy(_.time))
 	  
@@ -52,9 +54,7 @@ object ArmyEventDataCollector {
   
   private class DbLayer(db: DSLContext) extends ArmyEventDbLayer {
     
-    def selectStartTimeForGame(gameId: Int): Long = {
-      return db.select(games.START_TIME).from(games).where(games.ID === gameId).fetchOne().value1().getTime()
-    }
+    def selectStartTimeForGame(gameId: Int): Long = new GameStartTimeLoader(db).selectStartTimeForGame(gameId)
     
     def selectArmyEventsForGame(gameId: Int): List[ArmyEventDbResult] = {
       val lst  = db.select(playerGameRels.P, 
@@ -67,7 +67,8 @@ object ArmyEventDataCollector {
           armyEvents.Z, 
           armyEvents.PLANET_ID, 
           armyEvents.WATCHTYPE, 
-          armyEvents.TIMEPOINT).
+          armyEvents.TIMEPOINT,
+          armyEvents.ID).
           	from(playerGameRels).
           join(players).onKey().
           join(names).onKey().
@@ -80,7 +81,7 @@ object ArmyEventDataCollector {
           
       val buf = for (r <- lst.asScala) yield {
         def v[T](f: Field[T]) = r.getValue(f)
-        val dat = ArmyEvent(v(specKeys.SPEC), v(armyEvents.X).toInt, v(armyEvents.Y).toInt, v(armyEvents.Z).toInt, v(armyEvents.PLANET_ID), v(armyEvents.WATCHTYPE), v(armyEvents.TIMEPOINT).getTime())
+        val dat = ArmyEvent(v(armyEvents.ID), v(specKeys.SPEC), v(armyEvents.X).toInt, v(armyEvents.Y).toInt, v(armyEvents.Z).toInt, v(armyEvents.PLANET_ID), v(armyEvents.WATCHTYPE), v(armyEvents.TIMEPOINT).getTime())
         ArmyEventDbResult(v(playerGameRels.P), v(names.DISPLAY_NAME), v(teams.PRIMARY_COLOR), v(teams.SECONDARY_COLOR), dat)
       }
           

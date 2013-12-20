@@ -92,15 +92,7 @@ $(function() {
 		var lastTime = undefined;
 
 		var xTimeFormat = function(n) {
-			var secs = (n - firstTime) / 1000;
-
-			if (secs < 0) {
-				return "";
-			}
-
-			var min = Math.floor(secs / 60);
-			var sec = Math.floor(secs % 60);
-			return zeroFill(min, 2) + ":" + zeroFill(sec, 2);
+			return fmtTime(firstTime, n);
 		};
 		
 		var graphConf = {
@@ -201,5 +193,5 @@ $(function() {
 
 	var viewModel = new ChartModel();
 	window.setTimeout(function() {viewModel.loadData();}, 500);
-	ko.applyBindings(viewModel.basicChart);
+	ko.applyBindings(viewModel.basicChart, document.getElementById('chartbase'));
 });

@@ -54,9 +54,6 @@ object RunningGameStatsReporter {
   }
 
   private class DbLayer(db: DSLContext) extends RunningGameUpdaterDbLayer with GameIdFromLinkLoader with GameEndTimeUpdater {
-    // it may be worth to turn this off in the future:
-    // http://www.postgresql.org/docs/9.1/static/runtime-config-wal.html#GUC-SYNCHRONOUS-COMMIT
-    // nobody cares about a few lost records anyway...
     def insertArmyEvents(data: List[ArmyEvent], link: Int) = {
       val specs = data.map(_.spec)
 
