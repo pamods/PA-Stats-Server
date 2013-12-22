@@ -3,12 +3,13 @@ $(document).ready(function() {
     var start = /[^\/]*$/;  // ^ : start , \/ : '/', $ : end // as wildcard: /*.json 
     var end = /[.]json$/;
 	
-	function ArmyUnit(spc) {
+	function ArmyUnit(spc, cnt) {
 		var self = this;
 		
 		self.spec = ko.observable(spc);
 		self.icon = ko.computed(function() {return imageBaseUrl +"units/"+ self.spec().substring(self.spec().search(start), self.spec().search(end))+".png"});
-		self.count = ko.observable(1);
+		self.count = ko.observable(cnt);
+		self.visible = ko.computed(function() {return self.count() > 0;});
 	}
 	
 	function PlayerArmy(i, n, pClr, sClr) {
@@ -19,46 +20,48 @@ $(document).ready(function() {
 		self.secondaryColor = ko.observable(sClr);
 		self.units = ko.observableArray([]);
 		
+		self.visibleUnits = ko.computed(function() {
+			return ko.utils.arrayFilter(self.units(), function(unit) {
+				return unit.visible();
+			});
+		}, self);
+		
 		self.resetUnits = function() {
 			self.units.removeAll();
 		}
 		
+		self.unitSpecIndex = {};
+		
 		self.changeUnitCount = function (spec, changeCnt) {
-			var found = false;
-			for (var i = 0; i < self.units().length; i++) {
-				var unt = self.units()[i];
-				if (unt.spec() == spec) {
-					var cnt = unt.count();
-					unt.count(cnt+changeCnt);
-					if (changeCnt < 0 && unt.count() == 0) {
-						self.units.splice(i, 1);
-					}
-					found = true;
-					break;
+			var index = self.unitSpecIndex[spec];
+			var found = index != undefined;
+			if (found) {// found is executed once per event in the game
+				// so it needs to be fast
+				var unt = self.units()[index];
+				unt.count(unt.count()+changeCnt);
+			} else { // else is only executed once per unit type that occurs in the entire game
+				// so the following code can be slow
+				var newUnit = new ArmyUnit(spec, changeCnt);
+				self.units.push(newUnit);
+				self.units.sort(function(left, right) {
+					return left.spec() == right.spec() ? 0 : (left.spec() < right.spec() ? -1 : 1);
+				});
+				// sorting breaks the index, so rebuild it
+				self.unitSpecIndex = {};
+				for (var i = 0; i < self.units().length; i++) {
+					var unt = self.units()[i];
+					self.unitSpecIndex[unt.spec()] = i;
 				}
 			}
-			if (!found && changeCnt > 0) {
-				self.units.push(new ArmyUnit(spec));
-			}
-			
-			self.units.sort(function(left, right) {
-				return left.spec() == right.spec() ? 0 : (left.spec() < right.spec() ? -1 : 1);
-			});
 		}
 	}
 	
 	
 	function ArmyCompositionModel(start) {
 		var self = this;
-		
-		self.events = ko.observableArray([]);
 
 		self.startTime = ko.observable(start);
-		self.endTime = ko.computed(function() {
-			var length = self.events().length;
-			var foo = length > 0 ? self.events()[length-1].timestamp : self.startTime();
-			return foo;
-		});
+		self.endTime = ko.observable(start);
 		self.selectedTime = ko.observable(start);
 		
 		self.formattedSelectedTime = ko.computed(function() {
@@ -77,12 +80,16 @@ $(document).ready(function() {
 		self.wasOnEnd = true;
 		
 		self.addEvent = function(player, spec, timestamp, typ) {
-			self.events.push({
+			var evt = {
 				player: player,
 				spec: spec,
 				timestamp: timestamp,
 				change: typ == 0 ? +1 : -1,
-			});
+			};
+			if (self.endTime() < timestamp) {
+				self.endTime(timestamp);
+			}
+			self.indexEvent(evt);
 		}
 		
 		self.lockForFollowTime = function() {
@@ -101,12 +108,6 @@ $(document).ready(function() {
 			self.players.push(new PlayerArmy(id, name, pColor, sColor));
 		}
 		
-		self.removeAllUnitsForAllPlayers = function() {
-			for (var i = 0; i < self.players().length; i++) {
-				self.players()[i].resetUnits();
-			}
-		}
-		
 		self.changeSpecForPlayer = function(playerId, spec, addElseRemove) {
 			var player = undefined;
 			for (var i = 0; i < self.players().length; i++) {
@@ -120,15 +121,39 @@ $(document).ready(function() {
 		}
 		
 		
+		self.timeBefore = self.selectedTime();
+		
+		self.eventIndex = {};
+		
+		var hashBucketSize = 1000;
+		
+		self.indexEvent = function(event) {
+			var hashBucket = Math.floor(event.timestamp / hashBucketSize);
+			if (self.eventIndex[hashBucket] === undefined) {
+				self.eventIndex[hashBucket] = [];
+			}
+			self.eventIndex[hashBucket].push(event);
+		}
+		
 		self.selectedTime.subscribe(function(newT) {
-			// TODO this is a pretty slow way to do this. chrome can deal with it, Firefox is a bit laggy
-			self.removeAllUnitsForAllPlayers();
-			for (var i = 0; i < self.events().length; i++) {
-				var evt = self.events()[i];
-				if (evt.timestamp <= newT) {
-					self.changeSpecForPlayer(evt.player, evt.spec, evt.change);
+			var direction = newT > self.timeBefore ? 1 : -1;
+			
+			var a = self.timeBefore > newT ? newT : self.timeBefore;
+			var b = self.timeBefore > newT ? self.timeBefore : newT;
+			
+			var firstBucket = Math.floor(a / hashBucketSize);
+			var lastBucket = Math.floor(b / hashBucketSize);
+			for (var i = firstBucket; i <= lastBucket; i++) {
+				if (self.eventIndex[i] != undefined) {
+					for (var j = 0; j < self.eventIndex[i].length; j++) {
+						var evt = self.eventIndex[i][j];
+						if (evt.timestamp > a && evt.timestamp <= b) {
+							self.changeSpecForPlayer(evt.player, evt.spec, evt.change * direction);
+						}
+					}
 				}
 			}
+			self.timeBefore = newT;
 		});
 	}
 	
@@ -166,5 +191,5 @@ $(document).ready(function() {
 		armyModel.mayFollowTime();
 	});	
 	
-	ko.applyBindings(armyModel, document.getElementById('armycomposition'));
+	ko.applyBindings(armyModel, document.getElementById('armycomposition'));	
 });

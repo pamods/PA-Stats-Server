@@ -11,10 +11,10 @@ liveGameThreshold=16000
 
 listGamesPageSize = 35;
 
-jslibs=jquery jqueryui knockout globalize d3 d3layout rickshaw
+jslibs=jquery jqueryui knockout kodeferred globalize d3 d3layout rickshaw
 csslibs=jqueryuicss rickshawcss
 
-
+kodeferred=http://nanodesu.info/static/lib/ko-deferred.js
 
 imagebase=http://nanodesu.info/static/img/
 

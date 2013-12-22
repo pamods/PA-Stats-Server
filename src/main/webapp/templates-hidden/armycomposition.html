@@ -2,6 +2,13 @@
 <html>
 <body data-lift-content-id="armycomposition">
 	<div id="armycomposition" class="column span-24 last">
+		<head-merge>
+			<style>
+				body {
+					height: 3500px;
+				}
+			</style>
+		</head-merge>
 		<div class="shiny_comet" data-lift="CometInit.gameArmyComposition">
 			<div class="army_composition_time_display">
 				<div class="army_composition_selected_time" data-bind="text: formattedSelectedTime"></div>
@@ -17,7 +24,7 @@
 								<span class="army_secondary_color" data-bind="style: {background: $data.secondaryColor}"></span>
 							</div>
 						</div>
-						<div class="army_team_units_box" data-bind="foreach: $data.units">
+						<div class="army_team_units_box" data-bind="foreach: $data.visibleUnits">
 							<div class="army_composition_unit">
 								<img class="army_composition_img" src=""
 									data-bind="attr: {src: $data.icon }" /> 
@@ -30,6 +37,7 @@
 			<div id="armyDataSource"></div>
 			<script src="/static/js/armycomposition.js"></script>
 		</div>
+
 	</div>
 </body>
 </html>

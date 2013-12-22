@@ -300,8 +300,8 @@ body {
 .army_composition_unit {
 	position: relative;
 	float: left;
-	height: 52px;
-    width: 52px;
+	height: 55px;
+    width: 55px;
     margin:1px;
     border: 1px solid rgba(10,10,10,.5);
     background-color: rgba(10,10,10,.3);
@@ -309,8 +309,8 @@ body {
 }
 
 .army_composition_img {
-	height: 46px;
-    width: 46x;
+	height: 48px;
+    width: 48x;
     top:0px;
     left:0px;
     position:absolute;
@@ -326,9 +326,9 @@ body {
 }
 
 .army_team_box {
-	float: left;
-	width: 225px;
-	min-height: 246px;
+	float:left;
+	width: 945px;
+	min-height: 81px;
 	margin:5px;
 	border: 1px solid rgba(10,10,10,.5);
 	border-radius: 7px 7px 7px 7px;
@@ -381,5 +381,5 @@ body {
 	white-space:nowrap;
 	overflow: hidden;
 	text-overflow: ellipsis; 
-	max-width: 115px;
+	max-width: 800px;
 }
