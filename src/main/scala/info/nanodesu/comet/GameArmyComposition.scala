@@ -25,7 +25,9 @@ import net.liftweb.common.Loggable
 import info.nanodesu.model.db.collectors.gameinfo.ArmyEventPackage
 import net.liftweb.common.Box
 import info.nanodesu.model.db.collectors.gameinfo.ArmyEventDataCollector
+import net.liftweb.util.CssSel
 
+// TODO these 2 case classes and their handling in this file look redundant to me
 case class AddEventsMsg(msgs: Map[String, List[ArmyEvent]]) extends JsCmd {
   implicit val formats = DefaultFormats
   
@@ -41,16 +43,48 @@ case class AddEventsMsg(msgs: Map[String, List[ArmyEvent]]) extends JsCmd {
   override val toJsCmd = JE.JsRaw("""$(document).trigger('new-army-events', %s);""".format(compact(net.liftweb.json.render(json)))).toJsCmd
 }
 
+case class AddPlayerMessage(msgs: Map[String, List[ArmyEventPlayer]]) extends JsCmd {
+  implicit val formats = DefaultFormats
+  
+  def json: JValue = {
+    val lst = msgs.toList.map(x => {
+      for (e <- x._2) yield {
+        Map("playerId" -> x._1, "name" -> e.name, "pColor" -> e.primaryColor, "sColor" -> e.secondaryColor)
+      }
+    }).flatten
+    Extraction decompose Map("value" -> lst)
+  }
+  
+  override val toJsCmd = JE.JsRaw("""$(document).trigger('new-players', %s);""".format(compact(net.liftweb.json.render(json)))).toJsCmd
+}
+
 class GameArmyComposition extends GameComet {
 	def nameKey = CometInit.gameArmyComposition
 	
 	private var armyEventsMap: Set[Int] = Set.empty
+	private var armyPlayers: Set[String] = Set.empty
 	private var lastPackage: Box[ArmyEventPackage] = Empty
 	
 	override def lowPriority = {
 	  case GameArmyCompositionUpdate(id: Int, composition: ArmyEventPackage) if isMyGame(id) => {
 	    lastPackage = Full(composition)
+	    checkForAddedPlayers(composition.playerInfo)
 	    checkForAddedEvents(composition.playerEvents)
+	  }
+	}
+	
+	private def checkForAddedPlayers(fromPackage: Map[String, ArmyEventPlayer]) = {
+	  var changes: Map[String, List[ArmyEventPlayer]] = Map.empty withDefaultValue(Nil)
+	  for (pair <- fromPackage) {
+	    if (!armyPlayers.contains(pair._1)) {
+	      armyPlayers += pair._1
+	      val changedList = (changes(pair._1))
+	      changes += (pair._1 -> (pair._2 :: changedList))
+	    }
+	  }
+	  if (changes.nonEmpty) {
+	    val re = changes.mapValues(x => x.reverse)
+	    partialUpdate(AddPlayerMessage(re))
 	  }
 	}
 	
@@ -72,6 +106,8 @@ class GameArmyComposition extends GameComet {
 	private def initSendMapByPackage(pack: ArmyEventPackage) {
 	  val ids = pack.playerEvents.map(x => x._2.map(_.id)).flatten
 	  armyEventsMap ++= ids
+	  val pIds = pack.playerInfo.map(x => x._1)
+	  armyPlayers ++= pIds
 	}
 	
 	def render = {
@@ -84,11 +120,9 @@ class GameArmyComposition extends GameComet {
 	      lastPackage = Some(loaded)
 	    }
 	    
-	    CookieBox withSession { db =>
-          "#armyDataSource [data-army-info]" #> compact(net.liftweb.json.render(Extraction decompose lastPackage))
-	    }
+        "#armyDataSource [data-army-info]" #> compact(net.liftweb.json.render(Extraction decompose lastPackage))
 	  }
-	  
+
 	  val dummy = "#dumymdumm" #> ""
 	  val d = foo.openOr(dummy)
 	  d

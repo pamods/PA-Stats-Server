@@ -383,3 +383,13 @@ body {
 	text-overflow: ellipsis; 
 	max-width: 800px;
 }
+
+/* http://stackoverflow.com/questions/796087/make-a-div-into-a-link */
+.link-spanner{
+  position:absolute; 
+  width:100%;
+  height:100%;
+  top:0;
+  left: 0;
+  z-index: 1000;
+}

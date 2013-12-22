@@ -7,7 +7,9 @@ $(document).ready(function() {
 		var self = this;
 		
 		self.spec = ko.observable(spc);
-		self.icon = ko.computed(function() {return imageBaseUrl +"units/"+ self.spec().substring(self.spec().search(start), self.spec().search(end))+".png"});
+		self.name = ko.computed(function() {return self.spec().substring(self.spec().search(start), self.spec().search(end))});
+		self.icon = ko.computed(function() {return imageBaseUrl +"units/"+ self.name() +".png"});
+		self.linkToPaDb = ko.computed(function() {return "http://pa-db.com/unit/"+self.name()});
 		self.count = ko.observable(cnt);
 		self.visible = ko.computed(function() {return self.count() > 0;});
 	}
@@ -24,12 +26,12 @@ $(document).ready(function() {
 			return ko.utils.arrayFilter(self.units(), function(unit) {
 				return unit.visible();
 			});
-		}, self);
+		});
 		
-		self.resetUnits = function() {
-			self.units.removeAll();
-		}
-		
+		self.hasUnits = ko.computed(function() {
+			return self.visibleUnits().length > 0;
+		});
+			
 		self.unitSpecIndex = {};
 		
 		self.changeUnitCount = function (spec, changeCnt) {
@@ -92,17 +94,29 @@ $(document).ready(function() {
 			self.indexEvent(evt);
 		}
 		
-		self.lockForFollowTime = function() {
-			self.wasOnEnd = self.endTime() - self.selectedTime() < 5000;
+		self.lockWasOnEnd = function() {
+			var prevEnd = self.endTime();
+			var border = (prevEnd - self.startTime()) * 0.05;
+			self.wasOnEnd = prevEnd - self.selectedTime() < border;
 		}
 		
-		self.mayFollowTime = function() {
+		self.selectEnd = function() {
+			self.selectedTime(self.endTime());
+		}
+		
+		self.maySelectEnd = function() {
 			if (self.wasOnEnd) {
-				self.selectedTime(self.endTime());
+				self.selectEnd();
 			}
 		}
 		
 		self.players = ko.observableArray([]);
+		
+		self.visiblePlayers = ko.computed(function() {
+			return ko.utils.arrayFilter(self.players(), function(player) {
+				return player.hasUnits();
+			});
+		}, self);
 		
 		self.addPlayer = function (id, name, pColor, sColor) {
 			self.players.push(new PlayerArmy(id, name, pColor, sColor));
@@ -169,9 +183,7 @@ $(document).ready(function() {
 	}
 	
 	var playerEvents = armyBaseData.playerEvents;
-	
-	armyModel.lockForFollowTime();
-	
+
 	for (playerId in playerEvents) {
 		var pEvents = playerEvents[playerId];
 		for (var i = 0; i < pEvents.length; i++) {
@@ -179,17 +191,31 @@ $(document).ready(function() {
 			armyModel.addEvent(playerId, evt.spec, evt.time, evt.watchType);
 		}
 	}
+
+	armyModel.maySelectEnd();
 	
-	armyModel.mayFollowTime();
+	$(document).on("new-players", function(event, data) {
+		for (var i = 0; i < data.value.length; i++) {
+			var p = data.value[i];
+			armyModel.addPlayer(p.playerId, p.name, p.pColor, p.sColor);
+		}
+		window.setTimeout(function() {
+			armyModel.selectEnd();
+		}, 750); // see below 
+	});
 	
 	$(document).on("new-army-events", function(event, data) {
-		armyModel.lockForFollowTime();
+		armyModel.lockWasOnEnd();
 		for (var i = 0; i < data.value.length; i++) {
 			var evt = data.value[i];
 			armyModel.addEvent(evt.playerId, evt.spec, evt.time, evt.watchType);
 		}
-		armyModel.mayFollowTime();
-	});	
+		window.setTimeout(function() {
+			armyModel.maySelectEnd();
+		}, 500); // ugly, but the only way I found to prevent ko deferred from inserting false (old) values. I have NO idea why it keeps doing it otherwise
+		// even a 10ms timeout was already enough in all my tests, so 500 should be pretty save. Worst thing that can happen is that it stops updating by itself
+		// ko-deferred improves perf so much that I think this is a fair trade
+	});
 	
 	ko.applyBindings(armyModel, document.getElementById('armycomposition'));	
 });
