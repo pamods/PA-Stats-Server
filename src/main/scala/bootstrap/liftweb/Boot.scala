@@ -29,6 +29,7 @@ import info.nanodesu.pages.GamePage
 import info.nanodesu.pages.StatsPage
 import info.nanodesu.lib.db.CookieBox
 import info.nanodesu.model.db.collectors.stats.RuntimeInfoCollector
+import info.nanodesu.model.db.collectors.stats.ExtraNumbersCollector
 
 // see: http://cookbook.liftweb.net/#InstallAndRunning
 /**
@@ -63,6 +64,7 @@ class Boot extends Loggable {
     SmallGamesCleaner.init()
     PlayerHighscoreCollector.init()
     MostPlaytimesCollector.init()
+    ExtraNumbersCollector.init()
     
     // Build SiteMap
     val entries = List(

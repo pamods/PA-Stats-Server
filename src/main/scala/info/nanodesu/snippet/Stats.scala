@@ -69,9 +69,11 @@ object Stats extends DispatchSnippet {
   private def doGeneral = {
     val numbers = CookieBox withSession (ExtraNumbersCollector(_))
     "#gamecount" #> numbers.gameCount &
-    "#datapointcnt" #> numbers.datapointsCount &
+    "#datapointcnt -*" #> numbers.datapointsCount &
     "#avglen" #> numbers.avgGameTime &
     "#gamelength" #> numbers.sumGameTime &
-    "#users" #> numbers.userCount
+    "#users" #> numbers.userCount &
+    "#unitsCreated -*" #> numbers.unitsCreated &
+    "#unitsDestroyed -*" #> numbers.unitsDestroyed
   }
 }
