@@ -41,7 +41,9 @@ trait RefreshRunner extends Loggable {
     while (containerIsAlive) {
       if (lastUpdate + RUN_INTERVAL < System.currentTimeMillis()) {
         try {
+          logger info "starting task "+processName
           runQuery()
+          logger info "completed task "+processName
         } catch {
           case th: Throwable =>
             {
