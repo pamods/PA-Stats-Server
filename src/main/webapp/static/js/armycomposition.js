@@ -2,14 +2,17 @@ $(document).ready(function() {
 
     var start = /[^\/]*$/;  // ^ : start , \/ : '/', $ : end // as wildcard: /*.json 
     var end = /[.]json$/;
-	
+    
 	function ArmyUnit(spc, cnt) {
 		var self = this;
 		
 		self.spec = ko.observable(spc);
 		self.name = ko.computed(function() {return self.spec().substring(self.spec().search(start), self.spec().search(end))});
 		self.icon = ko.computed(function() {return imageBaseUrl +"units/"+ self.name() +".png"});
-		self.linkToPaDb = ko.computed(function() {return "http://pa-db.com/unit/"+self.name()});
+		self.linkToPaDb = ko.computed(function() {
+			var link = /([^\/]+?\/[^\/]+?\/)(?=[^\/]*\.json)/.exec(self.spec());
+			return "http://pamatches.com/units/"+link[0];
+		});
 		self.count = ko.observable(cnt);
 		self.visible = ko.computed(function() {return self.count() > 0;});
 	}
