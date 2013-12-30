@@ -16,6 +16,7 @@ import info.nanodesu.lib.Formattings
 import info.nanodesu.model.db.collectors.gameinfo.loader._
 import info.nanodesu.model.db.collectors.gameinfo.ArmyEventPackage
 import info.nanodesu.model.db.collectors.gameinfo.ArmyEventDataCollector
+import java.util.concurrent.atomic.AtomicInteger
 
 case class GameDataUpdate(gameId: Int)
 case class ForceGameDataUpdate(gameId: Int)
@@ -26,6 +27,9 @@ case class GeneralGameJsCmd(gameId: Int, cmd: JsCmd)
 case class GamePlayersListJsCmd(gameId: Int, cmd: JsCmd)
 
 object GameCometServer extends LiftActor with ListenerManager with Loggable{
+  
+  val cometCounter = new AtomicInteger(0)
+  
     @volatile
     private var timingsMap: Map[Int, Long] = Map()
     

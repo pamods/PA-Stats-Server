@@ -122,4 +122,10 @@ class GameArmyComposition extends GameComet {
 	  val d = foo.openOr(dummy)
 	  d
 	}
+
+	override protected def localShutdown() = {
+	  super.localShutdown
+	  armyEventsMap = Set.empty
+	  armyPlayers = Set.empty
+	}
 }
