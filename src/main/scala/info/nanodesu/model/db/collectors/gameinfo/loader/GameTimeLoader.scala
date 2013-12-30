@@ -15,8 +15,12 @@ import java.sql.Timestamp
 import net.liftweb.json.JValue
 import net.liftweb.json.Extraction
 
-class GameStartTimeLoader(db: DSLContext) {
+class GameTimesLoader(db: DSLContext) {
     def selectStartTimeForGame(gameId: Int): Long = {
-      return db.select(games.START_TIME).from(games).where(games.ID === gameId).fetchOne().value1().getTime()
+      db.select(games.START_TIME).from(games).where(games.ID === gameId).fetchOne().value1().getTime()
+    }
+    
+    def selectEndTimeForGame(gameId: Int): Long = {
+      db.select(games.END_TIME).from(games).where(games.ID === gameId).fetchOne().value1().getTime()
     }
 }

@@ -20,12 +20,12 @@ import scala.actors.ActorTask
 import net.liftweb.http.S
 import net.liftweb.common.Empty
 import info.nanodesu.lib.db.CookieBox
-import info.nanodesu.model.db.collectors.gameinfo.loader.GameStartTimeLoader
 import net.liftweb.common.Loggable
 import info.nanodesu.model.db.collectors.gameinfo.ArmyEventPackage
 import net.liftweb.common.Box
 import info.nanodesu.model.db.collectors.gameinfo.ArmyEventDataCollector
 import net.liftweb.util.CssSel
+import info.nanodesu.snippet.cometrenderer.ArmyCompositionRenderer
 
 // TODO these 2 case classes and their handling in this file look redundant to me
 case class AddEventsMsg(msgs: Map[String, List[ArmyEvent]]) extends JsCmd {
@@ -101,7 +101,7 @@ class GameArmyComposition extends GameComet {
 	  }
 	}
 	
-	private def initSendMapByPackage(pack: ArmyEventPackage) {
+	def initSendMapByPackage(pack: ArmyEventPackage) {
 	  val ids = pack.playerEvents.map(x => x._2.map(_.id)).flatten
 	  armyEventsMap ++= ids
 	  val pIds = pack.playerInfo.map(x => x._1)
@@ -109,17 +109,10 @@ class GameArmyComposition extends GameComet {
 	}
 	
 	def render = {
-	  implicit val formats = DefaultFormats
-	  
 	  val foo = for (gId <- getGameId) yield {
-	    val loaded = CookieBox withSession { db => ArmyEventDataCollector(db).collectEventsFor(gId)}
-        initSendMapByPackage(loaded)
-	    
-        "#armyDataSource [data-army-info]" #> compact(net.liftweb.json.render(Extraction decompose loaded))
+	    new ArmyCompositionRenderer(gId, Some(this)).render
 	  }
-
-	  val dummy = "#dumymdumm" #> ""
-	  val d = foo.openOr(dummy)
+	  val d = foo.openOr("#noop" #> "")
 	  d
 	}
 

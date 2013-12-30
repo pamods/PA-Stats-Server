@@ -65,7 +65,6 @@ object GameCometServer extends LiftActor with ListenerManager with Loggable{
 	}
 	
 	def doUpdateNow(id: Int) = {
-	  logger info "update for game " + id
 	  updateListeners(GeneralGameJsCmd(id, createGeneralGameUpdate(id)))
       updateListeners(GamePlayersListJsCmd(id, createPlayersListUpdate(id)))
       updateListeners(createArmyCompositionUpdate(id))	  

@@ -14,8 +14,7 @@ import info.nanodesu.model.db.updaters.reporting.GenerateNewPlayer
 import java.sql.Timestamp
 import net.liftweb.json.JValue
 import net.liftweb.json.Extraction
-import info.nanodesu.model.db.collectors.gameinfo.loader.GameStartTimeLoader
-
+import info.nanodesu.model.db.collectors.gameinfo.loader.GameTimesLoader
 
 // yes currently this is practically a copy of the ArmyEvent in ReportData.
 // However I want to keep these 2 classes separate since they are used for different communication channels that may change independently from each other
@@ -54,7 +53,7 @@ object ArmyEventDataCollector {
   
   private class DbLayer(db: DSLContext) extends ArmyEventDbLayer {
     
-    def selectStartTimeForGame(gameId: Int): Long = new GameStartTimeLoader(db).selectStartTimeForGame(gameId)
+    def selectStartTimeForGame(gameId: Int): Long = new GameTimesLoader(db).selectStartTimeForGame(gameId)
     
     def selectArmyEventsForGame(gameId: Int): List[ArmyEventDbResult] = {
       val lst  = db.select(playerGameRels.P, 
