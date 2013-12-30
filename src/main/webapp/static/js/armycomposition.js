@@ -174,7 +174,7 @@ $(document).ready(function() {
 		});
 	}
 	
-	var armyBaseData = $("#armyDataSource").data("army-info").value;
+	var armyBaseData = $("#armyDataSource").data("army-info");
 	
 	var armyModel = new ArmyCompositionModel(armyBaseData.gameStart);
 

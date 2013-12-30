@@ -63,11 +63,9 @@ class GameArmyComposition extends GameComet {
 	
 	private var armyEventsMap: Set[Int] = Set.empty
 	private var armyPlayers: Set[String] = Set.empty
-	private var lastPackage: Box[ArmyEventPackage] = Empty
-	
+
 	override def lowPriority = {
 	  case GameArmyCompositionUpdate(id: Int, composition: ArmyEventPackage) if isMyGame(id) => {
-	    lastPackage = Full(composition)
 	    checkForAddedPlayers(composition.playerInfo)
 	    checkForAddedEvents(composition.playerEvents)
 	  }
@@ -114,13 +112,10 @@ class GameArmyComposition extends GameComet {
 	  implicit val formats = DefaultFormats
 	  
 	  val foo = for (gId <- getGameId) yield {
-	    if (lastPackage.isEmpty) {
-	      val loaded = CookieBox withSession { db => ArmyEventDataCollector(db).collectEventsFor(gId)}
-	      initSendMapByPackage(loaded)
-	      lastPackage = Some(loaded)
-	    }
+	    val loaded = CookieBox withSession { db => ArmyEventDataCollector(db).collectEventsFor(gId)}
+        initSendMapByPackage(loaded)
 	    
-        "#armyDataSource [data-army-info]" #> compact(net.liftweb.json.render(Extraction decompose lastPackage))
+        "#armyDataSource [data-army-info]" #> compact(net.liftweb.json.render(Extraction decompose loaded))
 	  }
 
 	  val dummy = "#dumymdumm" #> ""
