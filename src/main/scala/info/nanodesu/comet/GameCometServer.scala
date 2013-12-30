@@ -28,6 +28,7 @@ case class GamePlayersListJsCmd(gameId: Int, cmd: JsCmd)
 
 object GameCometServer extends LiftActor with ListenerManager with Loggable{
   
+  val myGameChecksCounter = new AtomicInteger(0)
   val cometCounter = new AtomicInteger(0)
   
     @volatile
@@ -64,6 +65,7 @@ object GameCometServer extends LiftActor with ListenerManager with Loggable{
 	}
 	
 	def doUpdateNow(id: Int) = {
+	  logger info "update for game " + id
 	  updateListeners(GeneralGameJsCmd(id, createGeneralGameUpdate(id)))
       updateListeners(GamePlayersListJsCmd(id, createPlayersListUpdate(id)))
       updateListeners(createArmyCompositionUpdate(id))	  

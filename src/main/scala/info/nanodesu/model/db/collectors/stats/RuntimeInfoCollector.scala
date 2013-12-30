@@ -25,6 +25,7 @@ class RuntimeInfoCollector(db: DSLContext) {
   val poolConnections = CookieBox.getNumPoolConnections
   val busyConnections = CookieBox.getNumBusyConnections
   val activeGameComets = GameCometServer.cometCounter.get()
+  val myGameChecks = GameCometServer.myGameChecksCounter.get()
 }
 
 object RuntimeInfoCollector {
