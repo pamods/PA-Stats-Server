@@ -17,6 +17,7 @@ import java.sql.Timestamp
 import info.nanodesu.model.RunningGameData
 import info.nanodesu.model.db.updaters.reporting.running.RunningGameStatsReporter
 import info.nanodesu.model.db.updaters.reporting.running.RunningGameUpdater
+import net.liftweb.common.Loggable
 
 trait InitialReportAcceptorDblayer {
   def selectGameId(ident: String): Option[Int]
@@ -33,22 +34,30 @@ trait InitialReportAcceptorBase {
 }
 
 class InitialReportAcceptor(reportLinker: InitialGameToReportLinker, initReport: InitialReport,
-  statsInserter: RunningGameUpdater) extends InitialReportAcceptorBase {
+  statsInserter: RunningGameUpdater) extends InitialReportAcceptorBase with Loggable {
   def acceptInitialReport(data: ReportData, reportDate: Date): Int = {
     val gameIdBox = dbL.selectGameId(data.ident)
-    val gameId =  gameIdBox getOrElse {
+    val gameId = gameIdBox getOrElse {
       initReport.createGameAndReturnId(data, new Timestamp(reportDate.getTime()))
     }
 
-    val link = reportLinker.fixUpGameLinkAndReturnIt(gameId, data.reporterTeam, data.reporterUberName, data.reporterDisplayName)
-    if (!data.showLive) {
-      dbL.privatizeGame(link)
-    }
+    try {
+      val link = reportLinker.fixUpGameLinkAndReturnIt(gameId, data.reporterTeam, data.reporterUberName, data.reporterDisplayName)
+      if (!data.showLive) {
+        dbL.privatizeGame(link)
+      }
 
-    val dataToReport = RunningGameData(link, data.firstStats, data.armyEvents)
-    statsInserter.insertRunningGameData(dataToReport, reportDate)
-    
-    link
+      val dataToReport = RunningGameData(link, data.firstStats, data.armyEvents)
+      statsInserter.insertRunningGameData(dataToReport, reportDate)
+
+      link
+    } catch {
+      case r: Exception => {
+        logger error "hit exception while linking game"
+        logger error "pack was: " + data
+        throw r
+      }
+    }
   }
 }
 
@@ -61,12 +70,12 @@ object InitialReportAcceptor {
     lockMap.putIfAbsent(ident, new Object())
     lockMap.get(ident)
   }
-  
+
   def acceptInitialReport(db: DSLContext, data: ReportData, reportDate: Date): Int = {
-      val worker = new InitialReportAcceptor(InitialGameToReport(db), InitialReportUpdater(db),
-        RunningGameStatsReporter(db))
-      worker.init(new DbLayer(db))
-      worker.acceptInitialReport(data, reportDate)
+    val worker = new InitialReportAcceptor(InitialGameToReport(db), InitialReportUpdater(db),
+      RunningGameStatsReporter(db))
+    worker.init(new DbLayer(db))
+    worker.acceptInitialReport(data, reportDate)
   }
 
   private class DbLayer(db: DSLContext) extends InitialReportAcceptorDblayer with GameIdFromIdentLoader {
