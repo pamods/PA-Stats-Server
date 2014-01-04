@@ -98,7 +98,7 @@ object StatisticsReportService extends RestHelper with Loggable {
       gameList match {
         case Full(Failure(msg, exc, chain)) => ResponseWithReason(BadResponse(), msg) 
         case Full(Full(x)) => Extraction decompose x
-        case _ => ResponseWithReason(BadResponse(), "something went wrong somewhere :(")
+        case wtf => ResponseWithReason(BadResponse(), "something went wrong somewhere :( data is:\n"+wtf)
       }
   }
 
