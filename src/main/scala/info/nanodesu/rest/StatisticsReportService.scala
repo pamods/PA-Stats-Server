@@ -34,6 +34,7 @@ import java.math.BigInteger
 import java.lang.Long
 import org.apache.commons.lang.StringUtils
 import info.nanodesu.model.db.collectors.gameinfo.ArmyEventDataCollector
+import info.nanodesu.comet.ForceGameDataUpdate
 
 
 object StatisticsReportService extends RestHelper with Loggable {
@@ -122,7 +123,7 @@ object StatisticsReportService extends RestHelper with Loggable {
             execute()
         }
         for (gameId <- ReportDataC.getGameIdForLink(link)) {
-          GameCometServer ! GameDataUpdate(gameId)
+          GameCometServer ! ForceGameDataUpdate(gameId)
         }
       }
       OkResponse()
@@ -147,7 +148,7 @@ object StatisticsReportService extends RestHelper with Loggable {
             where(games.ID === gameId).
             execute()
         }
-        GameCometServer ! GameDataUpdate(gameId)
+        GameCometServer ! ForceGameDataUpdate(gameId)
       }
 
       OkResponse()
