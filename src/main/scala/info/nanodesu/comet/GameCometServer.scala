@@ -17,11 +17,15 @@ import info.nanodesu.model.db.collectors.gameinfo.loader._
 import info.nanodesu.model.db.collectors.gameinfo.ArmyEventPackage
 import info.nanodesu.model.db.collectors.gameinfo.ArmyEventDataCollector
 import java.util.concurrent.atomic.AtomicInteger
+import info.nanodesu.model.db.collectors.gameinfo.ChartDataPackage
+import info.nanodesu.model.db.collectors.gameinfo.ChartDataCollector
 
 case class GameDataUpdate(gameId: Int)
 case class ForceGameDataUpdate(gameId: Int)
 
 case class GameArmyCompositionUpdate(gameId: Int, composition: ArmyEventPackage)
+
+case class GameChartUpdate(gameId: Int, chartData: ChartDataPackage)
 
 case class GeneralGameJsCmd(gameId: Int, cmd: JsCmd)
 case class GamePlayersListJsCmd(gameId: Int, cmd: JsCmd)
@@ -67,8 +71,12 @@ object GameCometServer extends LiftActor with ListenerManager with Loggable{
 	def doUpdateNow(id: Int) = {
 	  updateListeners(GeneralGameJsCmd(id, createGeneralGameUpdate(id)))
       updateListeners(GamePlayersListJsCmd(id, createPlayersListUpdate(id)))
-      updateListeners(createArmyCompositionUpdate(id))	  
+      updateListeners(createArmyCompositionUpdate(id))
+      updateListeners(createGameChartUpdate(id))
 	}
+	
+	private def createGameChartUpdate(id: Int) = 
+	  GameChartUpdate(id, CookieBox withSession (ChartDataCollector(_).collectDataFor(id)))
 	
 	private def createArmyCompositionUpdate(id: Int) = 
 	  GameArmyCompositionUpdate(id, CookieBox withSession (ArmyEventDataCollector(_).collectEventsFor(id)))

@@ -27,35 +27,25 @@ import info.nanodesu.model.db.collectors.gameinfo.ArmyEventDataCollector
 import net.liftweb.util.CssSel
 import info.nanodesu.snippet.cometrenderer.ArmyCompositionRenderer
 
-// TODO these 2 case classes and their handling in this file look redundant to me
-case class AddEventsMsg(msgs: Map[String, List[ArmyEvent]]) extends JsCmd {
-  implicit val formats = DefaultFormats
-  
-  def json: JValue = {
-    val lst = msgs.toList.map(x => {
-      for (e <- x._2) yield {
-        Map("playerId" -> x._1, "spec" -> e.spec, "time" -> e.time, "watchType" -> e.watchType)
-      }
-    }).flatten
-    Extraction decompose Map("value" -> lst)
+// TODO  handling of these classes in this file looks redundant to me
+case class AddEventsMsg(msgs: Map[String, List[ArmyEvent]]) extends MapFlatteningTriggerMessage[ArmyEvent] {
+  def input = msgs
+
+  def map(key: String, event: ArmyEvent) = {
+   Map("playerId" -> key, "spec" -> event.spec, "time" -> event.time, "watchType" -> event.watchType)
   }
   
-  override val toJsCmd = JE.JsRaw("""$(document).trigger('new-army-events', %s);""".format(compact(net.liftweb.json.render(json)))).toJsCmd
+  def triggerName = "new-army-events"
 }
 
-case class AddPlayerMessage(msgs: Map[String, List[ArmyEventPlayer]]) extends JsCmd {
-  implicit val formats = DefaultFormats
+case class AddPlayerMessage(msgs: Map[String, List[ArmyEventPlayer]]) extends MapFlatteningTriggerMessage[ArmyEventPlayer] {
+  def input = msgs
   
-  def json: JValue = {
-    val lst = msgs.toList.map(x => {
-      for (e <- x._2) yield {
-        Map("playerId" -> x._1, "name" -> e.name, "pColor" -> e.primaryColor, "sColor" -> e.secondaryColor)
-      }
-    }).flatten
-    Extraction decompose Map("value" -> lst)
+  def map(key: String, e: ArmyEventPlayer) = {
+    Map("playerId" -> key, "name" -> e.name, "pColor" -> e.primaryColor, "sColor" -> e.secondaryColor)
   }
-  
-  override val toJsCmd = JE.JsRaw("""$(document).trigger('new-players', %s);""".format(compact(net.liftweb.json.render(json)))).toJsCmd
+ 
+  def triggerName = "new-players"
 }
 
 class GameArmyComposition extends GameComet {

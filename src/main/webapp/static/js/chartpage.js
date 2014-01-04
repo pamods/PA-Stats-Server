@@ -133,22 +133,11 @@ $(function() {
 			slider: sliderConf
 		});
 		
-		self.loadData = function() {
-			var gameId = $.urlParam("gameId");
-
-			// queryUrl is injected from the HeadInjection snippet
-			if (gameId === undefined) {
-				$.get(queryUrl + "?gameIdent=" + $.urlParam('gameIdent'),
-						populateChart);
-			} else {
-				$.get(queryUrl + "?gameId=" + gameId, populateChart);
-			}
-		}
-
-
 		var showingLiveNote = false;
-
-		function processTime(currentData) {
+		
+		var currentData = undefined;
+		
+		function processTime() {
 			var timePointData = currentData.playerTimeData;
 			firstTime = undefined;
 			lastTime = undefined;
@@ -164,19 +153,11 @@ $(function() {
 					lastTime = timePointData[playerName][timePointData[playerName].length - 1].timepoint;
 				}
 			}
-		}
-		
-		function populateChart(data) {
-			processTime(data);
-			data.info = data.playerInfo;
-			data.timeData = data.playerTimeData;
-			self.basicChart.updateData(data);
 			
 			// dont trust the user's time for this, all game data points are supposed to be server time
 			$.get(queryUrl + "/time", function(timeMs) {
 				var mightStillBeRunning = timeMs.ms - lastTime < gameIsLiveOffsetGuess;
 				if (mightStillBeRunning) {
-					window.setTimeout(self.loadData, 5000);
 					if (!showingLiveNote) {
 						$("#livenote").show("slide", {direction: "right" }, "slow");
 						showingLiveNote = true;
@@ -187,11 +168,40 @@ $(function() {
 						showingLiveNote = false;
 					}
 				}
+				window.setTimeout(function() {processTime();}, 3000);
 			});
+		}
+		
+		function updateByCurrentData() {
+			currentData.info = currentData.playerInfo;
+			currentData.timeData = currentData.playerTimeData;
+			self.basicChart.updateData(currentData);
+		}
+		
+		self.populateChart = function (data) {
+			currentData = data;
+			processTime();
+			updateByCurrentData();
+		}
+		
+		self.addData = function(data) {
+			for (var i = 0; i < data.value.length; i++) {
+				var playerPack = data.value[i];
+				currentData.playerTimeData[playerPack.playerId].push(playerPack.data);
+			}
+			updateByCurrentData();
 		}
 	}
 
 	var viewModel = new ChartModel();
-	window.setTimeout(function() {viewModel.loadData();}, 500);
+
+	
+	$(document).on("new-chart-data", function(event, data) {
+		viewModel.addData(data);
+	});
+	
 	ko.applyBindings(viewModel.basicChart, document.getElementById('chartbase'));
+
+	var baseData = $('#chartDataSource').data("chart-info");
+	window.setTimeout(function() {viewModel.populateChart(baseData);}, 500);
 });

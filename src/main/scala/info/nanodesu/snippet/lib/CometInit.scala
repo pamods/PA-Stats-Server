@@ -16,6 +16,7 @@ import info.nanodesu.snippet.cometrenderer.PlayerInfoRenderer
 import net.liftweb.util.CssSel
 import info.nanodesu.snippet.cometrenderer.GameInfoRenderer
 import info.nanodesu.snippet.cometrenderer.ArmyCompositionRenderer
+import info.nanodesu.snippet.cometrenderer.GameChartDataRenderer
 
 object CometInit extends DispatchSnippet with Loggable {
   val cometServePastThreshold = 1800 * 1000 // 30min
@@ -23,11 +24,13 @@ object CometInit extends DispatchSnippet with Loggable {
   val playerGameInfoKey = "game_player_lines_"
   val gameInfoKey = "game_general_"
   val gameArmyComposition = "game_army_composition_"
-
+  val gameChartComet = "game_chart_comet_"
+    
   val dispatch: DispatchIt = {
     case "playerGameInfo" => doPlayerGameInfo
     case "gameGeneralInfo" => doGameGeneralInfo
     case "gameArmyComposition" => doGameArmyComposition
+    case "gameChartInfo" => doGameChartInfo
   }
 
   private def shouldBeConsideredLive(gameId: Int): Boolean = {
@@ -36,6 +39,8 @@ object CometInit extends DispatchSnippet with Loggable {
     threshold > System.currentTimeMillis()
   }
 
+  private def doGameChartInfo = doCometOrSnippet(new GameChartDataRenderer(_).render, "GameChartComet", gameChartComet)
+  
   private def doPlayerGameInfo = doCometOrSnippet(new PlayerInfoRenderer(_).render, "PlayerGameInfo", playerGameInfoKey)
 
   private def doCometOrSnippet(renderSnippet: Int => CssSel, cometType: String, cometKey: String) = {
