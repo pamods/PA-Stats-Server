@@ -135,10 +135,10 @@ $(function() {
 		
 		var showingLiveNote = false;
 		
-		var currentData = undefined;
+		self.currentData = undefined;
 		
 		function processTime() {
-			var timePointData = currentData.playerTimeData;
+			var timePointData = self.currentData.playerTimeData;
 			firstTime = undefined;
 			lastTime = undefined;
 			for ( var playerName in timePointData) {
@@ -173,13 +173,14 @@ $(function() {
 		}
 		
 		function updateByCurrentData() {
-			currentData.info = currentData.playerInfo;
-			currentData.timeData = currentData.playerTimeData;
-			self.basicChart.updateData(currentData);
+			self.currentData.info = self.currentData.playerInfo;
+			self.currentData.timeData = self.currentData.playerTimeData;
+			self.basicChart.updateData(self.currentData);
 		}
 		
 		self.populateChart = function (data) {
-			currentData = data;
+			//console.log("populated");
+			self.currentData = data;
 			processTime();
 			updateByCurrentData();
 		}
@@ -187,7 +188,7 @@ $(function() {
 		self.addData = function(data) {
 			for (var i = 0; i < data.value.length; i++) {
 				var playerPack = data.value[i];
-				currentData.playerTimeData[playerPack.playerId].push(playerPack.data);
+				self.currentData.playerTimeData[playerPack.playerId].push(playerPack.data);
 			}
 			updateByCurrentData();
 		}
