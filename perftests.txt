@@ -1,0 +1,8 @@
+- simulate players that send data to games
+- simulate viewers that view the games, these viewers have different behavior:
+	some part of them randomly browses different (old) games
+	some other part open live games
+- simulate viewers that browser player pages. Do this by opening the players list and crawl through it
+
+the important metric is how many players and viewers can be on the system before the response time of the "send data" players goes beyond 3 seconds
+This is because the report data webservice is basically the core of the system, if it fails reported data will be damaged or destroyed and thus the system would be useless

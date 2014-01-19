@@ -2,10 +2,10 @@ dbName=rbztest
 
 queryUrl=http://127.0.0.1:8080/report/get
 
-minGameLength=0
-deletionInterval=11111
+minGameLength=5
+deletionInterval=10
 
-minDataPointsToKeep = 0
+minDataPointsToKeep = 12
 
 liveGameThreshold=16000
 

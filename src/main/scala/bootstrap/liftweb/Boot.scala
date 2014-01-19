@@ -41,6 +41,14 @@ import info.nanodesu.model.db.collectors.stats.ExtraNumbersCollector
 class Boot extends Loggable {
 	
   def boot {
+//        LiftRules.supplimentalHeaders = s => s.addHeaders(
+//      List(HTTPParam("X-Lift-Version", LiftRules.liftVersion),
+//        HTTPParam("Access-Control-Allow-Origin", "*"),
+//        HTTPParam("Access-Control-Allow-Credentials", "true"),
+//        HTTPParam("Access-Control-Allow-Methods", "GET, POST, PUT, OPTIONS"),
+//        HTTPParam("Access-Control-Allow-Headers", "WWW-Authenticate,Keep-Alive,User-Agent,X-Requested-With,Cache-Control,Content-Type")))
+    
+    
     // no need for jmx access to c3p0
     System.getProperties().setProperty("com.mchange.v2.c3p0.management.ManagementCoordinator", "com.mchange.v2.c3p0.management.NullManagementCoordinator")
     
@@ -75,6 +83,7 @@ class Boot extends Loggable {
       Menu.i("Players") / PlayerSearchPage.pageName,
       Menu(Loc("Ladder", ExtLink("http://pastats-ladder.gamestown24.de/"), "Ladder")),
       Menu.i("Extra") / StatsPage.pageName,
+      Menu(Loc("Units", ExtLink("http://www.nanodesu.info/pa-db/"), "Units")),
       Menu.i("Player") / PlayerPage.pageName >> Hidden,
       Menu.i("Chart") / GamePage.pageName >> Hidden,
       Menu.i("Ingamechart") / "ingamechart" >> Hidden)

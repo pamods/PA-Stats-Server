@@ -66,7 +66,7 @@ object StatisticsReportService extends RestHelper with Loggable {
             val result = db.select(teams.INGAME_ID, playerGameRels.P, names.DISPLAY_NAME, games.WINNER_TEAM, games.ID, players.UBER_NAME, games.START_TIME).
               from(playerGameRels).
               join(games).onKey().
-              //leftOuterJoin(stats).on(stats.PLAYER_GAME === playerGameRels.ID). // I *think* this is a pretty pointless join that hurts performance, but I let this commet here until it is deployed and noobody complains...
+//              leftOuterJoin(stats).on(stats.PLAYER_GAME === playerGameRels.ID). // I *think* this is a pretty pointless join that hurts performance, but I let this commet here until it is deployed and noobody complains...
               join(players).onKey().
               join(names).onKey().
               join(teams).onKey().
