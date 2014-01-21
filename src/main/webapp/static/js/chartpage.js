@@ -137,7 +137,7 @@ $(function() {
 		
 		self.currentData = undefined;
 		
-		function processTime() {
+		self.processTime = function() {
 			var timePointData = self.currentData.playerTimeData;
 			firstTime = undefined;
 			lastTime = undefined;
@@ -153,23 +153,28 @@ $(function() {
 					lastTime = timePointData[playerName][timePointData[playerName].length - 1].timepoint;
 				}
 			}
-			
-			// dont trust the user's time for this, all game data points are supposed to be server time
-			$.get(queryUrl + "/time", function(timeMs) {
-				var mightStillBeRunning = timeMs.ms - lastTime < gameIsLiveOffsetGuess;
-				if (mightStillBeRunning) {
-					if (!showingLiveNote) {
-						$("#livenote").show("slide", {direction: "right" }, "slow");
-						showingLiveNote = true;
-					}
-				} else {
-					if (showingLiveNote) {
-						$("#livenote").hide("slide", {direction: "right" }, "slow");
-						showingLiveNote = false;
-					}
+		}
+		
+		var lastUpdated = 0;
+		
+		self.setLastUpdate = function(v) {
+			lastUpdated = v;
+		}
+		
+		self.checkLiveProc = function() {
+			var mightStillBeRunning = new Date().getTime() - lastUpdated < gameIsLiveOffsetGuess;
+			if (mightStillBeRunning) {
+				if (!showingLiveNote) {
+					$("#livenote").show("slide", {direction: "right" }, "slow");
+					showingLiveNote = true;
 				}
-				window.setTimeout(function() {processTime();}, 3000);
-			});
+			} else {
+				if (showingLiveNote) {
+					$("#livenote").hide("slide", {direction: "right" }, "slow");
+					showingLiveNote = false;
+				}
+			}
+			window.setTimeout(self.checkLiveProc, 1000);
 		}
 		
 		function updateByCurrentData() {
@@ -179,9 +184,8 @@ $(function() {
 		}
 		
 		self.populateChart = function (data) {
-			//console.log("populated");
 			self.currentData = data;
-			processTime();
+			self.processTime();
 			updateByCurrentData();
 		}
 		
@@ -195,10 +199,12 @@ $(function() {
 	}
 
 	var viewModel = new ChartModel();
-
+	viewModel.checkLiveProc();
 	
 	$(document).on("new-chart-data", function(event, data) {
+		viewModel.setLastUpdate(new Date().getTime());
 		viewModel.addData(data);
+		viewModel.processTime();
 	});
 	
 	ko.applyBindings(viewModel.basicChart, document.getElementById('chartbase'));
