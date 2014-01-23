@@ -67,7 +67,7 @@ class ChartDataCollector(dbLayer: ChartDataCollectorDblayer) extends ChartDataCo
     val sorted = perPlayerDataPoints.mapValues(_.sortBy(_.timepoint))
 
     val playerData = input.groupBy(x => (x.playerId.toString, ChartPlayer(x.playerName, x.playerColor))).keySet.toMap
-
+    
     ChartDataPackage(gameId, sorted, playerData)
   }
 }

@@ -135,15 +135,18 @@ $(function() {
 		
 		var showingLiveNote = false;
 		
-		self.currentData = undefined;
+		self.currentData = {
+			playerTimeData: {},
+			playerInfo: {}
+		};
 		
 		self.processTime = function() {
+			
 			var timePointData = self.currentData.playerTimeData;
 			firstTime = undefined;
 			lastTime = undefined;
+			// data is always sorted before calling this function
 			for ( var playerName in timePointData) {
-				// access the first or last element, since the objects are given
-				// to us sorted by the webservice
 				if (firstTime === undefined
 						|| firstTime > timePointData[playerName][0].timepoint) {
 					firstTime = timePointData[playerName][0].timepoint;
@@ -165,50 +168,76 @@ $(function() {
 			var mightStillBeRunning = new Date().getTime() - lastUpdated < gameIsLiveOffsetGuess;
 			if (mightStillBeRunning) {
 				if (!showingLiveNote) {
-					$("#livenote").show("slide", {direction: "right" }, "slow");
+					$("#livenote").show("slow");
 					showingLiveNote = true;
 				}
 			} else {
 				if (showingLiveNote) {
-					$("#livenote").hide("slide", {direction: "right" }, "slow");
+					$("#livenote").hide("slow");
 					showingLiveNote = false;
 				}
 			}
-			window.setTimeout(self.checkLiveProc, 1000);
+			window.setTimeout(self.checkLiveProc, 500);
 		}
 		
-		function updateByCurrentData() {
+		self.updateByCurrentData = function() {
 			self.currentData.info = self.currentData.playerInfo;
 			self.currentData.timeData = self.currentData.playerTimeData;
 			self.basicChart.updateData(self.currentData);
 		}
 		
-		self.populateChart = function (data) {
-			self.currentData = data;
-			self.processTime();
-			updateByCurrentData();
+		self.addPlayer = function(data) {
+			for (var i = 0; i < data.value.length; i++) {
+				var player = data.value[i];
+				if (self.currentData.playerInfo[player.id] === undefined) {
+					self.currentData.playerInfo[player.id] = player.data;
+				}
+			}
+			self.updateByCurrentData();
 		}
 		
 		self.addData = function(data) {
 			for (var i = 0; i < data.value.length; i++) {
 				var playerPack = data.value[i];
+				if (self.currentData.playerTimeData[playerPack.playerId] === undefined) {
+					self.currentData.playerTimeData[playerPack.playerId] = [];
+				}
 				self.currentData.playerTimeData[playerPack.playerId].push(playerPack.data);
+				self.currentData.playerTimeData[playerPack.playerId].sort(function(a, b) {
+					return a.timepoint - b.timepoint;
+				});
 			}
-			updateByCurrentData();
+			self.processTime();
+			self.updateByCurrentData();
 		}
 	}
 
 	var viewModel = new ChartModel();
 	viewModel.checkLiveProc();
 	
-	$(document).on("new-chart-data", function(event, data) {
-		viewModel.setLastUpdate(new Date().getTime());
-		viewModel.addData(data);
-		viewModel.processTime();
-	});
+	var baseData = $('#chartDataSource').data("comet-info");
+	var hadUpdate = false;
+	
+	if (baseData.hasComet) {
+		$(document).on("new-chart-data", function(event, data) {
+			if (hadUpdate) {
+				viewModel.setLastUpdate(new Date().getTime());
+			}
+			hadUpdate = true;
+			viewModel.addData(data);
+		});
+		$(document).on("new-player-data", function(event, data) {
+			viewModel.addPlayer(data);
+		});
+	} else {
+		$.getJSON(queryUrl + "?gameId="+$.urlParam("gameId"), function(data) {
+			window.setTimeout(function() {
+				viewModel.currentData = data;
+				viewModel.processTime();
+				viewModel.updateByCurrentData();
+			}, 250);
+		});
+	}
 	
 	ko.applyBindings(viewModel.basicChart, document.getElementById('chartbase'));
-
-	var baseData = $('#chartDataSource').data("chart-info");
-	window.setTimeout(function() {viewModel.populateChart(baseData);}, 500);
 });

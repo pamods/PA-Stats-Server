@@ -71,15 +71,7 @@ object GameCometServer extends LiftActor with ListenerManager with Loggable{
 	def doUpdateNow(id: Int) = {
 	  updateListeners(GeneralGameJsCmd(id, createGeneralGameUpdate(id)))
       updateListeners(GamePlayersListJsCmd(id, createPlayersListUpdate(id)))
-      updateListeners(createArmyCompositionUpdate(id))
-      updateListeners(createGameChartUpdate(id))
 	}
-	
-	private def createGameChartUpdate(id: Int) = 
-	  GameChartUpdate(id, CookieBox withSession (ChartDataCollector(_).collectDataFor(id)))
-	
-	private def createArmyCompositionUpdate(id: Int) = 
-	  GameArmyCompositionUpdate(id, CookieBox withSession (ArmyEventDataCollector(_).collectEventsFor(id)))
 	
 	private def createPlayersListUpdate(id: Int) = {
 	  import PlayerGameInfo._

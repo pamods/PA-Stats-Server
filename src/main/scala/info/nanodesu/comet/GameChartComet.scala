@@ -29,6 +29,7 @@ import info.nanodesu.snippet.cometrenderer.ArmyCompositionRenderer
 import info.nanodesu.snippet.cometrenderer.GameChartDataRenderer
 import info.nanodesu.model.db.collectors.gameinfo.ChartDataPoint
 import info.nanodesu.model.db.collectors.gameinfo.ChartDataPackage
+import info.nanodesu.model.db.collectors.gameinfo.ChartPlayer
 
 case class AddGameChartDataMsg(msgs: Map[String, List[ChartDataPoint]]) extends MapFlatteningTriggerMessage[ChartDataPoint] {
   def input = msgs
@@ -36,37 +37,62 @@ case class AddGameChartDataMsg(msgs: Map[String, List[ChartDataPoint]]) extends 
   def triggerName = "new-chart-data"
 }
 
-class GameChartComet extends GameComet {
+case class AddPlayersMsg(players: Map[String, ChartPlayer]) extends TriggerMessage {
+  def triggerName = "new-player-data"
+  def messageValues = {
+    players.toList.map(x => Map("id" -> x._1, "data" -> x._2))
+  }
+}
+ 
+class GameChartComet extends ServerGameComet {
   def nameKey = CometInit.gameChartComet
 		  
   private var chartDataKnownTime = 0L
+  private var knownPlayerIds: Set[String] = Set.empty
   
-  override def lowPriority = {
-    case GameChartUpdate(id: Int, chartData: ChartDataPackage) if isMyGame(id) => {
-    	checkForAddedChartData(chartData.playerTimeData)
-    	// no live update for new players, as new players are never added after the game started
+  protected def prepareShutdown() = {
+    knownPlayerIds = Set.empty
+  }
+  
+  protected def pushDataToClients(server: GameServerActor) {
+    val chartData = server.chartData.makePackage
+    checkForAddedPlayers(chartData.playerInfo)
+    checkForAddedChartData(chartData.playerTimeData)
+  }
+  
+  private def checkForAddedPlayers(fromPackage: Map[String, ChartPlayer]) = {
+    val prevKnown = knownPlayerIds
+    val filtered = fromPackage.filterKeys(!prevKnown.contains(_))
+    if (filtered.nonEmpty) {
+      for (key <- filtered.keys) {
+        knownPlayerIds += key
+      }
+      partialUpdate(AddPlayersMsg(filtered))
     }
   }
   
   private def checkForAddedChartData(fromPackage: Map[String, List[ChartDataPoint]]) = {
     val newData = (for (lists <- fromPackage.toList.map(x => (x._1, x._2.filter(_.timepoint > chartDataKnownTime)))) yield lists).toMap
-    if (newData.nonEmpty) {
-      for (v <- newData.values; d <- v) {
+    val noEmptyPlayers = newData.filter(!_._2.isEmpty)
+    if (noEmptyPlayers.nonEmpty) {
+      for (v <- noEmptyPlayers.values; d <- v) {
         recheckKnownTime(d.timepoint)
       }
-      partialUpdate(AddGameChartDataMsg(newData))
+      partialUpdate(AddGameChartDataMsg(noEmptyPlayers))
     }
   }
   
-  def recheckKnownTime(time: Long) = {
+  private def recheckKnownTime(time: Long) = {
     if (chartDataKnownTime < time) {
       chartDataKnownTime = time
     }
   }
   
-  def render = {
+  def coreRender = {
+	chartDataKnownTime = 0
+	knownPlayerIds = Set.empty
     val foo = for (gId <- getGameId) yield {
-      new GameChartDataRenderer(gId, Some(this)).render
+      new GameChartDataRenderer(gId, true).render
     }
     val d = foo.openOr("#noop" #> "")
     d

@@ -2,61 +2,9 @@
 <html>
 <body data-lift-content-id="main">
 	<div id="main" data-lift="surround?with=default;at=content">
-		<h1>Changelog</h1>
-		<div>Here I will present you with the most recent updates to PA Stats :)</div>
-		<div>Note that you can find the latest issues on Github: <a href="https://github.com/pamods/PA-Stats-Server/issues?labels=&milestone=&page=1&state=open">LINK</a></div>
-		<br/>
-		<h4>v14.2.0</h4>
-		<ul>
-			<li>Small bugfixes, internal changes and better logging to hunt down another bug once it occures again</li>
-			<li>PA Stats tries to detect draws now</li>
-			<li>The winner-webservice now contains a starttime and can show winner = -1 for draws</li>
-		</ul>
-		<h4>v14.1.1</h4>
-		<ul>
-			<li>The units in the Army composition display now link to the PA Matches <a href="http://pamatches.com/wiki/">Wiki</a>.</li>
-		</ul>
-		<h4>v14.1.0</h4>
-		<ul>
-			<li>Fixed APM Charts</li>
-			<li>Fixed lots of things about the army composition display. It should no longer lag any browser</li>
-			<li>Changed army composition layout a bit to prevent lots of scrolling</li>
-			<li>The units in the army composition can now be click to open pa-db.com. This will hopefully soon be replaced with links to the pamatches.com wiki, which is better maintained</li>
-			<li>Added PA Stats options to the PA-settings</li>
-		</ul>
-		<h4>v14.0.0</h4>
-		<ul>
-			<li>Added capturing of unit constructed and destroyed events</li>
-			<li>Show army composition of players based on those events</li>
-		</ul>
-		<h4>v13.2.0</h4>
-		<ul>
-			<li>Added link to the -under construction- ladder page</li>
-			<li>Fixed an internal bug</li>
-		</ul>
-		<h4>v13.1.0</h4>
-		<ul>
-			<li>Fixed a bug in the mod that caused the ingame-checkboxes to appear next to the controls for Planet smashing</li>
-			<li>Added an ingame-explanation of what PA Stats does, so everyone knows their data is being collected</li>
-			<li>Improved the seachbox for the player-search</li>
-			<li>Link Github issues in the changelog</li>
-			<li>changed a few colors and made the vs between teams white so it is easier to see</li>
-			<li>added a graph on the player-pages. More features will be added to this in a future version</li>
-			<li>Fixed a few internal bugs that probably went unnoticed so far</li>
-		</ul>
-		<h4>v13.0.1</h4>
-		<ul>
-			<li>Fixed a bug that prevented new users from using PA Stats. Sorry. :(</li>
-			<li>Added Updates section</li>
-		</ul>
-		<h4>v13.0.0</h4>
-		<ul>
-			<li>PA Stats is now on Github, feel free to contribute: <a href="https://github.com/pamods/PA-Stats-Server">HERE</a> I am especially looking for people with webdesign knowledge</li>
-			<li>Teamcolors are now used in the graphs. The redundant legend was removed.</li>
-			<li>Players are grouped by teams.</li>
-			<li>The backend has been rewritten for the most part. If you spot new bugs please report them.</li>
-			<li>Old data still uses the old colors, however for old teamgames the list of players is a bit broken. The old data is just too... well it doesn't know of teams.</li>
-		</ul>
+		<div id="wrap">
+			<div data-lift="IFrameSnip.frame?id=updates;src=http://www.nanodesu.info/stuff/pa/updates.html"></div>
+		</div>
 	</div>
 </body>
 </html>

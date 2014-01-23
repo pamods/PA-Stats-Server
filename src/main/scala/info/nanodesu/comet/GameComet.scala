@@ -9,6 +9,7 @@ import net.liftweb.common.Loggable
 import net.liftweb.util.Helpers._
 import scala.language.postfixOps
 
+// TODO: when I am done this class will be gone
 abstract class GameComet extends CometActor with CometListener with Loggable {
   def nameKey: String
   protected var cachedGameId: Box[Int] = null
@@ -23,16 +24,4 @@ abstract class GameComet extends CometActor with CometListener with Loggable {
     id == getGameId.getOrElse(-1)
   }
   def registerWith = GameCometServer
-
-  override protected def localSetup() = {
-    super.localSetup()
-    GameCometServer.cometCounter.incrementAndGet()
-  }
-
-  override protected def localShutdown() = {
-    super.localShutdown()
-    GameCometServer.cometCounter.decrementAndGet()
-  }
-  
-  override def lifespan = Full(30 seconds)
 }

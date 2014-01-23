@@ -22,14 +22,10 @@ import net.liftweb.json._
 import net.liftweb.json.DefaultFormats
 import info.nanodesu.comet.GameChartComet
 
-class GameChartDataRenderer(gId: Int, cometToInitialize: Option[GameChartComet] = None) extends CometRenderer {
+class GameChartDataRenderer(gId: Int, val hasComet: Boolean = false) extends CometRenderer {
   private implicit val formats = net.liftweb.json.DefaultFormats
   def render = {
-    val loaded = CookieBox withSession (ChartDataCollector(_).collectDataFor(gId))
-    for (chartComet <- cometToInitialize; data <- loaded.playerTimeData.values.flatten) {
-      chartComet.recheckKnownTime(data.timepoint)
-    }
-    val data = Extraction decompose loaded
-    "#chartDataSource [data-chart-info]" #> compact(net.liftweb.json.render(data))
+    val data = Extraction decompose Map("hasComet" -> hasComet)
+    "#chartDataSource [data-comet-info]" #> compact(net.liftweb.json.render(data))
   }
 }

@@ -26,6 +26,8 @@ import net.liftweb.common.Box
 import info.nanodesu.model.db.collectors.gameinfo.ArmyEventDataCollector
 import net.liftweb.util.CssSel
 import info.nanodesu.snippet.cometrenderer.ArmyCompositionRenderer
+import net.liftweb.http.ShutDown
+import net.liftweb.http.ShutdownIfPastLifespan
 
 // TODO  handling of these classes in this file looks redundant to me
 case class AddEventsMsg(msgs: Map[String, List[ArmyEvent]]) extends MapFlatteningTriggerMessage[ArmyEvent] {
@@ -48,17 +50,22 @@ case class AddPlayerMessage(msgs: Map[String, List[ArmyEventPlayer]]) extends Ma
   def triggerName = "new-players"
 }
 
-class GameArmyComposition extends GameComet {
+class GameArmyComposition extends ServerGameComet {
 	def nameKey = CometInit.gameArmyComposition
 	
 	private var armyEventsMap: Set[Int] = Set.empty
 	private var armyPlayers: Set[String] = Set.empty
-
-	override def lowPriority = {
-	  case GameArmyCompositionUpdate(id: Int, composition: ArmyEventPackage) if isMyGame(id) => {
+	
+	protected def prepareShutdown() = {
+	  armyEventsMap = Set.empty
+	  armyPlayers = Set.empty
+	  gameServer = None
+	}
+	
+	protected def pushDataToClients(server: GameServerActor) {
+	    val composition = server.armyComposition.makePackage
 	    checkForAddedPlayers(composition.playerInfo)
 	    checkForAddedEvents(composition.playerEvents)
-	  }
 	}
 	
 	private def checkForAddedPlayers(fromPackage: Map[String, ArmyEventPlayer]) = {
@@ -91,24 +98,13 @@ class GameArmyComposition extends GameComet {
 	  }
 	}
 	
-	def initSendMapByPackage(pack: ArmyEventPackage) {
-	  val ids = pack.playerEvents.map(x => x._2.map(_.id)).flatten
-	  armyEventsMap ++= ids
-	  val pIds = pack.playerInfo.map(x => x._1)
-	  armyPlayers ++= pIds
-	}
-	
-	def render = {
+	protected def coreRender = {
+	  armyEventsMap = Set.empty
+	  armyPlayers = Set.empty
 	  val foo = for (gId <- getGameId) yield {
-	    new ArmyCompositionRenderer(gId, Some(this)).render
+	    new ArmyCompositionRenderer(gId, true).render
 	  }
 	  val d = foo.openOr("#noop" #> "")
 	  d
-	}
-
-	override protected def localShutdown() = {
-	  super.localShutdown
-	  armyEventsMap = Set.empty
-	  armyPlayers = Set.empty
 	}
 }

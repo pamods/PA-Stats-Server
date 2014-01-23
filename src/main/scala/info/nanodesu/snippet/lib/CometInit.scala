@@ -17,9 +17,10 @@ import net.liftweb.util.CssSel
 import info.nanodesu.snippet.cometrenderer.GameInfoRenderer
 import info.nanodesu.snippet.cometrenderer.ArmyCompositionRenderer
 import info.nanodesu.snippet.cometrenderer.GameChartDataRenderer
+import net.liftweb.util.Props
 
 object CometInit extends DispatchSnippet with Loggable {
-  val cometServePastThreshold = 1800 * 1000 // 30min
+  val cometServePastThreshold = Props.getInt("cometServeThreshold", 300000)
 
   val playerGameInfoKey = "game_player_lines_"
   val gameInfoKey = "game_general_"
@@ -33,7 +34,7 @@ object CometInit extends DispatchSnippet with Loggable {
     case "gameChartInfo" => doGameChartInfo
   }
 
-  private def shouldBeConsideredLive(gameId: Int): Boolean = {
+  def shouldBeConsideredLive(gameId: Int): Boolean = {
     val time = CookieBox withSession (new GameTimesLoader(_).selectEndTimeForGame(gameId))
     val threshold = (time + cometServePastThreshold)
     threshold > System.currentTimeMillis()

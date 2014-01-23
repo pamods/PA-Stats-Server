@@ -6,14 +6,13 @@
 			<div class="shiny_comet" data-lift="CometInit.gameGeneralInfo">
 				<div style="float: left">
 					<img id="planetimg" alt="planet biome"
-						src="/static/img/planets/unknown.png" width=auto, height=150px,
-						title="Biome: " />
+						src="/static/img/planets/unknown.png" width=auto height=150px title="Biome: " />
 					<div class="planetemblem" id="planetname"></div>
 				</div>
 
 				<div style="margin-left: 150px;">
 					<div id="gameheader">
-						<span id="gamenum">Game #</span><br /> <span id="players"></span>
+						<span id="gamenum">Game #</span> <span id="livenote" data-lift="GameInfo.livenote" style="display: none"><span class="white bold" id="live_note_txt"></span></span> <br /> <span id="players"></span>
 					</div>
 					<table class="greyborder" id="gameinfotable">
 						<tbody>

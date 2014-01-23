@@ -7,7 +7,7 @@ function println(txt) {
 
 var queryUrlBase = "http://127.0.0.1:8080/";
 var reportVersion = 999;
-var playersCount = 10;
+var playersCount = 4;
 var failTestTimeOut = 750;
 
 function makeArmyEvent(spec, x, y, z, planetId, watchType, time) {
@@ -66,7 +66,7 @@ function ReportTeam() {
 
 function ReportPlayer() {
 	var self = this;
-	self.displayName = ""
+	self.displayName = "";
 }
 
 function ReportedPlanet() {
@@ -90,6 +90,9 @@ function RunningGameData() {
 function GameSimulator(numPlayers) {
 	var self = this;
 	
+	var gameStartTime = new Date().getTime();
+	var lifeTime = Math.floor(Math.random() * 10) + 5;
+
 	var packageSendDelay = 5000;
 	
 	self.ident = Math.random();
@@ -116,21 +119,21 @@ function GameSimulator(numPlayers) {
 			} else {
 				// prevent too many reports of the time
 				if (!reportedAvgs) {
-					println("time;"+Math.floor(avg)+"ms");
+//					println("time;"+Math.floor(avg)+"ms");
 				}
 				reportedAvgs = true;
 			}
 		} else {
 			times.push(time); // only start checking the avg when we have a few values
 		}
-	}
+	};
 	
 	// always FFA for now
 	self.initPlayers = function(playerNum) {
 		for (var i = 0; i < playerNum; i++) {
 			self.players.push(new PlayerSimulator("uN "+i+"/"+Math.random(), "Player "+i, i, self));
 		}
-	}
+	};
 	
 	self.initPlayers(numPlayers);
 
@@ -166,18 +169,23 @@ function GameSimulator(numPlayers) {
 		report.planet.biome = "moon";
 		report.planet.planet_name = "faked planet";
 		return report;
-	}
+	};
 	
 	self.sendPackages = function() {
 		for (var i = 0; i < self.players.length; i++) {
 			window.setTimeout(self.players[i].sendReport, 100 * i);
 		}
-	}
-	
+	};
 	self.simulate = function() {
-		self.sendPackages();
-		window.setTimeout(self.simulate, packageSendDelay);
-	}
+		var shouldStop = gameStartTime + lifeTime * 1000 * 60 < new Date().getTime();
+		if (shouldStop) {
+			println("ended");
+			window.setTimeout(function() {phantom.exit();}, 10000);
+		} else {
+			self.sendPackages();
+			window.setTimeout(self.simulate, packageSendDelay);
+		}
+	};
 }
 
 function PlayerSimulator(uberN, displayN, ix, game) {
@@ -196,7 +204,7 @@ function PlayerSimulator(uberN, displayN, ix, game) {
 	
 	self.nextValue = function() {
 		return Math.floor(Math.random() * 1000);
-	}
+	};
 	
 	self.generateStats = function() {
 		var statsPacket = new StatsReportData();
@@ -215,10 +223,10 @@ function PlayerSimulator(uberN, displayN, ix, game) {
 		statsPacket.energyIncome = self.nextValue();
 		statsPacket.apm = self.nextValue();
 		return statsPacket;
-	}
+	};
 	
 	self.generateArmyEvents = function() {
-		var numEvents = Math.floor(Math.random() * self.generatedReports*2);
+		var numEvents = 1+Math.floor(Math.random() * self.generatedReports/4);
 		var events = [];
 		for (var i = 0; i < numEvents; i++) {
 			var eType = Math.random() > 0.7 ? 2 : 0;
@@ -226,7 +234,7 @@ function PlayerSimulator(uberN, displayN, ix, game) {
 			events.push(makeArmyEvent("/pa/units/sea/missile_ship/missile_ship.json", 0, 1, 3, 0, eType, new Date().getTime()));
 		}
 		return events;
-	}
+	};
 	
 	self.generateReport = function() {
 		self.generatedReports = self.generatedReports + 1;
@@ -237,7 +245,7 @@ function PlayerSimulator(uberN, displayN, ix, game) {
 			initialReport.reporterTeam = self.index;
 			initialReport.firstStats = self.generateStats();
 			initialReport.armyEvents = self.generateArmyEvents();
-			initialReport.gameStartTime = self.gameSim.gameStartTime
+			initialReport.gameStartTime = self.gameSim.gameStartTime;
 			return initialReport;
 		} else {
 			var runningReport = new RunningGameData();
@@ -246,8 +254,8 @@ function PlayerSimulator(uberN, displayN, ix, game) {
 			runningReport.armyEvents = self.generateArmyEvents();
 			return runningReport;
 		}
-	}
-	
+	};
+		
 	self.sendReport = function() {
 		var startTime = new Date().getTime();
 		$.ajax({
@@ -269,7 +277,7 @@ function PlayerSimulator(uberN, displayN, ix, game) {
 				}
 			} 
 		});
-	}
+	};
 }
 
 var simGame = new GameSimulator(playersCount);

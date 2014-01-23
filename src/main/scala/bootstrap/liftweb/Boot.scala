@@ -30,6 +30,7 @@ import info.nanodesu.pages.StatsPage
 import info.nanodesu.lib.db.CookieBox
 import info.nanodesu.model.db.collectors.stats.RuntimeInfoCollector
 import info.nanodesu.model.db.collectors.stats.ExtraNumbersCollector
+import info.nanodesu.snippet.lib.IFrameSnip
 
 // see: http://cookbook.liftweb.net/#InstallAndRunning
 /**
@@ -41,12 +42,12 @@ import info.nanodesu.model.db.collectors.stats.ExtraNumbersCollector
 class Boot extends Loggable {
 	
   def boot {
-//        LiftRules.supplimentalHeaders = s => s.addHeaders(
-//      List(HTTPParam("X-Lift-Version", LiftRules.liftVersion),
-//        HTTPParam("Access-Control-Allow-Origin", "*"),
-//        HTTPParam("Access-Control-Allow-Credentials", "true"),
-//        HTTPParam("Access-Control-Allow-Methods", "GET, POST, PUT, OPTIONS"),
-//        HTTPParam("Access-Control-Allow-Headers", "WWW-Authenticate,Keep-Alive,User-Agent,X-Requested-With,Cache-Control,Content-Type")))
+        LiftRules.supplimentalHeaders = s => s.addHeaders(
+      List(HTTPParam("X-Lift-Version", LiftRules.liftVersion),
+        HTTPParam("Access-Control-Allow-Origin", "*"),
+        HTTPParam("Access-Control-Allow-Credentials", "true"),
+        HTTPParam("Access-Control-Allow-Methods", "GET, POST, PUT, OPTIONS"),
+        HTTPParam("Access-Control-Allow-Headers", "WWW-Authenticate,Keep-Alive,User-Agent,X-Requested-With,Cache-Control,Content-Type")))
     
     
     // no need for jmx access to c3p0
@@ -65,6 +66,7 @@ class Boot extends Loggable {
       case "PlayerInfo" => PlayerInfo
       case "CometInit" => CometInit
       case "PlayerSearch" => PlayerSearch
+      case "IFrameSnip" => IFrameSnip
     }
 
     CookieBox.init()
@@ -81,9 +83,9 @@ class Boot extends Loggable {
       Menu.i("Updates") / "updates",
       Menu.i("Games") / "listgames",
       Menu.i("Players") / PlayerSearchPage.pageName,
+      Menu(Loc("Units", ExtLink("http://www.nanodesu.info/pa-db/"), "Units")),
       Menu(Loc("Ladder", ExtLink("http://pastats-ladder.gamestown24.de/"), "Ladder")),
       Menu.i("Extra") / StatsPage.pageName,
-      Menu(Loc("Units", ExtLink("http://www.nanodesu.info/pa-db/"), "Units")),
       Menu.i("Player") / PlayerPage.pageName >> Hidden,
       Menu.i("Chart") / GamePage.pageName >> Hidden,
       Menu.i("Ingamechart") / "ingamechart" >> Hidden)
@@ -100,5 +102,7 @@ class Boot extends Loggable {
       new Html5Properties(r.userAgent))
 
     logger info "BOOT complete! run.mode=" + System.getProperty("run.mode")
+    logger info "min comet interval is " + Props.getInt("minCometInterval")
+    logger info "comet serve threshold is " + Props.getInt("cometServeThreshold")
   }
 }

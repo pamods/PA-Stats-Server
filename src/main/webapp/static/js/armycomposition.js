@@ -174,51 +174,61 @@ $(document).ready(function() {
 		});
 	}
 	
-	var armyBaseData = $("#armyDataSource").data("army-info");
+	var cometInfo = $("#armyDataSource").data("comet-info");
+	var armyModel = new ArmyCompositionModel(cometInfo.gameStart);
 	
-	var armyModel = new ArmyCompositionModel(armyBaseData.gameStart);
-
-	var playerInfo = armyBaseData.playerInfo;
-	
-	for (playerId in playerInfo) {
-		var player = playerInfo[playerId];
-		armyModel.addPlayer(playerId, player.name, player.primaryColor, player.secondaryColor);
-	}
-	
-	var playerEvents = armyBaseData.playerEvents;
-
-	for (playerId in playerEvents) {
-		var pEvents = playerEvents[playerId];
-		for (var i = 0; i < pEvents.length; i++) {
-			var evt = pEvents[i];
-			armyModel.addEvent(playerId, evt.spec, evt.time, evt.watchType);
-		}
-	}
-
-	armyModel.maySelectEnd();
-	
-	$(document).on("new-players", function(event, data) {
-		for (var i = 0; i < data.value.length; i++) {
-			var p = data.value[i];
-			armyModel.addPlayer(p.playerId, p.name, p.pColor, p.sColor);
-		}
-		window.setTimeout(function() {
+	if (cometInfo.hasComet) {
+		var nothingReceived = true;
+		$(document).on("new-players", function(event, data) {
+			ko.tasks.processImmediate(function() {
+				for (var i = 0; i < data.value.length; i++) {
+					var p = data.value[i];
+					armyModel.addPlayer(p.playerId, p.name, p.pColor, p.sColor);
+				}
+			});
 			armyModel.selectEnd();
-		}, 750); // see below 
-	});
+		});
+		
+		$(document).on("new-army-events", function(event, data) {
+			armyModel.lockWasOnEnd();
+			ko.tasks.processImmediate(function() {
+				for (var i = 0; i < data.value.length; i++) {
+					var evt = data.value[i];
+					armyModel.addEvent(evt.playerId, evt.spec, evt.time, evt.watchType);
+				}
+			});
+			if (nothingReceived) {
+				armyModel.selectEnd();
+				nothingReceived = false;
+			} else {
+				armyModel.maySelectEnd();
+			}
+		});
+	} else {
+		$.getJSON(queryUrl + "/events?gameId="+$.urlParam("gameId"), function(armyBaseData) {
+			var playerInfo = armyBaseData.playerInfo;
+			
+			ko.tasks.processImmediate(function() {
+				for (playerId in playerInfo) {
+					var player = playerInfo[playerId];
+					armyModel.addPlayer(playerId, player.name, player.primaryColor, player.secondaryColor);
+				}
+			});
+			
+			var playerEvents = armyBaseData.playerEvents;
+
+			for (playerId in playerEvents) {
+				var pEvents = playerEvents[playerId];
+				ko.tasks.processImmediate(function() {
+					for (var i = 0; i < pEvents.length; i++) {
+						var evt = pEvents[i];
+						armyModel.addEvent(playerId, evt.spec, evt.time, evt.watchType);
+					}
+				});
+				armyModel.maySelectEnd();
+			}
+		});
+	}
 	
-	$(document).on("new-army-events", function(event, data) {
-		armyModel.lockWasOnEnd();
-		for (var i = 0; i < data.value.length; i++) {
-			var evt = data.value[i];
-			armyModel.addEvent(evt.playerId, evt.spec, evt.time, evt.watchType);
-		}
-		window.setTimeout(function() {
-			armyModel.maySelectEnd();
-		}, 500); // ugly, but the only way I found to prevent ko deferred from inserting false (old) values. I have NO idea why it keeps doing it otherwise
-		// even a 10ms timeout was already enough in all my tests, so 500 should be pretty save. Worst thing that can happen is that it stops updating by itself
-		// ko-deferred improves perf so much that I think this is a fair trade
-	});
-	
-	ko.applyBindings(armyModel, document.getElementById('armycomposition'));	
+	ko.applyBindings(armyModel, document.getElementById('armycomposition'));
 });

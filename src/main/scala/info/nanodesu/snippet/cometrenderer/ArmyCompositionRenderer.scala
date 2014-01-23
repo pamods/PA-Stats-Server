@@ -17,17 +17,18 @@ import info.nanodesu.lib.db.CookieBox
 import info.nanodesu.lib.Formattings._
 import info.nanodesu.model.db.collectors.gameinfo._
 import info.nanodesu.model.db.collectors.gameinfo.HasSomeLockedPlayersCollector
-import info.nanodesu.comet.GameArmyComposition
 import net.liftweb.json._
 import net.liftweb.json.DefaultFormats
+import info.nanodesu.model.db.collectors.gameinfo.loader.GameTimesLoader
 
-class ArmyCompositionRenderer(val gId: Int, val cometToBeInitialized: Option[GameArmyComposition] = None) extends CometRenderer {
+class ArmyCompositionRenderer(val gId: Int, val hasComet: Boolean = false) extends CometRenderer with Loggable{
   def render = {
     implicit val formats = DefaultFormats
-    val loaded = CookieBox withSession { db => ArmyEventDataCollector(db).collectEventsFor(gId) }
-    for (armyComet <- cometToBeInitialized) {
-      armyComet.initSendMapByPackage(loaded)
-    }
-    "#armyDataSource [data-army-info]" #> compact(net.liftweb.json.render(Extraction decompose loaded))
+
+    val gameStart = CookieBox withSession { db => new GameTimesLoader(db).selectStartTimeForGame(gId)}
+    
+    "#armyDataSource [data-comet-info]" #> compact(net.liftweb.json.render(
+        Extraction decompose Map("hasComet" -> hasComet, "gameStart" -> gameStart)
+    ))
   }
 }

@@ -36,6 +36,14 @@ import org.apache.commons.lang.StringUtils
 import info.nanodesu.model.db.collectors.gameinfo.ArmyEventDataCollector
 import info.nanodesu.comet.ForceGameDataUpdate
 import net.liftweb.common.Failure
+import info.nanodesu.comet.GameServers
+import info.nanodesu.model.db.collectors.playerinfo.loader.PlayerIdForLinkLoader
+import info.nanodesu.comet.NewPlayerEvents
+import info.nanodesu.comet.NewPlayer
+import info.nanodesu.comet.PushUpdate
+import info.nanodesu.model.db.collectors.playerinfo.CometUpdatePlayerDataCollector
+import info.nanodesu.comet.NewChartStats
+import info.nanodesu.comet.NewChartStats
 
 
 object StatisticsReportService extends RestHelper with Loggable {
@@ -66,7 +74,6 @@ object StatisticsReportService extends RestHelper with Loggable {
             val result = db.select(teams.INGAME_ID, playerGameRels.P, names.DISPLAY_NAME, games.WINNER_TEAM, games.ID, players.UBER_NAME, games.START_TIME).
               from(playerGameRels).
               join(games).onKey().
-//              leftOuterJoin(stats).on(stats.PLAYER_GAME === playerGameRels.ID). // I *think* this is a pretty pointless join that hurts performance, but I let this commet here until it is deployed and noobody complains...
               join(players).onKey().
               join(names).onKey().
               join(teams).onKey().
@@ -193,10 +200,22 @@ object StatisticsReportService extends RestHelper with Loggable {
           }
         }
 
-        for (gameId <- ReportDataC.getGameIdForLink(link)) {
+        val playerData = CookieBox withSession (CometUpdatePlayerDataCollector(_, link))
+        
+        for (gameId <- playerData.gameId;
+        	 playerId <- playerData.playerId;
+        	 playerName <- playerData.playerName) {
           GameCometServer ! GameDataUpdate(gameId)
-        }
 
+          // this is the normal location that causes the server to be created
+          // here the server really can be empty so far, so it does not need any init from the database
+          val server = GameServers.serverForGame(gameId, false)
+          val team = data.observedTeams(data.reporterTeam)
+          server ! NewPlayer(playerId, playerName, team.primaryColor, team.secondaryColor)
+          server ! NewChartStats(playerId, now.getTime(), data.firstStats)
+          server ! PushUpdate(false)
+        }
+        
         Extraction decompose PlayerGameLinkIdResponse(link)
       }
   }
@@ -208,9 +227,18 @@ object StatisticsReportService extends RestHelper with Loggable {
       CookieBox withTransaction { db => // needs autocommit = off for batch inserts
         RunningGameStatsReporter(db).insertRunningGameData(data, now)
       }
-
+  
       for (gameId <- ReportDataC.getGameIdForLink(data.gameLink)) {
         GameCometServer ! GameDataUpdate(gameId)
+        
+	      for (playerId <- CookieBox.withSession(new PlayerIdForLinkLoader(_).selectPlayerId(data.gameLink))) {
+	        val server = GameServers.serverForGame(gameId)
+	        if (data.armyEvents.nonEmpty) {
+	          server ! NewPlayerEvents(playerId, data.armyEvents)
+	        }
+		    server ! NewChartStats(playerId, now.getTime(), data.stats)
+		    server ! PushUpdate(false)
+		  }
       }
 
       OkResponse()
@@ -248,7 +276,10 @@ object StatisticsReportService extends RestHelper with Loggable {
     case "report" :: "get" :: "events" :: Nil Get _ =>
       try {
         CookieBox withSession { db =>
-          for (id <- GamePage.getGameId) yield Extraction decompose ArmyEventDataCollector(db).collectEventsFor(id)
+          val before = System.currentTimeMillis()
+          val r = for (id <- GamePage.getGameId) yield Extraction decompose ArmyEventDataCollector(db).collectEventsFor(id)
+          logger info (System.currentTimeMillis() - before) + "ms"
+          r
         }
       } catch {
         case ex: Exception => {

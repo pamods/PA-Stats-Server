@@ -15,6 +15,7 @@ import java.sql.Timestamp
 import net.liftweb.json.JValue
 import net.liftweb.json.Extraction
 import info.nanodesu.model.db.collectors.gameinfo.loader.GameTimesLoader
+import net.liftweb.common.Loggable
 
 // yes currently this is practically a copy of the ArmyEvent in ReportData.
 // However I want to keep these 2 classes separate since they are used for different communication channels that may change independently from each other
@@ -51,12 +52,12 @@ class ArmyEventDataCollector(dbLayer: ArmyEventDbLayer) {
 object ArmyEventDataCollector {
   def apply(db: DSLContext) = new ArmyEventDataCollector(new DbLayer(db)) 
   
-  private class DbLayer(db: DSLContext) extends ArmyEventDbLayer {
+  private class DbLayer(db: DSLContext) extends ArmyEventDbLayer with Loggable {
     
     def selectStartTimeForGame(gameId: Int): Long = new GameTimesLoader(db).selectStartTimeForGame(gameId)
     
     def selectArmyEventsForGame(gameId: Int): List[ArmyEventDbResult] = {
-      val lst  = db.select(playerGameRels.P, 
+      val q = db.select(playerGameRels.P, 
           names.DISPLAY_NAME, 
           teams.PRIMARY_COLOR, 
           teams.SECONDARY_COLOR, 
@@ -75,15 +76,16 @@ object ArmyEventDataCollector {
           join(armyEvents).on(armyEvents.PLAYER_GAME === playerGameRels.ID).
           join(specKeys).onKey().
           	where(playerGameRels.LOCKED.isFalse()).
-          and(playerGameRels.G === gameId).
-          fetch()
+          and(playerGameRels.G === gameId)
           
+      val lst  = q.fetch()
+
       val buf = for (r <- lst.asScala) yield {
         def v[T](f: Field[T]) = r.getValue(f)
         val dat = ArmyEvent(v(armyEvents.ID), v(specKeys.SPEC), v(armyEvents.X).toInt, v(armyEvents.Y).toInt, v(armyEvents.Z).toInt, v(armyEvents.PLANET_ID), v(armyEvents.WATCHTYPE), v(armyEvents.TIMEPOINT).getTime())
         ArmyEventDbResult(v(playerGameRels.P), v(names.DISPLAY_NAME), v(teams.PRIMARY_COLOR), v(teams.SECONDARY_COLOR), dat)
       }
-          
+      
       buf.toList
     }
   }
