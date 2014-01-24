@@ -23,14 +23,12 @@ class PlayerInfoRenderer(val gId: Int) extends CometRenderer {
       for (p <- activeReporters.selectActiveReportersWithName(db, gId)) yield {
         val inf = GameAndPlayerInfoCollector(db, p.id, gId)
 
-        val playerNameStyleAddition = {
-          if (p.primaryColor != null && p.secondaryColor != null)
-            s"color:${p.primaryColor};border-bottom: 1px solid ${p.secondaryColor};"
-          else ""
-        }
-
-        ".playername *" #> p.name &
-          ".playername [style]" #> (playerNameStyleAddition + "font-weight:bold;") &
+        val primColor = if (p.primaryColor == null) "#000" else p.primaryColor
+        val secColor = if (p.secondaryColor == null) "#000" else p.secondaryColor
+        
+        ".playername *+" #> p.name &
+          ".army_primary_color [style]" #> ("background:"+primColor+";") &
+          ".army_secondary_color [style]" #> ("background:"+secColor+";") &
           ".avgbuildspeed *" #> inf.buildSpeed &
           ".summetal *" #> inf.sumMetal &
           ".metalused *" #> inf.metalUseAvg &
