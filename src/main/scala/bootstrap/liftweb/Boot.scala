@@ -84,7 +84,7 @@ class Boot extends Loggable {
       Menu.i("Games") / "listgames",
       Menu.i("Players") / PlayerSearchPage.pageName,
       Menu(Loc("Units", ExtLink("http://www.nanodesu.info/pa-db/"), "Units")),
-      Menu(Loc("Ladder", ExtLink("http://pastats-ladder.gamestown24.de/"), "Ladder")),
+      Menu(Loc("Ladder", ExtLink("http://ladder.pastats.tk/"), "Ladder")),
       Menu.i("Extra") / StatsPage.pageName,
       Menu.i("Player") / PlayerPage.pageName >> Hidden,
       Menu.i("Chart") / GamePage.pageName >> Hidden,
