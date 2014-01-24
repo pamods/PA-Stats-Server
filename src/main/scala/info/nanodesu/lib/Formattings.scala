@@ -15,7 +15,7 @@ object Formattings {
     prettyTimespan(end - start) + (if (probablyStillActive) "+" else "")
   }
   
-  def transformPercent(in: Double) = f(in, "%")
+  def formatPercent(in: Double) = f(in, "%")
   
   def formatUnit(in: Double, unit: String) = f(in, unit)
   

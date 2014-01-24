@@ -277,9 +277,14 @@ object StatisticsReportService extends RestHelper with Loggable {
       try {
         CookieBox withSession { db =>
           val before = System.currentTimeMillis()
-          val r = for (id <- GamePage.getGameId) yield Extraction decompose ArmyEventDataCollector(db).collectEventsFor(id)
-          logger info (System.currentTimeMillis() - before) + "ms"
-          r
+          for (id <- GamePage.getGameId) yield {
+            val result = Extraction decompose ArmyEventDataCollector(db).collectEventsFor(id)
+            val timeUsed = System.currentTimeMillis() - before
+	        if (timeUsed > 1000) {
+	      	  logger info s"used a rather big amount of time to generate eventdata: game=$id; time=" + (System.currentTimeMillis() - before) + "ms"            
+	        }
+            result
+          }
         }
       } catch {
         case ex: Exception => {

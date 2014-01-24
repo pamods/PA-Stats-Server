@@ -14,6 +14,7 @@ import info.nanodesu.model.db.updaters.reporting.GenerateNewPlayer
 import java.sql.Timestamp
 import net.liftweb.json.JValue
 import net.liftweb.json.Extraction
+import info.nanodesu.model.StatsReportData
 
 // definition of the data that is sent to the js layer of the webpage that shows the charts
 
@@ -47,6 +48,23 @@ case class ChartDataPackage(
 object ChartDataPackage {
   private implicit val formats = net.liftweb.json.DefaultFormats
   implicit def toJson(report: ChartDataPackage): JValue = Extraction.decompose(report)
+  def makeDataPoint(time: Long, s: StatsReportData) = {
+	  ChartDataPoint(time, 
+	      s.armyCount,
+	      s.metalIncome,
+	      s.energyIncome,
+	      s.metalIncomeNet,
+	      s.energyIncomeNet,
+	      s.metalSpending,
+	      s.energySpending,
+	      s.metalStored,
+	      s.energyStored,
+	      s.metalProducedSinceLastTick,
+	      s.energyProducedSinceLastTick,
+	      s.metalWastedSinceLastTick,
+	      s.energyWastedSinceLastTick,
+	      s.apm)    
+  }
 }
 
 case class ChartDataDbResult(playerId: Int, playerName: String, playerColor: String, data: ChartDataPoint)

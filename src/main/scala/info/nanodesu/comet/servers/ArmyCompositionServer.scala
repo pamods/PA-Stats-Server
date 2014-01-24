@@ -26,6 +26,11 @@ class ArmyCompositionServer(val gameId: Int) extends Loggable {
 	  playerInfo = initialData.playerInfo
 	}
 	
+	def clearUp() = {
+	  playerEvents = Map.empty
+	  playerInfo = Map.empty
+	}
+	
 	def addArmyEventsFor(playerId: Int, events: List[ArmyEvent]) = {
 	  val pIdAsStr = playerId.toString
 	  val evts = playerEvents.getOrElse(pIdAsStr, List.empty)

@@ -16,11 +16,15 @@ import net.liftweb.json.JValue
 import net.liftweb.json.Extraction
 
 class GameTimesLoader(db: DSLContext) {
-    def selectStartTimeForGame(gameId: Int): Long = {
-      db.select(games.START_TIME).from(games).where(games.ID === gameId).fetchOne().value1().getTime()
+
+  private def selectTimeSave(gameId: Int, timeField: Field[Timestamp]): Option[Long] = {
+    val time = for (d: Record1[Timestamp] <- db.select(timeField).from(games).where(games.ID === gameId).fetch()) yield {
+      d.value1().getTime()
     }
-    
-    def selectEndTimeForGame(gameId: Int): Long = {
-      db.select(games.END_TIME).from(games).where(games.ID === gameId).fetchOne().value1().getTime()
-    }
+    if (time.size == 1) Some(time(0))
+    else None
+  }
+  
+  def selectStartTimeForGame(gameId: Int): Option[Long] = selectTimeSave(gameId, games.START_TIME)
+  def selectEndTimeForGame(gameId: Int): Option[Long] = selectTimeSave(gameId, games.END_TIME)
 }

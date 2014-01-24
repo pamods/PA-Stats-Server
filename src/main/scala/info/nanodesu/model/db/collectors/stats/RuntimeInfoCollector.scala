@@ -11,6 +11,7 @@ import info.nanodesu.lib.db.CookieBox
 import info.nanodesu.lib.db.CookieFunc
 import bootstrap.liftweb.Boot
 import info.nanodesu.comet.GameCometServer
+import info.nanodesu.comet.GameServers
 
 class RuntimeInfoCollector(db: DSLContext) {
   import RuntimeInfoCollector._
@@ -24,7 +25,7 @@ class RuntimeInfoCollector(db: DSLContext) {
   val idleConnections = CookieBox.getNumIdleConnections
   val poolConnections = CookieBox.getNumPoolConnections
   val busyConnections = CookieBox.getNumBusyConnections
-  val activeGameComets = GameCometServer.cometCounter.get()
+  val activeGameComets = GameServers.cometCounter.get()
   val myGameChecks = GameCometServer.myGameChecksCounter.get()
 }
 

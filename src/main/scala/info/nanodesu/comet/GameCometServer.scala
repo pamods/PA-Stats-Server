@@ -33,9 +33,8 @@ case class GamePlayersListJsCmd(gameId: Int, cmd: JsCmd)
 object GameCometServer extends LiftActor with ListenerManager with Loggable{
   
   val myGameChecksCounter = new AtomicInteger(0)
-  val cometCounter = new AtomicInteger(0)
-  
-    @volatile
+
+  @volatile
     private var timingsMap: Map[Int, Long] = Map()
     
     private var cleanTime = System.currentTimeMillis()
@@ -70,33 +69,7 @@ object GameCometServer extends LiftActor with ListenerManager with Loggable{
 	
 	def doUpdateNow(id: Int) = {
 	  updateListeners(GeneralGameJsCmd(id, createGeneralGameUpdate(id)))
-      updateListeners(GamePlayersListJsCmd(id, createPlayersListUpdate(id)))
 	}
-	
-	private def createPlayersListUpdate(id: Int) = {
-	  import PlayerGameInfo._
-	  
-	  CookieBox withSession { db =>
-	    val activeReporters = new ActiveReportersForGameLoader
-	    val cmds = for (p <- activeReporters.selectActiveReportersFor(db, id)) yield {
-		    val inf = GameAndPlayerInfoCollector(db, p, id)
-		    val builder = setHtmlBuilder(p, id) _
-		    builder(inf.buildSpeed, avgBuildSpeed) &
-		    builder(inf.sumMetal, sumMetal) &
-		    builder(inf.metalUseAvg, metalUsed) &
-		    builder(inf.sumEnergy, sumEnergy) &
-		    builder(inf.energyUseAvg, energyUsed) &
-		    builder(inf.apmAvg, apmAvg)
-	    }
-        cmds.reduce(_&_)
-	  }
-	}
-	
-	private def setHtmlBuilder(p: Int, g: Int)(value: Any, idFunc: (Int, Int) => String) = {
-	  makeSetHtmlCmd(Full(value.toString), idFunc(g, p))
-	}
-	
-	private def makeSetHtmlCmd(value: Box[String], id: String) = value.map(x => SetHtml(id, Text(x))) openOr JsCmds.Noop
 	
 	private def createGeneralGameUpdate(id: Int) = {
 	  def loadUpdateInfo = {

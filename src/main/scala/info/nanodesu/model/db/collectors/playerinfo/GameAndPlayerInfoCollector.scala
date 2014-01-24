@@ -14,15 +14,30 @@ import net.liftweb.common.Box
 import java.math.{ BigDecimal => JBigDecimal }
 import org.jooq.util.postgres.PostgresDataType
 
-class GameAndPlayerInfoCollector(db: DSLContext, player: Int, gameId: Option[Int]) {
+trait GamePlayerInfo {
+  def apmAvg: Int
+  def metalUseAvg: Double
+  def energyUseAvg: Double
+  def buildSpeed: Double
+  def sumMetal: Long
+  def sumEnergy: Long
+  def name: String
+  def primaryColor: String
+  def secondaryColor: String
+}
+
+class GameAndPlayerInfoCollector(db: DSLContext, player: Int, gameId: Option[Int]) extends GamePlayerInfo {
   import GameAndPlayerInfoCollector._
 
   val apmAvg = getAvgApm(db, player, gameId)
-  val metalUseAvg = transformPercent(getAvgMetalUsage(db, player, gameId))
-  val energyUseAvg = transformPercent(getAvgEnergyUsage(db, player, gameId))
-  val buildSpeed = transformPercent(getAvgBuildSpeed(db, player, gameId))
-  val sumMetal = formatKMBT(getMetalSum(db, player, gameId))
-  val sumEnergy = formatKMBT(getEnergySum(db, player, gameId))  
+  val metalUseAvg = getAvgMetalUsage(db, player, gameId)
+  val energyUseAvg = getAvgEnergyUsage(db, player, gameId)
+  val buildSpeed = getAvgBuildSpeed(db, player, gameId)
+  val sumMetal = getMetalSum(db, player, gameId)
+  val sumEnergy = getEnergySum(db, player, gameId)
+  var name: String = ""
+  var primaryColor: String = ""
+  var secondaryColor: String = ""
 }
 
 object GameAndPlayerInfoCollector extends GameAndPlayerInfoCollectorBase {

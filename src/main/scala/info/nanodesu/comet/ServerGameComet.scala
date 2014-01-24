@@ -56,14 +56,14 @@ abstract class ServerGameComet extends CometActor with Loggable {
 
   override protected def localSetup() = {
     super.localSetup()
-    GameCometServer.cometCounter.incrementAndGet()
+    GameServers.cometCounter.incrementAndGet()
     for (id <- getGameId) {
       GameServers.serverForGame(id) ! RegisterCometActor(this)
     }
   }
 
   override protected def localShutdown() = {
-    GameCometServer.cometCounter.decrementAndGet()
+    GameServers.cometCounter.decrementAndGet()
     prepareShutdown()
     for (id <- getGameId) {
       GameServers.serverForGame(id) ! UnregisterCometActor(this)

@@ -28,7 +28,7 @@ class ArmyCompositionRenderer(val gId: Int, val hasComet: Boolean = false) exten
     val gameStart = CookieBox withSession { db => new GameTimesLoader(db).selectStartTimeForGame(gId)}
     
     "#armyDataSource [data-comet-info]" #> compact(net.liftweb.json.render(
-        Extraction decompose Map("hasComet" -> hasComet, "gameStart" -> gameStart)
+        Extraction decompose Map("hasComet" -> hasComet, "gameStart" -> gameStart.getOrElse(-1))
     ))
   }
 }

@@ -54,7 +54,7 @@ object ArmyEventDataCollector {
   
   private class DbLayer(db: DSLContext) extends ArmyEventDbLayer with Loggable {
     
-    def selectStartTimeForGame(gameId: Int): Long = new GameTimesLoader(db).selectStartTimeForGame(gameId)
+    def selectStartTimeForGame(gameId: Int): Long = new GameTimesLoader(db).selectStartTimeForGame(gameId).getOrElse(-1)
     
     def selectArmyEventsForGame(gameId: Int): List[ArmyEventDbResult] = {
       val q = db.select(playerGameRels.P, 

@@ -20,22 +20,52 @@ import info.nanodesu.lib.db.CookieBox
 import info.nanodesu.model.db.collectors.playerinfo.GameAndPlayerInfoCollector
 import info.nanodesu.model.db.collectors.gameinfo.loader.ActiveReportersForGameLoader
 import info.nanodesu.snippet.cometrenderer.PlayerInfoRenderer
+import info.nanodesu.lib.Formattings._
 
-class PlayerGameInfo extends GameComet {
-  override def lowPriority = {
-    case GamePlayersListJsCmd(id, cmd: JsCmd) if (isMyGame(id)) => partialUpdate(cmd)
-  }
-
+class PlayerGameInfo extends ServerGameComet {
   def nameKey = CometInit.playerGameInfoKey
 
-  def render = {
-    val tx = for (gId <- getGameId) yield {
-    	new PlayerInfoRenderer(gId).render
+  protected def prepareShutdown() = {
+    // nothing to do, as we do not have our own data
+  }
+
+  protected def pushDataToClients(server: GameServerActor) = {
+    def setHtmlBuilder(p: Int, g: Int)(value: Any, idFunc: (Int, Int) => String) = {
+      makeSetHtmlCmd(Full(value.toString), idFunc(g, p))
     }
+    def makeSetHtmlCmd(value: Box[String], id: String) = value.map(x => SetHtml(id, Text(x))) openOr JsCmds.Noop
     
+    val summaries = server.playerSummaries.getSummaries
+
+    for (gameId <- getGameId.toList) {
+      val cmds = for (summary <- summaries) yield {
+        import PlayerGameInfo._
+        val builder = setHtmlBuilder(summary._1, gameId) _
+        val inf = summary._2
+        builder(formatPercent(inf.buildSpeed), avgBuildSpeed) &
+          builder(formatKMBT(inf.sumMetal), sumMetal) &
+          builder(formatPercent(inf.metalUseAvg), metalUsed) &
+          builder(formatKMBT(inf.sumEnergy), sumEnergy) &
+          builder(formatPercent(inf.energyUseAvg), energyUsed) &
+          builder(inf.apmAvg, apmAvg)
+      }
+      partialUpdate(cmds.reduce(_&_))
+    }
+  }
+
+  // no need to push any updates after render
+  // this is a rather static comet after all
+  override def render = {
+    val tx = for (gId <- getGameId) yield {
+      new PlayerInfoRenderer(gId, gameServer).render
+    }
+
     val fooo = tx openOr ("#noop" #> "")
     fooo
   }
+
+  // should never be called, as we overwrote render
+  protected def coreRender = ???
 }
 
 object PlayerGameInfo {

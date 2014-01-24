@@ -12,39 +12,52 @@ import info.nanodesu.lib.db.CookieBox
 import info.nanodesu.model.db.collectors.playerinfo.GameAndPlayerInfoCollector
 import info.nanodesu.model.db.collectors.gameinfo.loader.GameTimesLoader
 import net.liftweb.common.Loggable
+import info.nanodesu.model.db.collectors.playerinfo.GamePlayerInfo
+import info.nanodesu.comet.GameServers
+import info.nanodesu.comet.GameServerActor
+import info.nanodesu.lib.Formattings._
 
-class PlayerInfoRenderer(val gId: Int) extends CometRenderer {
+class PlayerInfoRenderer(val gId: Int, val server: Option[GameServerActor] = None) extends CometRenderer {
   def render = {
     val activeReporters = new ActiveReportersForGameLoader
 
     import PlayerGameInfo._
-
-    val transform = CookieBox withSession { db =>
-      for (p <- activeReporters.selectActiveReportersWithName(db, gId)) yield {
-        val inf = GameAndPlayerInfoCollector(db, p.id, gId)
-
-        val primColor = if (p.primaryColor == null) "#000" else p.primaryColor
-        val secColor = if (p.secondaryColor == null) "#000" else p.secondaryColor
+    
+    def makeTransform(pid: Int, inf: GamePlayerInfo) = {
+        val primColor = if (inf.primaryColor == null) "#000" else inf.primaryColor
+        val secColor = if (inf.secondaryColor == null) "#000" else inf.secondaryColor
         
-        ".playername *+" #> p.name &
+        ".playername *+" #> inf.name &
           ".army_primary_color [style]" #> ("background:"+primColor+";") &
           ".army_secondary_color [style]" #> ("background:"+secColor+";") &
-          ".avgbuildspeed *" #> inf.buildSpeed &
-          ".summetal *" #> inf.sumMetal &
-          ".metalused *" #> inf.metalUseAvg &
-          ".sumenergy *" #> inf.sumEnergy &
-          ".energyused *" #> inf.energyUseAvg &
+          ".avgbuildspeed *" #> formatPercent(inf.buildSpeed) &
+          ".summetal *" #> formatKMBT(inf.sumMetal) &
+          ".metalused *" #> formatPercent(inf.metalUseAvg) &
+          ".sumenergy *" #> formatKMBT(inf.sumEnergy) &
+          ".energyused *" #> formatPercent(inf.energyUseAvg) &
           ".apmavg *" #> inf.apmAvg &
-          ".playername [id]" #> playerName(gId, p.id) &
-          ".avgbuildspeed [id]" #> avgBuildSpeed(gId, p.id) &
-          ".summetal [id]" #> sumMetal(gId, p.id) &
-          ".metalused [id]" #> metalUsed(gId, p.id) &
-          ".sumenergy [id]" #> sumEnergy(gId, p.id) &
-          ".energyused [id]" #> energyUsed(gId, p.id) &
-          ".apmavg [id]" #> apmAvg(gId, p.id)
+          ".playername [id]" #> playerName(gId, pid) &
+          ".avgbuildspeed [id]" #> avgBuildSpeed(gId, pid) &
+          ".summetal [id]" #> sumMetal(gId, pid) &
+          ".metalused [id]" #> metalUsed(gId, pid) &
+          ".sumenergy [id]" #> sumEnergy(gId, pid) &
+          ".energyused [id]" #> energyUsed(gId, pid) &
+          ".apmavg [id]" #> apmAvg(gId, pid)
+    }
+    
+    val playerSummaries = server map (_.playerSummaries.getSummaries) getOrElse {
+      CookieBox withSession { db =>
+	      val listed = for (p <- activeReporters.selectActiveReportersWithName(db, gId)) yield {
+	        val inf =  GameAndPlayerInfoCollector(db, p.id, gId)
+	        inf.name = p.name
+	        inf.primaryColor = p.primaryColor
+	        inf.secondaryColor = p.secondaryColor
+	        p.id -> inf
+	      }
+	      listed.toMap
       }
     }
 
-    "#pstatline" #> (transform)
+    "#pstatline" #> (playerSummaries.map(x => makeTransform(x._1, x._2)))
   }
 }

@@ -36,8 +36,10 @@ object CometInit extends DispatchSnippet with Loggable {
 
   def shouldBeConsideredLive(gameId: Int): Boolean = {
     val time = CookieBox withSession (new GameTimesLoader(_).selectEndTimeForGame(gameId))
-    val threshold = (time + cometServePastThreshold)
-    threshold > System.currentTimeMillis()
+    time map { t =>
+	    val threshold = (t + cometServePastThreshold)
+	    threshold > System.currentTimeMillis()
+    } getOrElse false
   }
 
   private def doGameChartInfo = doCometOrSnippet(new GameChartDataRenderer(_).render, "GameChartComet", gameChartComet)

@@ -28,8 +28,11 @@ import net.liftweb.util.TimeHelpers
 import net.liftweb.util.Props
 import info.nanodesu.comet.servers.ChartDataServer
 import info.nanodesu.model.StatsReportData
+import info.nanodesu.comet.servers.PlayerSummaryServer
 
 object GameServers {
+    val cometCounter = new AtomicInteger(0)
+  
 	private var servers: Map[Int, LiftActor] = Map.empty
 	
 	// using some sort of concurrent map might be an idea in the future
@@ -47,6 +50,11 @@ object GameServers {
 	  }
 	}
 
+	def mayGetServer(gId: Int): Option[LiftActor] = synchronized {
+	  if (hasGameServer(gId)) Some(serverForGame(gId))
+	  else None
+	}
+	
 	def removeGameServer(gId: Int) = synchronized {
 	  servers -= gId
 	}
@@ -77,21 +85,27 @@ class GameServerActor(gameId: Int) extends LiftActor with Loggable {
 
   val armyComposition = new ArmyCompositionServer(gameId)
   val chartData = new ChartDataServer(gameId)
+  val playerSummaries = new PlayerSummaryServer(gameId)
   
   private var lastNewDataTime = System.currentTimeMillis()
   
   def forceInit() = {
     armyComposition.forcefulInit()
-    chartData.forcefulInit()
+ 	val initialData = CookieBox withSession (ChartDataCollector(_).collectDataFor(gameId))    
+    chartData.forcefulInit(initialData)
+    playerSummaries.forcefulInit(initialData)
   }
   
   override def messageHandler = {
     case NewChartStats(id, time, stats) =>
       chartData.addChartDataFor(id, time, stats)
-    
+      playerSummaries.addStats(id, time, stats)
+      
     case NewPlayer(id, name, primaryColor, secondaryColor) =>
+      // TODO this looks redundant to me
       chartData.setPlayerInfo(id, name, primaryColor)
       armyComposition.setPlayerInfo(id, name, primaryColor, secondaryColor)
+      playerSummaries.setPlayerInfo(id, name, primaryColor, secondaryColor)
       
     case NewPlayerEvents(playerId, events: List[ArmyEvent]) =>
       armyComposition.addArmyEventsFor(playerId, events)
@@ -102,9 +116,8 @@ class GameServerActor(gameId: Int) extends LiftActor with Loggable {
         actor ! RegisterAcknowledged(this)
       }
     
-    case UnregisterCometActor(actor: CometActor) => {
+    case UnregisterCometActor(actor: CometActor) => 
       cometActorsToUpdate = cometActorsToUpdate.filter(_ != actor)
-    }
     
     case PushUpdate(force: Boolean) =>
       if (cometActorsToUpdate.nonEmpty) {
@@ -117,6 +130,8 @@ class GameServerActor(gameId: Int) extends LiftActor with Loggable {
         scheduleGameRelevanceCheck()
       } else {
         cometActorsToUpdate.foreach(_ ! ServerShutdown())
+        armyComposition.clearUp()
+        chartData.clearUp()
         GameServers.removeGameServer(gameId)
       }
     }
