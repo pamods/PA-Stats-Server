@@ -14,7 +14,6 @@ import info.nanodesu.model.db.collectors.gameinfo.loader.GameTimesLoader
 import net.liftweb.common.Loggable
 import info.nanodesu.snippet.cometrenderer.PlayerInfoRenderer
 import net.liftweb.util.CssSel
-import info.nanodesu.snippet.cometrenderer.GameInfoRenderer
 import info.nanodesu.snippet.cometrenderer.ArmyCompositionRenderer
 import info.nanodesu.snippet.cometrenderer.GameChartDataRenderer
 import net.liftweb.util.Props
@@ -22,14 +21,12 @@ import net.liftweb.util.Props
 object CometInit extends DispatchSnippet with Loggable {
   val cometServePastThreshold = Props.getInt("cometServeThreshold", 300000)
 
-  val playerGameInfoKey = "game_player_lines_"
-  val gameInfoKey = "game_general_"
+  val playerGameInfoKey = "game_summary_comet_"
   val gameArmyComposition = "game_army_composition_"
   val gameChartComet = "game_chart_comet_"
     
   val dispatch: DispatchIt = {
     case "playerGameInfo" => doPlayerGameInfo
-    case "gameGeneralInfo" => doGameGeneralInfo
     case "gameArmyComposition" => doGameArmyComposition
     case "gameChartInfo" => doGameChartInfo
   }
@@ -57,7 +54,6 @@ object CometInit extends DispatchSnippet with Loggable {
     renderer openOr "#noop" #> ""
   }
   
-  private def doGameGeneralInfo = doCometOrSnippet(new GameInfoRenderer(_).render, "GeneralGameInfo", gameInfoKey)
   private def doGameArmyComposition = doCometOrSnippet(new ArmyCompositionRenderer(_).render, "GameArmyComposition", gameArmyComposition)
 
   private def makeShinyComet(typ: String, key: String, gid: Int): net.liftweb.util.CssSel = {

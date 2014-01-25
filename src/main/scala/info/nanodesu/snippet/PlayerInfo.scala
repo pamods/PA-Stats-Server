@@ -19,7 +19,7 @@ import info.nanodesu.model.db.collectors.playerinfo.PlayerHistoryEntry
 import net.liftweb.json.Extraction
 import net.liftweb.json._
 import net.liftweb.json.JsonDSL._
-import info.nanodesu.lib.Formattings
+import info.nanodesu.lib.Formattings._
 
 object PlayerInfo extends DispatchSnippet with Loggable {
 
@@ -48,11 +48,11 @@ object PlayerInfo extends DispatchSnippet with Loggable {
         "#gametimesum *" #> inf.playerGameTime &
         "#gametimeavg *" #> inf.playerGameTimeAvg &
         "#avgapm *" #> inf.apmAvg &
-        "#summetal *" #> inf.sumMetal &
-        "#sumenergy *" #> inf.sumEnergy &
-        "#metalusageavg *" #> inf.metalUseAvg &
-        "#energyusageavg *" #> inf.energyUseAvg &
-        "#avgbuildspeed *" #> inf.buildSpeed &
+        "#summetal *" #> formatKMBT(inf.sumMetal) &
+        "#sumenergy *" #> formatKMBT(inf.sumEnergy) &
+        "#metalusageavg *" #> formatPercent(inf.metalUseAvg) &
+        "#energyusageavg *" #> formatPercent(inf.energyUseAvg) &
+        "#avgbuildspeed *" #> formatPercent(inf.buildSpeed) &
         "#timelinedatasource" #> graphData
     } else {
       "#playerName *" #> "unknown player ID!"

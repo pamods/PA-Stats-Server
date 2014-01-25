@@ -14,8 +14,6 @@ import net.liftweb.json.JsonAST.JValue
 import net.liftweb.util.Helpers._
 import net.liftweb.common.Box
 import net.liftweb.util.Helpers
-import info.nanodesu.comet.GameCometServer
-import info.nanodesu.comet.GameDataUpdate
 import info.nanodesu.model.RunningGameDataC
 import info.nanodesu.model.ReportDataC
 import info.nanodesu.model.db.updaters.reporting.initial.InitialReportAcceptor
@@ -34,7 +32,6 @@ import java.math.BigInteger
 import java.lang.Long
 import org.apache.commons.lang.StringUtils
 import info.nanodesu.model.db.collectors.gameinfo.ArmyEventDataCollector
-import info.nanodesu.comet.ForceGameDataUpdate
 import net.liftweb.common.Failure
 import info.nanodesu.comet.GameServers
 import info.nanodesu.model.db.collectors.playerinfo.loader.PlayerIdForLinkLoader
@@ -45,6 +42,7 @@ import info.nanodesu.model.db.collectors.playerinfo.CometUpdatePlayerDataCollect
 import info.nanodesu.comet.NewChartStats
 import info.nanodesu.comet.NewChartStats
 import info.nanodesu.comet.WinnerSet
+import info.nanodesu.comet.PushUpdate
 
 
 object StatisticsReportService extends RestHelper with Loggable {
@@ -139,7 +137,7 @@ object StatisticsReportService extends RestHelper with Loggable {
             execute()
         }
         for (gameId <- ReportDataC.getGameIdForLink(link)) {
-          GameCometServer ! ForceGameDataUpdate(gameId)
+          GameServers.serverForGame(gameId) ! PushUpdate(true)
         }
       }
       OkResponse()
@@ -165,8 +163,9 @@ object StatisticsReportService extends RestHelper with Loggable {
             where(games.ID === gameId).
             execute()
         }
-        GameServers.serverForGame(gameId) ! WinnerSet(data.victor)
-        GameCometServer ! ForceGameDataUpdate(gameId)
+        val server = GameServers.serverForGame(gameId) 
+        server ! WinnerSet(data.victor)
+        server ! PushUpdate(true)
       }
 
       OkResponse()
@@ -207,7 +206,6 @@ object StatisticsReportService extends RestHelper with Loggable {
         for (gameId <- playerData.gameId;
         	 playerId <- playerData.playerId;
         	 playerName <- playerData.playerName) {
-          GameCometServer ! GameDataUpdate(gameId)
 
           // this is the normal location that causes the server to be created
           // here the server really can be empty so far, so it does not need any init from the database
@@ -231,8 +229,6 @@ object StatisticsReportService extends RestHelper with Loggable {
       }
   
       for (gameId <- ReportDataC.getGameIdForLink(data.gameLink)) {
-        GameCometServer ! GameDataUpdate(gameId)
-        
 	      for (playerId <- CookieBox.withSession(new PlayerIdForLinkLoader(_).selectPlayerId(data.gameLink))) {
 	        val server = GameServers.serverForGame(gameId)
 	        if (data.armyEvents.nonEmpty) {

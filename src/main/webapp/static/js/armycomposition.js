@@ -230,5 +230,6 @@ $(document).ready(function() {
 		});
 	}
 	
+	console.log("bind army composition!");
 	ko.applyBindings(armyModel, document.getElementById('armycomposition'));
 });

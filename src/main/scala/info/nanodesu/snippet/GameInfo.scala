@@ -17,7 +17,6 @@ import info.nanodesu.lib.db.CookieBox
 import info.nanodesu.lib.Formattings._
 import info.nanodesu.model.db.collectors.gameinfo._
 import info.nanodesu.model.db.collectors.gameinfo.HasSomeLockedPlayersCollector
-import info.nanodesu.snippet.cometrenderer.GameInfoRenderer
 
 object GameInfo extends DispatchSnippet with Loggable {
 	val dispatch: DispatchIt = {
@@ -36,7 +35,41 @@ object GameInfo extends DispatchSnippet with Loggable {
 	
 	def renderGameInfo(gameId: Box[Int]) = {
 	  val boxed = for (gId <- gameId) yield {
-	    new GameInfoRenderer(gId).render
+    	  def getGame(gameId: Int) = CookieBox withSession { db =>
+		    GameInfoCollector(db, gameId)
+		  }
+		  val gameTitleCollector = CookieBox withSession (GameTitleCollector(_))
+		  gameTitleCollector.shouldCreateLinks = true
+		  val transform = for (game <- getGame(gId)) yield {
+			  val playerList = gameTitleCollector.createGameTitle(gId)
+	
+			  val planetTransform = for (planet <- CookieBox withSession (db => PlanetCollector(db, gId))) yield {
+			      "#size *+" #> planet.size &
+		  		  "#radius *+" #> planet.radius &
+		  		  "#heightrange *+" #> planet.heightRange &
+		  		  "#waterheight *+" #> planet.waterHeight &
+		  		  "#planetimg [src]" #> planet.imagePath &
+		  		  "#planetimg [title+]" #> planet.biome &
+		  		  "#planetseed *+" #> planet.seed &
+		  		  "#planetname *+" #> planet.name &
+		  		  "#temp *+" #> planet.temp
+			  }
+			  
+			  val base = "#gamenum *+" #> gId &
+			  "#players *+" #> playerList &
+			  "#version *+" #> game.paVersion &
+			  "#winner *+" #> game.winner &
+			  "#start *+" #> JSLocalTime.jsTimeSnipFor(game.startTime) &
+			  "#length *+" #> prettyTimespan(game.duration)
+			  
+			  planetTransform match {
+			    case Some(tx) => base & tx
+			    case _ => base
+			  }
+		  }
+		  
+		  val foo = transform getOrElse "*" #> ""
+		  foo
 	  }
 	  boxed.getOrElse("#noop" #> "")
 	}

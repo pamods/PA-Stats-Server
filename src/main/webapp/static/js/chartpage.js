@@ -239,5 +239,6 @@ $(function() {
 		});
 	}
 	
+	console.log("bind chartbase");
 	ko.applyBindings(viewModel.basicChart, document.getElementById('chartbase'));
 });

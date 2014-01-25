@@ -61,7 +61,7 @@ object LoadTester {
     }
 
     while (!failed) {
-      if (reporters < 1) {
+      if (reporters < 50) {
         reporters += 1
         GameSimProc start (testFailed) onComplete foobar
         println("running " + reporters)

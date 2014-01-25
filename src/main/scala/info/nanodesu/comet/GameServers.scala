@@ -100,7 +100,6 @@ class GameServerActor(gameId: Int) extends LiftActor with Loggable {
   override def messageHandler = {
     case WinnerSet(winner) =>
       gameSummary.setWinner(winner)
-      mayPushUpdate(true)
       
     case NewChartStats(id, time, stats) =>
       chartData.addChartDataFor(id, time, stats)

@@ -33,8 +33,7 @@ object Stats extends DispatchSnippet {
     "#idlesql" #> data.idleConnections &
     "#busysql" #> data.busyConnections &
     "#allsql" #> data.poolConnections &
-    "#gamecometcnt" #> data.activeGameComets &
-    "#mygamechecks" #> data.myGameChecks
+    "#gamecometcnt" #> data.activeGameComets
   }
 
   private def doContributers = "#line" #> MostPlaytimesCollector().topPlaytime.zipWithIndex.map(x => {

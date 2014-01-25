@@ -24,8 +24,7 @@ abstract class ServerGameComet extends CometActor with Loggable {
   protected var gameServer: Option[GameServerActor] = None
 
   private var shouldShutDown = false
-
-  override def lifespan = if (shouldShutDown) Full(0) else super.lifespan
+  override def lifespan = if (shouldShutDown) Full(0 seconds) else Full(30 seconds)
 
   protected def prepareShutdown()
   protected def pushDataToClients(server: GameServerActor)
@@ -65,8 +64,8 @@ abstract class ServerGameComet extends CometActor with Loggable {
   override protected def localShutdown() = {
     GameServers.cometCounter.decrementAndGet()
     prepareShutdown()
-    for (id <- getGameId) {
-      GameServers.serverForGame(id) ! UnregisterCometActor(this)
+    for (id <- getGameId; server <- GameServers.mayGetServer(id)) {
+      server ! UnregisterCometActor(this)
     }
     super.localShutdown()
   }
