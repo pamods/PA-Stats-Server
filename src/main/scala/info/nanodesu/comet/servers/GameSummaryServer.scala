@@ -8,9 +8,10 @@ import info.nanodesu.model.db.collectors.gameinfo.ChartDataCollector
 import info.nanodesu.model.db.collectors.gameinfo.ChartDataPackage
 import info.nanodesu.model.db.collectors.playerinfo.GamePlayerInfo
 
-class PlayerSummaryServer(val gameId: Int) {
+class GameSummaryServer(val gameId: Int) {
 
   class PlayerSummary extends GamePlayerInfo {
+    // FIXME this currently is not initialized by forceful init
     private var _name: String = ""
     private var _primaryColor: String = "#000"
     private var _secondaryColor: String = "#000"
@@ -25,8 +26,6 @@ class PlayerSummaryServer(val gameId: Int) {
     private var buildSpeedSum: Double = 0
     private var buildSpeedPartsCount: Int = 0
 
-    private def runTime = endTime - startTime
-
     override def name = _name
     override def primaryColor = _primaryColor
     override def secondaryColor = _secondaryColor
@@ -39,6 +38,7 @@ class PlayerSummaryServer(val gameId: Int) {
     def metalUseAvg = 1 - (metalWasted.toDouble / (metalProduced + Double.MinPositiveValue))
     def energyUseAvg = 1 - (energyWasted.toDouble / (energyProduced + Double.MinPositiveValue))
     def buildSpeed = if (buildSpeedPartsCount == 0) 1 else buildSpeedSum / buildSpeedPartsCount
+    def runTime = endTime - startTime
 
     def setPlayerInfo(name: String, primColor: String, secColor: String) = {
       this._name = name
@@ -73,6 +73,12 @@ class PlayerSummaryServer(val gameId: Int) {
   
   private var summaries: Map[Int, PlayerSummary] = Map.empty
   
+  private var startTime = Long.MaxValue
+  private var endTime = 0L
+  
+  // FIXME add this to forceful init
+  private var _winner = "unknown"
+  
   def forcefulInit(initialData: ChartDataPackage) = {
     for (entry <- initialData.playerTimeData) {
       val playerId = entry._1.toInt
@@ -91,13 +97,21 @@ class PlayerSummaryServer(val gameId: Int) {
     summaries += pId -> summary
   }
   
+  def setWinner(winner: String) = this._winner = winner
+  
   def addStats(playerId: Int, time: Long, data: StatsReportData) = {
     modifySummary(playerId, _.addStats(time, data))
+    if (startTime > time) {
+      startTime = time
+    }
+    endTime = time
   }
   
   def setPlayerInfo(playerId: Int, name: String, primaryColor: String, secondaryColor: String) = {
     modifySummary(playerId, _.setPlayerInfo(name, primaryColor, secondaryColor))
   }
   
+  def runTime = endTime - startTime
+  def winner = _winner
   def getSummaries = summaries
 }

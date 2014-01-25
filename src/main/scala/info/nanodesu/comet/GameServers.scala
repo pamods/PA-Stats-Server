@@ -28,7 +28,7 @@ import net.liftweb.util.TimeHelpers
 import net.liftweb.util.Props
 import info.nanodesu.comet.servers.ChartDataServer
 import info.nanodesu.model.StatsReportData
-import info.nanodesu.comet.servers.PlayerSummaryServer
+import info.nanodesu.comet.servers.GameSummaryServer
 
 object GameServers {
     val cometCounter = new AtomicInteger(0)
@@ -73,6 +73,7 @@ case class RegisterAcknowledged(server: GameServerActor)
 case class PushUpdate(force: Boolean)
 case class CheckGameRelevance()
 case class ServerShutdown()
+case class WinnerSet(winner: String)
 
 class GameServerActor(gameId: Int) extends LiftActor with Loggable {
   val cometServePastThreshold = Props.getInt("cometServeThreshold", 300000)
@@ -85,7 +86,7 @@ class GameServerActor(gameId: Int) extends LiftActor with Loggable {
 
   val armyComposition = new ArmyCompositionServer(gameId)
   val chartData = new ChartDataServer(gameId)
-  val playerSummaries = new PlayerSummaryServer(gameId)
+  val gameSummary = new GameSummaryServer(gameId)
   
   private var lastNewDataTime = System.currentTimeMillis()
   
@@ -93,19 +94,23 @@ class GameServerActor(gameId: Int) extends LiftActor with Loggable {
     armyComposition.forcefulInit()
  	val initialData = CookieBox withSession (ChartDataCollector(_).collectDataFor(gameId))    
     chartData.forcefulInit(initialData)
-    playerSummaries.forcefulInit(initialData)
+    gameSummary.forcefulInit(initialData)
   }
   
   override def messageHandler = {
+    case WinnerSet(winner) =>
+      gameSummary.setWinner(winner)
+      mayPushUpdate(true)
+      
     case NewChartStats(id, time, stats) =>
       chartData.addChartDataFor(id, time, stats)
-      playerSummaries.addStats(id, time, stats)
+      gameSummary.addStats(id, time, stats)
       
     case NewPlayer(id, name, primaryColor, secondaryColor) =>
       // TODO this looks redundant to me
       chartData.setPlayerInfo(id, name, primaryColor)
       armyComposition.setPlayerInfo(id, name, primaryColor, secondaryColor)
-      playerSummaries.setPlayerInfo(id, name, primaryColor, secondaryColor)
+      gameSummary.setPlayerInfo(id, name, primaryColor, secondaryColor)
       
     case NewPlayerEvents(playerId, events: List[ArmyEvent]) =>
       armyComposition.addArmyEventsFor(playerId, events)

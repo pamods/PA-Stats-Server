@@ -44,6 +44,7 @@ import info.nanodesu.comet.PushUpdate
 import info.nanodesu.model.db.collectors.playerinfo.CometUpdatePlayerDataCollector
 import info.nanodesu.comet.NewChartStats
 import info.nanodesu.comet.NewChartStats
+import info.nanodesu.comet.WinnerSet
 
 
 object StatisticsReportService extends RestHelper with Loggable {
@@ -164,6 +165,7 @@ object StatisticsReportService extends RestHelper with Loggable {
             where(games.ID === gameId).
             execute()
         }
+        GameServers.serverForGame(gameId) ! WinnerSet(data.victor)
         GameCometServer ! ForceGameDataUpdate(gameId)
       }
 

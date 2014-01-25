@@ -21,6 +21,7 @@ import info.nanodesu.model.db.collectors.playerinfo.GameAndPlayerInfoCollector
 import info.nanodesu.model.db.collectors.gameinfo.loader.ActiveReportersForGameLoader
 import info.nanodesu.snippet.cometrenderer.PlayerInfoRenderer
 import info.nanodesu.lib.Formattings._
+import info.nanodesu.lib.Formattings
 
 class PlayerGameInfo extends ServerGameComet {
   def nameKey = CometInit.playerGameInfoKey
@@ -35,10 +36,11 @@ class PlayerGameInfo extends ServerGameComet {
     }
     def makeSetHtmlCmd(value: Box[String], id: String) = value.map(x => SetHtml(id, Text(x))) openOr JsCmds.Noop
     
-    val summaries = server.playerSummaries.getSummaries
-
+    val gameSummary = server.gameSummary
+    val playerSummaries = gameSummary.getSummaries
+    
     for (gameId <- getGameId.toList) {
-      val cmds = for (summary <- summaries) yield {
+      val cmds = for (summary <- playerSummaries) yield {
         import PlayerGameInfo._
         val builder = setHtmlBuilder(summary._1, gameId) _
         val inf = summary._2
@@ -49,7 +51,9 @@ class PlayerGameInfo extends ServerGameComet {
           builder(formatPercent(inf.energyUseAvg), energyUsed) &
           builder(inf.apmAvg, apmAvg)
       }
-      partialUpdate(cmds.reduce(_&_))
+      val timeUpdate = SetHtml("length", Text("Duration: "+Formattings.prettyTimespan(gameSummary.runTime)))
+      val winnerUpdate = if (gameSummary.winner != "unknown") SetHtml("winner", Text("Winner: "+gameSummary.winner)) else JsCmds.Noop
+      partialUpdate(cmds.reduce(_&_) & timeUpdate & winnerUpdate)
     }
   }
 
