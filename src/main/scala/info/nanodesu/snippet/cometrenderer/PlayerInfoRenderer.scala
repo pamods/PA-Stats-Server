@@ -45,7 +45,7 @@ class PlayerInfoRenderer(val gId: Int, val server: Option[GameServerActor] = Non
           ".apmavg [id]" #> apmAvg(gId, pid)
     }
     
-    val playerSummaries = server map (_.playerSummaries.getSummaries) getOrElse {
+    val playerSummaries = server map (_.gameSummary.getSummaries) getOrElse {
       CookieBox withSession { db =>
 	      val listed = for (p <- activeReporters.selectActiveReportersWithName(db, gId)) yield {
 	        val inf =  GameAndPlayerInfoCollector(db, p.id, gId)
