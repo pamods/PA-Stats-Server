@@ -30,6 +30,11 @@ class PlayerGameInfo extends ServerGameComet {
     // nothing to do, as we do not have our own data
   }
 
+  class TimeUpdateMessage extends TriggerMessage {
+    def triggerName = "game-time-increases"
+    def messageValues = List(Map("dummy" -> ""))
+  }
+  
   protected def pushDataToClients(server: GameServerActor) = {
     def setHtmlBuilder(p: Int, g: Int)(value: Any, idFunc: (Int, Int) => String) = {
       makeSetHtmlCmd(Full(value.toString), idFunc(g, p))
@@ -53,7 +58,7 @@ class PlayerGameInfo extends ServerGameComet {
       }
       val timeUpdate = SetHtml("length", Text("Duration: "+Formattings.prettyTimespan(gameSummary.runTime)))
       val winnerUpdate = if (gameSummary.winner != "unknown") SetHtml("winner", Text("Winner: "+gameSummary.winner)) else JsCmds.Noop
-      partialUpdate(cmds.reduce(_&_) & timeUpdate & winnerUpdate)
+      partialUpdate(cmds.reduce(_&_) & timeUpdate & winnerUpdate & new TimeUpdateMessage())
     }
   }
 

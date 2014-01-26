@@ -61,7 +61,7 @@ class ChartDataCollectorSpec extends Specification with Mockito with ScalaCheck 
   class Subject(val game: Int, val dataIn: List[ChartDataDbResult]) {
     def result = {
 	    val db = mock[ChartDataCollectorDblayer]
-	    db.selectDataPointsForGame(game) returns Random.shuffle(dataIn)
+	    db.selectDataPointsForGame(game, false) returns Random.shuffle(dataIn)
 	    new ChartDataCollector(db).collectDataFor(game)      
     }
     

@@ -23,6 +23,8 @@ abstract class ServerGameComet extends CometActor with Loggable {
 
   protected var gameServer: Option[GameServerActor] = None
 
+  // this hack seems not to work.
+  // how can I shut down a comet?!
   private var shouldShutDown = false
   override def lifespan = if (shouldShutDown) Full(0 seconds) else Full(30 seconds)
 

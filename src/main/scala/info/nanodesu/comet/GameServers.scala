@@ -29,6 +29,7 @@ import net.liftweb.util.Props
 import info.nanodesu.comet.servers.ChartDataServer
 import info.nanodesu.model.StatsReportData
 import info.nanodesu.comet.servers.GameSummaryServer
+import info.nanodesu.comet.servers.PlayersServer
 
 object GameServers {
     val cometCounter = new AtomicInteger(0)
@@ -64,7 +65,8 @@ object GameServers {
 	}
 }
 
-case class NewPlayer(id: Int, name: String, primaryColor: String, secondaryColor: String)
+case class UnlockPlayer(id: Int)
+case class NewPlayer(id: Int, locked: Boolean, name: String, primaryColor: String, secondaryColor: String)
 case class NewPlayerEvents(playerId: Int, events: List[ArmyEvent])
 case class NewChartStats(playerId: Int, time: Long, stats: StatsReportData)
 case class RegisterCometActor(actor: CometActor)
@@ -84,15 +86,17 @@ class GameServerActor(gameId: Int) extends LiftActor with Loggable {
   
   private var lastUpdateTime = System.currentTimeMillis()
 
-  val armyComposition = new ArmyCompositionServer(gameId)
-  val chartData = new ChartDataServer(gameId)
-  val gameSummary = new GameSummaryServer(gameId)
+  val players = new PlayersServer(gameId)
+  val armyComposition = new ArmyCompositionServer(gameId, players)
+  val chartData = new ChartDataServer(gameId, players)
+  val gameSummary = new GameSummaryServer(gameId, players)
   
   private var lastNewDataTime = System.currentTimeMillis()
   
   def forceInit() = {
+    players.forcefulInit()
     armyComposition.forcefulInit()
- 	val initialData = CookieBox withSession (ChartDataCollector(_).collectDataFor(gameId))    
+ 	val initialData = CookieBox withSession (ChartDataCollector(_).collectDataFor(gameId, true))    
     chartData.forcefulInit(initialData)
     gameSummary.forcefulInit(initialData)
   }
@@ -105,11 +109,11 @@ class GameServerActor(gameId: Int) extends LiftActor with Loggable {
       chartData.addChartDataFor(id, time, stats)
       gameSummary.addStats(id, time, stats)
       
-    case NewPlayer(id, name, primaryColor, secondaryColor) =>
-      // TODO this looks redundant to me
-      chartData.setPlayerInfo(id, name, primaryColor)
-      armyComposition.setPlayerInfo(id, name, primaryColor, secondaryColor)
-      gameSummary.setPlayerInfo(id, name, primaryColor, secondaryColor)
+    case NewPlayer(id, locked, name, primaryColor, secondaryColor) =>
+      players.setPlayerInfo(id, locked, name, primaryColor, secondaryColor)
+   
+    case UnlockPlayer(id) =>
+      players.unlockPlayer(id)
       
     case NewPlayerEvents(playerId, events: List[ArmyEvent]) =>
       armyComposition.addArmyEventsFor(playerId, events)
@@ -136,6 +140,7 @@ class GameServerActor(gameId: Int) extends LiftActor with Loggable {
         cometActorsToUpdate.foreach(_ ! ServerShutdown())
         armyComposition.clearUp()
         chartData.clearUp()
+        players.clearUp()
         GameServers.removeGameServer(gameId)
       }
     }

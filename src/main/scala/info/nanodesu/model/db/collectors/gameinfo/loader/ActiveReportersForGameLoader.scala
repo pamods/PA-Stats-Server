@@ -8,7 +8,7 @@ import org.jooq.scala.Conversions._
 import info.nanodesu.lib.Formattings._
 import info.nanodesu.lib.db.CookieFunc._
 
-case class ActiveReporter(id: Int, name: String, primaryColor: String, secondaryColor: String)
+case class ActiveReporter(id: Int, locked: Boolean, name: String, primaryColor: String, secondaryColor: String)
 
 class ActiveReportersForGameLoader {
 	def selectActiveReportersFor(db:DSLContext, gameId: Int) = {
@@ -22,14 +22,14 @@ class ActiveReportersForGameLoader {
 	}
 	
 	def selectActiveReportersWithName(db: DSLContext, gameId: Int) = {
-	  db.select(playerGameRels.P, names.DISPLAY_NAME, teams.PRIMARY_COLOR, teams.SECONDARY_COLOR).
+	  db.select(playerGameRels.P, playerGameRels.LOCKED, names.DISPLAY_NAME, teams.PRIMARY_COLOR, teams.SECONDARY_COLOR).
 	  	from(playerGameRels).
 	  	leftOuterJoin(stats).onKey().
 	  	join(teams).on(teams.ID === playerGameRels.T).
 	  	join(players).onKey().
 	  	join(names).onKey().
 	  	where(playerGameRels.G === gameId).
-	  	groupBy(playerGameRels.P, names.DISPLAY_NAME, teams.PRIMARY_COLOR, teams.SECONDARY_COLOR).
+	  	groupBy(playerGameRels.P, playerGameRels.LOCKED, names.DISPLAY_NAME, teams.PRIMARY_COLOR, teams.SECONDARY_COLOR).
 	  	having(stats.ID.count().gt(0)).
 	  fetchInto(classOf[ActiveReporter]).toList
 	}

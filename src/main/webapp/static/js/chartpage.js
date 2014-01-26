@@ -216,14 +216,12 @@ $(function() {
 	viewModel.checkLiveProc();
 	
 	var baseData = $('#chartDataSource').data("comet-info");
-	var hadUpdate = false;
 	
 	if (baseData.hasComet) {
+		$(document).on("game-time-increases", function() {
+			viewModel.setLastUpdate(new Date().getTime());
+		});
 		$(document).on("new-chart-data", function(event, data) {
-			if (hadUpdate) {
-				viewModel.setLastUpdate(new Date().getTime());
-			}
-			hadUpdate = true;
 			viewModel.addData(data);
 		});
 		$(document).on("new-player-data", function(event, data) {

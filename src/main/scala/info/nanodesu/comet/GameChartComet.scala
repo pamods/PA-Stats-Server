@@ -72,7 +72,8 @@ class GameChartComet extends ServerGameComet {
   }
   
   private def checkForAddedChartData(fromPackage: Map[String, List[ChartDataPoint]]) = {
-    val newData = (for (lists <- fromPackage.toList.map(x => (x._1, x._2.filter(_.timepoint > chartDataKnownTime)))) yield lists).toMap
+    val knownTime = chartDataKnownTime
+    val newData = (for (lists <- fromPackage.toList.map(x => (x._1, x._2.filter(_.timepoint > knownTime)))) yield lists).toMap
     val noEmptyPlayers = newData.filter(!_._2.isEmpty)
     if (noEmptyPlayers.nonEmpty) {
       for (v <- noEmptyPlayers.values; d <- v) {

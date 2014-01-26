@@ -7,15 +7,12 @@ import info.nanodesu.lib.db.CookieBox
 import info.nanodesu.model.db.collectors.gameinfo.ChartDataCollector
 import info.nanodesu.model.db.collectors.gameinfo.ChartDataPackage
 import info.nanodesu.model.db.collectors.playerinfo.GamePlayerInfo
+import info.nanodesu.model.db.collectors.gameinfo.GameInfoCollector
+import info.nanodesu.model.db.collectors.gameinfo.loader.ActiveReportersForGameLoader
 
-class GameSummaryServer(val gameId: Int) {
+class GameSummaryServer(val gameId: Int, players: PlayersServer) {
 
-  class PlayerSummary extends GamePlayerInfo {
-    // FIXME this currently is not initialized by forceful init
-    private var _name: String = ""
-    private var _primaryColor: String = "#000"
-    private var _secondaryColor: String = "#000"
-    
+  class PlayerSummary(myId: Int) extends GamePlayerInfo {
     private var startTime: Long = Long.MaxValue
     private var endTime: Long = 0
     private var metalProduced: Long = 0
@@ -26,25 +23,24 @@ class GameSummaryServer(val gameId: Int) {
     private var buildSpeedSum: Double = 0
     private var buildSpeedPartsCount: Int = 0
 
-    override def name = _name
-    override def primaryColor = _primaryColor
-    override def secondaryColor = _secondaryColor
+    private def me = players.players(myId)
+    override def name = me.name
+    override def primaryColor = me.primColor
+    override def secondaryColor = me.secondaryColor
+    private def mayLock[T](d: => T, default: T): T = if (me.locked) default else d
     def apmAvg = {
-      val minutes = ((runTime.toDouble + Double.MinPositiveValue) / 1000 / 60)
-      Math.round(actions / minutes).toInt
+      mayLock({
+        val minutes = ((runTime.toDouble + Double.MinPositiveValue) / 1000 / 60)
+        Math.round(actions / minutes).toInt
+      }, 0)
     }
-    def sumMetal = metalProduced
-    def sumEnergy = energyProduced
-    def metalUseAvg = 1 - (metalWasted.toDouble / (metalProduced + Double.MinPositiveValue))
-    def energyUseAvg = 1 - (energyWasted.toDouble / (energyProduced + Double.MinPositiveValue))
-    def buildSpeed = if (buildSpeedPartsCount == 0) 1 else buildSpeedSum / buildSpeedPartsCount
+    
+    def sumMetal = mayLock(metalProduced, 0)
+    def sumEnergy = mayLock(energyProduced, 0)
+    def metalUseAvg = mayLock(1 - (metalWasted.toDouble / (metalProduced + Double.MinPositiveValue)), 0)
+    def energyUseAvg = mayLock(1 - (energyWasted.toDouble / (energyProduced + Double.MinPositiveValue)), 0)
+    def buildSpeed = mayLock(if (buildSpeedPartsCount == 0) 1 else buildSpeedSum / buildSpeedPartsCount, 0)
     def runTime = endTime - startTime
-
-    def setPlayerInfo(name: String, primColor: String, secColor: String) = {
-      this._name = name
-      this._primaryColor = primColor
-      this._secondaryColor = secColor
-    }
     
     def addStats(time: Long, data: StatsReportData) = {
       if (startTime > time) {
@@ -76,10 +72,11 @@ class GameSummaryServer(val gameId: Int) {
   private var startTime = Long.MaxValue
   private var endTime = 0L
   
-  // FIXME add this to forceful init
   private var _winner = "unknown"
   
   def forcefulInit(initialData: ChartDataPackage) = {
+    println("I was forced to init!")
+    
     for (entry <- initialData.playerTimeData) {
       val playerId = entry._1.toInt
       
@@ -89,10 +86,14 @@ class GameSummaryServer(val gameId: Int) {
             data.energyStored, data.metalProduced, data.energyProduced, data.metalWasted, data.energyWasted, data.apm))
       }
     }
+    
+    CookieBox withSession { db =>
+      setWinner(GameInfoCollector(db, gameId).map(_.winner).getOrElse("unknown"))
+    }
   }
   
   private def modifySummary(pId: Int, func: PlayerSummary => Unit) = {
-    val summary = summaries.getOrElse(pId, new PlayerSummary)
+    val summary = summaries.getOrElse(pId, new PlayerSummary(pId))
     func(summary)
     summaries += pId -> summary
   }
@@ -105,10 +106,6 @@ class GameSummaryServer(val gameId: Int) {
       startTime = time
     }
     endTime = time
-  }
-  
-  def setPlayerInfo(playerId: Int, name: String, primaryColor: String, secondaryColor: String) = {
-    modifySummary(playerId, _.setPlayerInfo(name, primaryColor, secondaryColor))
   }
   
   def runTime = endTime - startTime

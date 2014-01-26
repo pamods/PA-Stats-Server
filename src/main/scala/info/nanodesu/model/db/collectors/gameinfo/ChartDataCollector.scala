@@ -69,16 +69,16 @@ object ChartDataPackage {
 
 case class ChartDataDbResult(playerId: Int, playerName: String, playerColor: String, data: ChartDataPoint)
 trait ChartDataCollectorDblayer {
-  def selectDataPointsForGame(gameId: Int): List[ChartDataDbResult]
+  def selectDataPointsForGame(gameId: Int, ignoreLocks: Boolean): List[ChartDataDbResult]
 }
 
 trait ChartDataCollectorTrait {
-  def collectDataFor(gameId: Int): ChartDataPackage
+  def collectDataFor(gameId: Int, ignoreLocks: Boolean): ChartDataPackage
 }
 
 class ChartDataCollector(dbLayer: ChartDataCollectorDblayer) extends ChartDataCollectorTrait {
-  def collectDataFor(gameId: Int): ChartDataPackage = {
-    val input = dbLayer.selectDataPointsForGame(gameId)
+  def collectDataFor(gameId: Int, ignoreLocks: Boolean = false): ChartDataPackage = {
+    val input = dbLayer.selectDataPointsForGame(gameId, ignoreLocks)
 
     val perPlayer = input.groupBy(_.playerId.toString)
     val perPlayerDataPoints = perPlayer.mapValues(_.map(_.data))
@@ -97,7 +97,7 @@ object ChartDataCollector {
   private class DbLayer(db: DSLContext) extends ChartDataCollectorDblayer {
     // if somebody knows a better way: TELL ME. PLEASE!
     // I got the ordering right on first try :D
-    def selectDataPointsForGame(gameId: Int): List[ChartDataDbResult] = {
+    def selectDataPointsForGame(gameId: Int, ignoreLocks: Boolean): List[ChartDataDbResult] = {
       val lst = db.select(teams.PRIMARY_COLOR, players.ID, names.DISPLAY_NAME, stats.TIMEPOINT, stats.ARMY_COUNT, stats.METAL_INCOME, stats.ENERGY_INCOME, stats.METAL_INCOME_NET,
         stats.ENERGY_INCOME_NET, stats.METAL_SPENDING, stats.ENERGY_SPENDING, stats.METAL_STORED, stats.ENERGY_STORED, stats.METAL_COLLECTED,
         stats.ENERGY_COLLECTED, stats.METAL_WASTED, stats.ENERGY_WASTED, stats.APM).
@@ -106,7 +106,8 @@ object ChartDataCollector {
         join(players).onKey().
         join(names).onKey().
         join(teams).onKey().
-        where(playerGameRels.LOCKED.isFalse()).
+        where(playerGameRels.LOCKED.isNotDistinctFrom(ignoreLocks).
+            or(playerGameRels.LOCKED.isNotDistinctFrom(false))).
         and(playerGameRels.G === gameId)
         .fetch()
 

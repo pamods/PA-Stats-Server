@@ -17,7 +17,7 @@ import info.nanodesu.comet.GameServers
 import info.nanodesu.comet.GameServerActor
 import info.nanodesu.lib.Formattings._
 
-class PlayerInfoRenderer(val gId: Int, val server: Option[GameServerActor] = None) extends CometRenderer {
+class PlayerInfoRenderer(val gId: Int, val server: Option[GameServerActor] = None) extends CometRenderer with Loggable {
   def render = {
     val activeReporters = new ActiveReportersForGameLoader
 

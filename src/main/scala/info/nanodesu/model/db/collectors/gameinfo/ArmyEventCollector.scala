@@ -29,13 +29,13 @@ case class ArmyEventPackage(game: Int, gameStart: Long, playerEvents: Map[String
 
 case class ArmyEventDbResult(playerId: Int, playerName: String, playerPrimaryColor: String, playerSecondaryColor: String, event: ArmyEvent)
 trait ArmyEventDbLayer {
-  def selectArmyEventsForGame(gameId: Int): List[ArmyEventDbResult]
+  def selectArmyEventsForGame(gameId: Int, ignoreLocks: Boolean): List[ArmyEventDbResult]
   def selectStartTimeForGame(gameId: Int): Long
 }
     
 class ArmyEventDataCollector(dbLayer: ArmyEventDbLayer) {
-	def collectEventsFor(gameId: Int): ArmyEventPackage = {
-	  val raw = dbLayer.selectArmyEventsForGame(gameId)
+	def collectEventsFor(gameId: Int, ignoreLocks: Boolean = false): ArmyEventPackage = {
+	  val raw = dbLayer.selectArmyEventsForGame(gameId, ignoreLocks)
 	  
 	  val perPlayer = raw.groupBy(_.playerId.toString)
 	  
@@ -48,7 +48,6 @@ class ArmyEventDataCollector(dbLayer: ArmyEventDbLayer) {
 	}
 }
 
-
 object ArmyEventDataCollector {
   def apply(db: DSLContext) = new ArmyEventDataCollector(new DbLayer(db)) 
   
@@ -56,7 +55,7 @@ object ArmyEventDataCollector {
     
     def selectStartTimeForGame(gameId: Int): Long = new GameTimesLoader(db).selectStartTimeForGame(gameId).getOrElse(-1)
     
-    def selectArmyEventsForGame(gameId: Int): List[ArmyEventDbResult] = {
+    def selectArmyEventsForGame(gameId: Int, ignoreLocks: Boolean): List[ArmyEventDbResult] = {
       val q = db.select(playerGameRels.P, 
           names.DISPLAY_NAME, 
           teams.PRIMARY_COLOR, 
@@ -75,7 +74,8 @@ object ArmyEventDataCollector {
           join(teams).onKey().
           join(armyEvents).on(armyEvents.PLAYER_GAME === playerGameRels.ID).
           join(specKeys).onKey().
-          	where(playerGameRels.LOCKED.isFalse()).
+          	where(playerGameRels.LOCKED.isNotDistinctFrom(ignoreLocks).
+          	or (playerGameRels.LOCKED.isNotDistinctFrom(false))).
           and(playerGameRels.G === gameId)
           
       val lst  = q.fetch()

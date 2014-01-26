@@ -91,7 +91,7 @@ function GameSimulator(numPlayers) {
 	var self = this;
 	
 	var gameStartTime = new Date().getTime();
-	var lifeTime = Math.floor(Math.random() * 10) + 5;
+	var lifeTime = Math.floor(Math.random() * 10) + 500;
 
 	var packageSendDelay = 5000;
 	
@@ -159,7 +159,7 @@ function GameSimulator(numPlayers) {
 		
 		report.ident = self.ident+"";
 		report.observedTeams = generateObservedTeams();
-		report.showLive = true;
+		report.showLive = false;
 		report.paVersion = "fake";
 		report.planet.seed = 1337;
 		report.planet.temperature = "12";
