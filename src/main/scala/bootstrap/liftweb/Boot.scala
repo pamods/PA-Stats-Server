@@ -31,6 +31,7 @@ import info.nanodesu.lib.db.CookieBox
 import info.nanodesu.model.db.collectors.stats.RuntimeInfoCollector
 import info.nanodesu.model.db.collectors.stats.ExtraNumbersCollector
 import info.nanodesu.snippet.lib.IFrameSnip
+import info.nanodesu.rest.LadderService
 
 // see: http://cookbook.liftweb.net/#InstallAndRunning
 /**
@@ -42,13 +43,15 @@ import info.nanodesu.snippet.lib.IFrameSnip
 class Boot extends Loggable {
 	
   def boot {
-        LiftRules.supplimentalHeaders = s => s.addHeaders(
-      List(HTTPParam("X-Lift-Version", LiftRules.liftVersion),
-        HTTPParam("Access-Control-Allow-Origin", "*"),
-        HTTPParam("Access-Control-Allow-Credentials", "true"),
-        HTTPParam("Access-Control-Allow-Methods", "GET, POST, PUT, OPTIONS"),
-        HTTPParam("Access-Control-Allow-Headers", "WWW-Authenticate,Keep-Alive,User-Agent,X-Requested-With,Cache-Control,Content-Type")))
-    
+    // in production this is done by the apache in front of the jetty
+    if (Props.getBool("allowStarOrigin", false)) {
+	    LiftRules.supplimentalHeaders = s => s.addHeaders(
+	      List(HTTPParam("X-Lift-Version", LiftRules.liftVersion),
+	        HTTPParam("Access-Control-Allow-Origin", "*"),
+	        HTTPParam("Access-Control-Allow-Credentials", "true"),
+	        HTTPParam("Access-Control-Allow-Methods", "GET, POST, PUT, OPTIONS"),
+	        HTTPParam("Access-Control-Allow-Headers", "WWW-Authenticate,Keep-Alive,User-Agent,X-Requested-With,Cache-Control,Content-Type")))
+    } 
     
     // no need for jmx access to c3p0
     System.getProperties().setProperty("com.mchange.v2.c3p0.management.ManagementCoordinator", "com.mchange.v2.c3p0.management.NullManagementCoordinator")
@@ -75,6 +78,7 @@ class Boot extends Loggable {
     PlayerHighscoreCollector.init()
     MostPlaytimesCollector.init()
     ExtraNumbersCollector.init()
+    LadderService.initService()
     
     // Build SiteMap
     val entries = List(

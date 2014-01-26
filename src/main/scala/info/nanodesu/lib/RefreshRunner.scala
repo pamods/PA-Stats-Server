@@ -37,13 +37,19 @@ trait RefreshRunner extends Loggable {
     LiftRules.unloadHooks.append(() => { killReloading() })
   }
 
+  def shouldLog = true
+  
   private def doWork() = {
     while (containerIsAlive) {
       if (lastUpdate + RUN_INTERVAL < System.currentTimeMillis()) {
         try {
-          logger info "starting task "+processName
+          if (shouldLog) {
+            logger info "starting task "+processName
+          }
           runQuery()
-          logger info "completed task "+processName
+          if (shouldLog) {
+            logger info "completed task "+processName
+          }
         } catch {
           case th: Throwable =>
             {
