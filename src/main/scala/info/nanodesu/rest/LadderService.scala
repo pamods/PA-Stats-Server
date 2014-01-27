@@ -13,7 +13,7 @@ import net.liftweb.json.JsonAST.JValue
 import net.liftweb.util.Helpers._
 import net.liftweb.util.Helpers
 
-// Quicky, old, horrible code
+// Quick, old, horrible code
 object LadderService extends RestHelper with Loggable with RefreshRunner{
   
 	def initService(): Unit = {
@@ -21,43 +21,58 @@ object LadderService extends RestHelper with Loggable with RefreshRunner{
 	  init();
 	}
 	
-	override val firstLoadDelay = 5*1000
-	override val RUN_INTERVAL = 3*1000
+	val gameTimeOut = 50 * 1000
+	val playerTimeOut = 10 * 1000
+	
+	override val firstLoadDelay = 15*1000
+	override val RUN_INTERVAL = 2*1000
 	val processName = "ladder service"
 	
 	override def shouldLog = false
 	  
 	def runQuery() = {
 	  mutex synchronized {
+	    // filtering like this is _VERY_ unflexible I really need to rewrite this whole webservice once people use it
+	    // basically with this all game setup has to happen within gameCreationTimeOut and can NOT be prolonged
 		  val foo = gameCreationTimes.toMap
-		  for (x <- foo.filterKeys(System.currentTimeMillis() - _ > 60 * 1000)) {
+		  for (x <- foo.filterKeys(System.currentTimeMillis() - _ > gameTimeOut)) {
 		    gameCreationTimes retain ((k, v) => (v != x._2))
-		    registeredGames remove x._2
-		    val lobbyId = registeredLobbyIdByHost remove x._2
+		    registeredGames remove x._2._1
+		    val lobbyId = registeredLobbyIdByHost remove x._2._1
 		    for (gid <- lobbyId) {
 		      clientsReadyByLobby remove gid
 		    }
 		  }
 		  
 		  val rPlay = registeredPlayers.toMap
-		  for (x <- rPlay.filter(System.currentTimeMillis() - _._2 > 10 * 1000)) {
+		  for (x <- rPlay.filter(System.currentTimeMillis() - _._2 > playerTimeOut)) {
 		    registeredPlayers remove x._1
 		  }
 		  
+		  var hadStuff = false;
 		  if (!registeredPlayers.isEmpty) {
+		    hadStuff = true
 		    logger info "registered Players are => " + registeredPlayers
 		  }
 		  if (!registeredGames.isEmpty) {
+		    hadStuff = true
 		    logger info "registered Games are => " + registeredGames
 		  }
 		  if (!registeredLobbyIdByHost.isEmpty) {
+		    hadStuff = true
 		    logger info "registered Lobby id for hosts => " + registeredLobbyIdByHost
 		  }
 		  if (!clientsReadyByLobby.isEmpty) {
+		    hadStuff = true
 		    logger info "clients ready for lobby => " + clientsReadyByLobby
 		  }
 		  if (!gameCreationTimes.isEmpty) {
+		    hadStuff = true
 		    logger info "game creation times => " + gameCreationTimes
+		  }
+		  
+		  if (hadStuff) {
+		    logger info "\n\n\n\n"
 		  }
 	  }
 	}
@@ -67,8 +82,18 @@ object LadderService extends RestHelper with Loggable with RefreshRunner{
 	val clientsReadyByLobby = mutable.Set[String]()
 	val registeredLobbyIdByHost = mutable.Map[String, String]()
 	val registeredGames = mutable.Map[String, String]()
-	val gameCreationTimes = mutable.Map[Long, String]()
+	val gameCreationTimes = mutable.Map[Long, (String, String)]()
 	val registeredPlayers = mutable.Map[String, Long]()
+	
+	val successfulGameIds = mutable.Set[String]()
+	
+	serve {
+	  case "hasPlayersSearching" :: Nil Get _ =>
+	    val hasPlayers = mutex synchronized {
+	      registeredPlayers.nonEmpty
+	    }
+	    Extraction decompose Map("hasPlayers" -> hasPlayers)
+	}
 	
 	case class GameInfo(serverCreated: Boolean, hasTimeOut: Boolean, lobbyId: String)
 	serve {
@@ -112,10 +137,34 @@ object LadderService extends RestHelper with Loggable with RefreshRunner{
 	serve {
 	  case "unregister" :: Nil JsonPost NameMessage(data) -> _ => {
 	    mutex synchronized {
+	      
+	      logger info "state before unregister of "+data.uber_name
+	      logger info registeredPlayers
+	      logger info registeredGames
+	      logger info registeredLobbyIdByHost
+	      logger info clientsReadyByLobby
+	      logger info "_"
+	      
 	      registeredPlayers remove data.uber_name
-	      registeredGames retain ((k, v) => (k != data.uber_name && v != data.uber_name))
+	      val targets = registeredGames filter ((x) => (x._1 == data.uber_name || x._2 == data.uber_name))
+	      registeredGames --= targets.keys
+	      
+	      for (target <- targets) {
+	        logger info "clear target: "+target
+			val lobbyId = registeredLobbyIdByHost remove target._1
+			logger info "lobbyId for target = " + lobbyId  
+			for (gid <- lobbyId) {
+			   clientsReadyByLobby remove gid
+			}
+	      }
 	      
 	      logger info "unregistered " + data.uber_name
+	      logger info registeredPlayers
+	      logger info registeredGames
+	      logger info registeredLobbyIdByHost
+	      logger info clientsReadyByLobby
+	      logger info "_"
+	      
 	    }
 	    
 	    OkResponse()
@@ -140,7 +189,7 @@ object LadderService extends RestHelper with Loggable with RefreshRunner{
 		      logger info "registered game " + pA + " vs " + pB
 		      
 		      registeredGames put (pA, pB)
-		      gameCreationTimes put (System.currentTimeMillis(), pA)
+		      gameCreationTimes put (System.currentTimeMillis(), (pA, pB))
 		    }
 	    }
 	    
@@ -178,10 +227,13 @@ object LadderService extends RestHelper with Loggable with RefreshRunner{
 	  }
 	}
 	
+	private def timeOutFor(uberName: String) = gameCreationTimes.count(x => x._2._1 == uberName || x._2._2 == uberName) == 0
+	
 	case class ShouldStartResponse(shouldStart: Boolean, hasTimeOut: Boolean)
 	serve {
 	  case "shouldStartServer" :: Nil JsonPost NameMessage(data) -> _ => {
-	    val resp = ShouldStartResponse (mutex synchronized (clientsReadyByLobby contains data.game_id), !registeredGames.contains(data.uber_name))
+	    val resp = ShouldStartResponse (mutex synchronized (clientsReadyByLobby contains data.game_id),
+	        timeOutFor(data.uber_name))
 
 	    logger info "answer to should start server for " + data.uber_name + " is => " + resp
 	    
@@ -190,7 +242,8 @@ object LadderService extends RestHelper with Loggable with RefreshRunner{
 		      clientsReadyByLobby remove data.game_id
 		      registeredLobbyIdByHost remove data.uber_name
 		      registeredGames remove data.uber_name
-		      gameCreationTimes retain ((k,v) => (v != data.uber_name))
+		      
+		      successfulGameIds += data.game_id
 		      
 		      logger info "===done for " + data.game_id+"==="
 	      }
@@ -200,21 +253,21 @@ object LadderService extends RestHelper with Loggable with RefreshRunner{
 	  }
 	}
 	
+	case class TimeOutInfo(hasTimeOut: Boolean)
 	serve {
 	  case "readyToStart" :: Nil JsonPost NameMessage(data) -> _ => {
 	    
 	    if (data.game_id.isEmpty()) {
 	      logger info "got empty game_id from " + data.uber_name
 	      BadResponse()
-	    } else {
-		    mutex synchronized {
-		      
-		      logger info "rdy to start note from " + data
-		      
-		      clientsReadyByLobby add data.game_id
-		    }
-		    
-		    OkResponse()
+	    } else { 
+	      var timeout = false;
+          mutex synchronized {
+        	timeout = timeOutFor(data.uber_name)
+            logger info "rdy to start note from " + data + " timeout="+timeout
+		  	clientsReadyByLobby add data.game_id
+		  }
+	      Extraction decompose TimeOutInfo(timeout)
 	    }
 	  }
 	}
