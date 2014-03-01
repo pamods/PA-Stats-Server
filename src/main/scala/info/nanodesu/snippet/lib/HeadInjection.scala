@@ -14,6 +14,7 @@ object HeadInjection extends DispatchSnippet {
 	  case "chartpage" => injectChartPageQueryUrl 
 	  case "imports" => doImports
 	  case "imgbase" => injectImgBaseUrl
+	  case "banner" => doBanner
 	}
 	 
 	def injectChartPageQueryUrl = "*" #> <script data-lift="head" type="text/javascript"> 
@@ -23,7 +24,11 @@ object HeadInjection extends DispatchSnippet {
 
 		
    def injectImgBaseUrl = "*" #> <script data-lift="head" type="text/javascript">var imageBaseUrl = "{Props.get("imagebase", "error")}";</script>		
-		
+
+   def doBanner = "*" #> {
+     <img alt="PA Stats Banner"></img> % Attribute(None, "src", Text(Props.get("imagebase", "error")+"banner.png"), Null)
+   }
+   
    private val jslibs = resolveProperty("jslibs") split " "
    private val csslibs = resolveProperty("csslibs") split " "
    
