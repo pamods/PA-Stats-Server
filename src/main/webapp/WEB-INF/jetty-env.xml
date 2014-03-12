@@ -6,12 +6,12 @@
 			<New class="com.mchange.v2.c3p0.ComboPooledDataSource">
 				<Set name="driverClass">org.postgresql.Driver</Set>
 				<Set name="jdbcUrl">jdbc:postgresql://127.0.0.1/rbz</Set>
-				<Set name="user">xxx</Set>
-				<Set name="password">xxx</Set>
-				<Set name="maxPoolSize">15</Set>
+				<Set name="user">cookie</Set>
+				<Set name="password">ibda1!</Set>
+				<Set name="maxPoolSize">10</Set>
 				<Set name="testConnectionOnCheckin">true</Set>
-				<Set name="maxIdleTimeExcessConnections">240</Set>
-				<Set name="idleConnectionTestPeriod">600</Set>
+				<Set name="maxIdleTimeExcessConnections">600</Set>
+				<Set name="idleConnectionTestPeriod">5000</Set>
 				<Set name="preferredTestQuery">SELECT 1</Set>
 			</New>
 		</Arg>
@@ -22,13 +22,13 @@
 		<Arg>
 			<New class="com.mchange.v2.c3p0.ComboPooledDataSource">
 				<Set name="driverClass">org.postgresql.Driver</Set>
-				<Set name="jdbcUrl">jdbc:postgresql://10.8.0.1/rbztest</Set>
-				<Set name="user">xxx</Set>
-				<Set name="password">xxx</Set>
-				<Set name="maxPoolSize">3</Set>
+				<Set name="jdbcUrl">jdbc:postgresql://127.0.0.1/rbztest</Set>
+				<Set name="user">postgres</Set>
+				<Set name="password">roxyrox1</Set>
+				<Set name="maxPoolSize">10</Set>
 				<Set name="testConnectionOnCheckin">true</Set>
-				<Set name="maxIdleTimeExcessConnections">240</Set>
-				<Set name="idleConnectionTestPeriod">600</Set>
+				<Set name="maxIdleTimeExcessConnections">600</Set>
+				<Set name="idleConnectionTestPeriod">5000</Set>
 				<Set name="preferredTestQuery">SELECT 1</Set>
 			</New>
 		</Arg>

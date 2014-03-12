@@ -1,3 +1,14 @@
+#globediv {
+	width: 700px;
+	height: 500px;
+	float: left;
+	padding-bottom: 10px;
+}
+
+#globeconfig {
+	
+}
+
 .edit_error_class {
 	display: block;
 	color: red;
