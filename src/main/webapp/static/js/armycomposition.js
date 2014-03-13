@@ -328,6 +328,7 @@ $(document).ready(function() {
 		function handleNewImageCase(x, y, z, spec, parsedColor, imgPath) {
 			var billBoard = addBillboard(x, y, z, spec, parsedColor);
 			var image = new Image();
+			image.crossOrigin = "anonymous"; // FUCK CORS
 			// TODO this introduces (?) a race condition that can lead to images being loaded multiple times
 			// should not affect program correctness apart from that though...
 			image.onload = function() {
