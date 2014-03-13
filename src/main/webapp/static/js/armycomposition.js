@@ -56,8 +56,6 @@ $(document).ready(function() {
 			
 		self.unitSpecIndex = {};
 		
-		var foo = {};
-		
 		self.changeUnitCount = function (spec, x, y, z, planet_id, changeCnt) {
 			var index = self.unitSpecIndex[spec];
 			var found = index != undefined;
@@ -123,10 +121,10 @@ $(document).ready(function() {
 				z: z,
 				planet_id: planetId
 			};
+			self.indexEvent(evt);
 			if (self.endTime() < timestamp) {
 				self.endTime(timestamp);
 			}
-			self.indexEvent(evt);
 		}
 		
 		self.lockWasOnEnd = function() {
@@ -178,10 +176,15 @@ $(document).ready(function() {
 		
 		self.indexEvent = function(event) {
 			var hashBucket = Math.floor(event.timestamp / hashBucketSize);
+			
 			if (self.eventIndex[hashBucket] === undefined) {
 				self.eventIndex[hashBucket] = [];
 			}
 			self.eventIndex[hashBucket].push(event);
+			
+			self.eventIndex[hashBucket].sort(function(a, b) {
+				return a.timestamp - b.timestamp;
+			});
 		}
 		
 		self.selectedTime.subscribe(function(newT) {
@@ -193,19 +196,18 @@ $(document).ready(function() {
 			
 			var firstBucket = Math.floor(self.timeBefore / hashBucketSize);
 			var lastBucket = Math.floor(newT / hashBucketSize);
+			
 			for (var i = firstBucket; toR ? i <= lastBucket : i >= lastBucket; i+=direction) {
 				if (self.eventIndex[i] != undefined) {
 					for (var j = toR ? 0 : self.eventIndex[i].length-1; toR ? j < self.eventIndex[i].length : j >= 0; j+=direction) {
 						var evt = self.eventIndex[i][j];
 						if (evt.timestamp > a && evt.timestamp <= b) {
-//							if (evt.spec.indexOf("teleporter") !== -1 && evt.x === 195) {
-//								console.log(evt.change);
-//							}
 							self.changeSpecForPlayer(evt.player, evt.spec, evt.x, evt.y, evt.z, evt.planet_id, evt.change * direction);
 						}
 					}
 				}
 			}
+			
 			self.timeBefore = newT;
 		});
 		
@@ -218,16 +220,38 @@ $(document).ready(function() {
 			});
 			armyModel.selectEnd();
 		};
-
-		
 		
 		var nothingReceived = true;
 		self.newArmyEventsHandler = function(event, data) {
 			armyModel.lockWasOnEnd();
 			ko.tasks.processImmediate(function() {
+				data.value.sort(function(a, b) {
+					return a.time - b.time;
+				});
+				var minTime = data.value[data.value.length-1].time;
+				for (var i = 0; i < data.value.length; i++) {
+					if (minTime > data.value[i].time) {
+						minTime = data.value[i].time;
+					}
+				}
+				
+				var reSimUntil = undefined; 
+				if (minTime < self.selectedTime()) {
+					reSimUntil = self.selectedTime();
+					ko.tasks.processImmediate(function() {
+						self.selectedTime(minTime-5000);
+					});
+				}
+				
 				for (var i = 0; i < data.value.length; i++) {
 					var evt = data.value[i];
 					armyModel.addEvent(evt.playerId, evt.spec, evt.time, evt.watchType, evt.x, evt.y, evt.z, evt.planetId);
+				}
+				
+				if (reSimUntil) {
+					ko.tasks.processImmediate(function() {
+						self.selectedTime(reSimUntil);
+					});
 				}
 			});
 			
@@ -244,11 +268,16 @@ $(document).ready(function() {
 		var self = this;
 		self.widget = new Cesium.CesiumWidget('globediv', {
 			imageryProvider : new Cesium.TileCoordinatesImageryProvider({
-				tileWidth : 96,
-				tileHeight : 96,
+				color: Cesium.Color.BLACK,
 			})
 		});
 		
+		var layers = self.widget.centralBody.imageryLayers;
+	    var white = layers.addImageryProvider(new Cesium.SingleTileImageryProvider({
+	        url : imageBaseUrl+'white.png',
+	    }));
+		layers.lower(white);
+	    
 		var planetSizeFactor = 6378137/planetInfo["0"];
 		
 		self.ellipsoid = self.widget.centralBody.ellipsoid;
@@ -276,9 +305,6 @@ $(document).ready(function() {
 			});
 
 			var key = x+"/"+y+"/"+z+"/"+spec;
-			
-//			console.log(new Date().getTime()+"add " + key);
-			
 			var value = self.billboardsMap[key]; 
 			if (value === undefined) {
 				value = [];
@@ -286,53 +312,33 @@ $(document).ready(function() {
 			value.push(handle);
 			
 			self.billboardsMap[key] = value;
-//			console.log("after add:");
-//			console.log(value);
-//			console.log(self.billboardsMap);
-//			console.log("____");
-
 			return handle;
 		}
 		
 		function removeBillboard(x, y, z, spec) {
-
 			var key = x+"/"+y+"/"+z+"/"+spec;
-			
-//			console.log(new Date().getTime()+"remove "+key);
-			
 			var value = self.billboardsMap[key];
 			if (value !== undefined && value.length > 0) {
 				self.billboards.remove(value[value.length-1]);
 				value.length = value.length -1;
 				self.billboardsMap[key] = value;
-//				console.log("after remove:");
-//				console.log(value);
-			} else {
-//				console.log("nothing found to remove!");
 			}
-//			console.log(self.billboardsMap);
-//			console.log("___");
 		}
 		
 		function handleNewImageCase(x, y, z, spec, parsedColor, imgPath) {
 			var billBoard = addBillboard(x, y, z, spec, parsedColor);
 			var image = new Image();
 			// TODO this introduces (?) a race condition that can lead to images being loaded multiple times
+			// should not affect program correctness apart from that though...
 			image.onload = function() {
 				var newIndex = self.textureAtlas.addImage(image);
 				self.imagesMap[imgPath] = newIndex;
-				console.log("loaded!");
 				billBoard.setImageIndex(newIndex);
 			};
 			image.src = imgPath;
 		}
 		
 		self.eventsHandler = function(pColor, spec, x, y, z, changeCnt) {
-			
-//			if (spec.indexOf("teleporter") === -1 || x !== 195) {
-//				return;
-//			}
-			
 			var imgPath = self.getImagePath(spec);
 			var imgIndex = self.imagesMap[imgPath];
 			var parsedColor = parseColor(pColor);

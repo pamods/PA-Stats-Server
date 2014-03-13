@@ -4,8 +4,8 @@
   <jdbc>
     <driver>org.postgresql.Driver</driver>
     <url>jdbc:postgresql://10.8.0.1/rbztest</url>
-    <user>xxx</user>
-    <password>xxx</password>
+    <user>cookie</user>
+    <password>ibda1!</password>
   </jdbc>
 
   <generator>

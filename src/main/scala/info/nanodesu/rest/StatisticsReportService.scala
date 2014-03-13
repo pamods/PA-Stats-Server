@@ -44,6 +44,7 @@ import info.nanodesu.comet.NewChartStats
 import info.nanodesu.comet.WinnerSet
 import info.nanodesu.comet.PushUpdate
 import info.nanodesu.comet.UnlockPlayer
+import net.liftweb.http.OkResponse
 
 
 object StatisticsReportService extends RestHelper with Loggable {
@@ -256,8 +257,28 @@ object StatisticsReportService extends RestHelper with Loggable {
   serve {
     case "report" :: "get" :: "time" :: Nil Get _ =>
       Extraction decompose CurrentTimeMs(System.currentTimeMillis())
+
   }
 
+  serve {
+    case "report" :: "getplayerid" :: Nil Get _ =>
+      try {
+          val r = for (name <- S.param("ubername")) yield {
+            CookieBox withSession { db => 
+              db.select(players.ID).from(players).where(players.UBER_NAME === name).
+              	fetchFirstPrimitiveIntoOption(classOf[Int]).getOrElse(-1)
+            }
+          }
+        
+          Extraction decompose r.getOrElse(-1)
+      } catch {
+        case ex: Exception => {
+          logger.error(ex, ex)
+          InternalServerErrorResponse()
+        }
+      }
+  }
+  
   // TODO careful redundant code incoming...
   
   serve {

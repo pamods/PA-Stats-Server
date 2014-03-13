@@ -27,7 +27,8 @@ class ShortGamesCleaner(db: DSLContext) {
 	      	from(games).
 	      	where(games.END_TIME.gt(before3Hours)).
 	      	and(games.END_TIME.lt(before3Min)).
-	      	and(epoch(games.END_TIME.sub(games.START_TIME)).lt(minLength))
+	      	and(epoch(games.END_TIME.sub(games.START_TIME)).lt(minLength)).
+	      	and(games.WINNER_TEAM.isNull())
 	  )).execute()
 	}
 }
