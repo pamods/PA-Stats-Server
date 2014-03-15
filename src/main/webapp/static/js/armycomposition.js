@@ -235,6 +235,9 @@ $(document).ready(function() {
 				if (!knownIds[input.value[i].id]) {
 					data.value.push(input.value[i]);
 					knownIds[input.value[i].id] = true;
+				} else {
+					console.log("filter out: ");
+					console.log(input.value[i]);
 				}
 			}
 			if (data.value.length === 0) {
@@ -295,11 +298,10 @@ $(document).ready(function() {
 	    }));
 		layers.lower(white);
 	    
-		var planetSizeFactor = 6378137/planetInfo["0"];
-		
 		self.ellipsoid = self.widget.centralBody.ellipsoid;
 		self.scene = self.widget.scene;
 		
+		// unused, should be used once more plantes are listed
 		self.planetInfoMap = ko.observable(planetInfo);
 		
 		self.textureAtlas = self.scene.context.createTextureAtlas();
@@ -315,6 +317,8 @@ $(document).ready(function() {
 		};
 		
 		function addBillboard(x, y, z, spec, color, imageIndex) {
+			var distance = Math.sqrt(x * x + y * y + z * z);
+			var planetSizeFactor = 6378137/distance;
 			var handle = self.billboards.add({
 				position: new Cesium.Cartesian3(x*planetSizeFactor, y*planetSizeFactor, z*planetSizeFactor),
 				color: new Cesium.Color(color[0], color[1], color[2], 1),

@@ -216,6 +216,9 @@ object StatisticsReportService extends RestHelper with Loggable {
           // here the server really can be empty so far, so it does not need any init from the database
           val server = GameServers.serverForGame(gameId, false)
           val team = data.observedTeams(data.reporterTeam)
+          if (data.armyEvents.nonEmpty) {
+            server ! NewPlayerEvents(playerId, data.armyEvents)
+          }
           server ! NewPlayer(playerId, !data.showLive, playerName, team.primaryColor, team.secondaryColor)
           server ! NewChartStats(playerId, now.getTime(), data.firstStats)
           server ! PushUpdate(false)

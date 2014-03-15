@@ -34,7 +34,7 @@ case class AddEventsMsg(msgs: Map[String, List[ArmyEvent]]) extends MapFlattenin
   def input = msgs
 
   def map(key: String, event: ArmyEvent) = {
-   Map("playerId" -> key, "spec" -> event.spec, "time" -> event.time, "watchType" -> event.watchType, "x" -> event.x, "y" -> event.y, "z" -> event.z, "planetId" -> event.planetId)
+   Map("id" -> event.id, "playerId" -> key, "spec" -> event.spec, "time" -> event.time, "watchType" -> event.watchType, "x" -> event.x, "y" -> event.y, "z" -> event.z, "planetId" -> event.planetId)
   }
   
   def triggerName = "new-army-events"
