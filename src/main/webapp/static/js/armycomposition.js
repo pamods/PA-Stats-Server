@@ -221,9 +221,26 @@ $(document).ready(function() {
 			armyModel.selectEnd();
 		};
 		
+		var knownIds = {};
+		
 		var nothingReceived = true;
-		self.newArmyEventsHandler = function(event, data) {
+		self.newArmyEventsHandler = function(event, input) {
 			armyModel.lockWasOnEnd();
+			
+			var data = {value: []};
+			
+			// TODO this filters double events, I am not sure I even have them
+			// but something causes events to be processed twice in some cases, so this is the first try to prevent it
+			for (var i = 0; i < input.value.length; i++) {
+				if (!knownIds[input.value[i].id]) {
+					data.value.push(input.value[i]);
+					knownIds[input.value[i].id] = true;
+				}
+			}
+			if (data.value.length === 0) {
+				return;
+			}
+			
 			ko.tasks.processImmediate(function() {
 				data.value.sort(function(a, b) {
 					return a.time - b.time;
