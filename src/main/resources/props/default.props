@@ -8,7 +8,7 @@ cometServeThreshold = 300000
 minGameLength=5
 deletionInterval=10
 
-minDataPointsToKeep = 12
+minDataPointsToKeep = 0
 
 liveGameThreshold=10000
 

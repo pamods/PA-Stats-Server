@@ -71,7 +71,7 @@ object StatisticsReportService extends RestHelper with Loggable {
 			val ta = teams as "ta"
 			db.select(g.ID, g.WINNER_TEAM, ta.INGAME_ID, g.START_TIME, g.END_TIME).
 		    	from(a).
-		    	join(b).on(a.P === 410).and(b.P === 412).and(a.ID !== b.ID).and(b.G === a.G).
+		    	join(b).on(a.P === pa).and(b.P === pb).and(a.ID !== b.ID).and(b.G === a.G).
 		    	join(c).on(c.G === a.G).
 		    	join(g).on(a.G === g.ID).
 		    	join(ta).on(ta.ID === a.T).
