@@ -52,7 +52,64 @@ object StatisticsReportService extends RestHelper with Loggable {
   def init(): Unit = {
     LiftRules.statelessDispatch append StatisticsReportService
   }
-
+  
+  serve {
+    case "report" :: "matchesof" :: Nil Get _ =>
+      val resultMaps = for (
+          pa <- Helpers.tryo(S.param("a").map(_.toInt).get);
+          pb <- Helpers.tryo(S.param("b").map(_.toInt).get);
+          start <- Helpers.tryo(S.param("start").map(_.toLong).get);
+          duration <- Helpers.tryo(S.param("duration").map(_.toLong).get)
+      ) yield {
+        val startTime = BigInteger.valueOf(start)
+        val endTime = startTime.add(BigInteger.valueOf(duration))
+        val results = CookieBox withSession { db =>
+			val a = playerGameRels as "a"
+			val b = playerGameRels as "b"
+			val c = playerGameRels as "c"
+			val g = games as "g"
+			val ta = teams as "ta"
+			db.select(g.ID, g.WINNER_TEAM, ta.INGAME_ID, g.START_TIME, g.END_TIME).
+		    	from(a).
+		    	join(b).on(a.P === 410).and(b.P === 412).and(a.ID !== b.ID).and(b.G === a.G).
+		    	join(c).on(c.G === a.G).
+		    	join(g).on(a.G === g.ID).
+		    	join(ta).on(ta.ID === a.T).
+		    	where(epoch(g.START_TIME).gt(startTime)).
+		    	and(epoch(g.END_TIME).lt(endTime)).
+	            groupBy(g.ID, g.WINNER_TEAM, ta.INGAME_ID, g.START_TIME, g.END_TIME).
+	            having(count(c.ID) === 2).
+	            orderBy(g.ID.desc()).
+	            fetch().asScala.toList
+        }
+        
+        for (game <- results) yield {
+	      val winner = if (game.value2() != null) {
+	        if (game.value2() == -1)  -1 
+	        else {
+	          if (game.value2() == game.value3()) {
+	            pa
+	          } else {
+	            pb
+	          } 
+	        }
+	      } else null
+	        
+	      Map("gameId" -> game.value1(), "start" -> game.value4().getTime(),
+	    		  "end" -> game.value5().getTime(), "winner" -> winner)
+	    }
+      }
+      
+      resultMaps match {
+        case Failure(msg, exc, chain) =>
+          ResponseWithReason(BadResponse(), msg)
+        case Full(valid) => 
+          Extraction decompose valid
+        case wtf =>
+          ResponseWithReason(BadResponse(), "something went wrong somewhere :( data is:\n"+wtf)
+      }
+  }
+  
   case class Player(playerId: Int, playerName: String)
   case class Team(teamId: Int, players: List[Player])
   case class Game(gameId: Int, teams: List[Team], winner: Int, startTime: Long)
