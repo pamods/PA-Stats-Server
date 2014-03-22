@@ -1,34 +1,34 @@
 dbName=rbz
 
-queryUrl=http://www.nanodesu.info/pastats/report/get
+queryUrl=http://ns393951.ip-176-31-115.eu/report/get
 
-minCometInterval = 3500
-cometServeThreshold = 300000
+minCometInterval = 3000
+cometServeThreshold = 200000
 
 minGameLength=5
 deletionInterval=10
 
 minDataPointsToKeep = 0
 
-liveGameThreshold=10000
+liveGameThreshold=14000
 
 listGamesPageSize = 35
 
 jslibs=jquery jqueryui knockout kodeferred globalize d3 d3layout rickshaw
 csslibs=jqueryuicss rickshawcss
 
-kodeferred=http://nanodesu.info/static/lib/ko-deferred.js
+kodeferred=http://ns393951.ip-176-31-115.eu/ext/lib/ko-deferred.js
 
-imagebase=http://nanodesu.info/static/img/
+imagebase=http://ns393951.ip-176-31-115.eu/ext/img/
 
-jqueryuicss=http://nanodesu.info/static/lib/ui/jquery-ui-1.10.3.min.css
-rickshawcss=http://nanodesu.info/static/lib/rickshaw.a.min.css
+jqueryuicss=http://ns393951.ip-176-31-115.eu/ext/lib/ui/jquery-ui-1.10.3.min.css
+rickshawcss=http://ns393951.ip-176-31-115.eu/ext/lib/rickshaw.a.min.css
 
-jquery=http://nanodesu.info/static/lib/jquery-1.10.2.min.js
-jqueryui=http://nanodesu.info/static/lib/ui/jquery-ui-1.10.3.min.js
-knockout=http://nanodesu.info/static/lib/knockout-min-2.3.0.js
-globalize=http://nanodesu.info/static/lib/globalize-0.1.1.min.js
+jquery=http://ns393951.ip-176-31-115.eu/ext/lib/jquery-1.10.2.min.js
+jqueryui=http://ns393951.ip-176-31-115.eu/ext/lib/ui/jquery-ui-1.10.3.min.js
+knockout=http://ns393951.ip-176-31-115.eu/ext/lib/knockout-min-2.3.0.js
+globalize=http://ns393951.ip-176-31-115.eu/ext/lib/globalize-0.1.1.min.js
 
-d3=http://nanodesu.info/static/lib/d3.a.min.js
-d3layout=http://nanodesu.info/static/lib/d3.layout.a.min.js
-rickshaw=http://nanodesu.info/static/lib/rickshaw.a.min.js
+d3=http://ns393951.ip-176-31-115.eu/ext/lib/d3.a.min.js
+d3layout=http://ns393951.ip-176-31-115.eu/ext/lib/d3.layout.a.min.js
+rickshaw=http://ns393951.ip-176-31-115.eu/ext/lib/rickshaw.a.min.js

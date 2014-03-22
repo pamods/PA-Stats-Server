@@ -16,7 +16,7 @@ object IFrameSnip extends DispatchSnippet {
 	}
 	
 	def injectFrame = {
-	  val src = S.attr("src").getOrElse("")
+	  val src = S.attr("src").getOrElse("")+"?r="+Math.random()
 	  val id = S.attr("id").getOrElse("")
 	  val link = <a>Your browser does not support iframes. Click here to show the content</a>
 	  "*" #> {

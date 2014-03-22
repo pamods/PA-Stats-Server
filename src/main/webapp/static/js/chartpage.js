@@ -160,24 +160,33 @@ $(function() {
 		
 		var lastUpdated = 0;
 		
-		self.setLastUpdate = function(v) {
-			lastUpdated = v;
+		self.updateLastTime = function(v) {
+			var max = -1;
+			for (var i = 0; i < v.length; i++) {
+				if (max < v[i].data.timepoint) {
+					max = v[i].data.timepoint;
+				}
+			}
+			lastUpdated = max;
 		}
 		
 		self.checkLiveProc = function() {
-			var mightStillBeRunning = new Date().getTime() - lastUpdated < gameIsLiveOffsetGuess;
-			if (mightStillBeRunning) {
-				if (!showingLiveNote) {
-					$("#livenote").show("slow");
-					showingLiveNote = true;
+			$.get(queryUrl + "/time", function(timeMs) {
+				var diff = timeMs.ms - lastUpdated;
+				var mightStillBeRunning = diff < gameIsLiveOffsetGuess;
+				if (mightStillBeRunning) {
+					if (!showingLiveNote) {
+						$("#livenote").show("slow");
+						showingLiveNote = true;
+					}
+				} else {
+					if (showingLiveNote) {
+						$("#livenote").hide("slow");
+						showingLiveNote = false;
+					}
 				}
-			} else {
-				if (showingLiveNote) {
-					$("#livenote").hide("slow");
-					showingLiveNote = false;
-				}
-			}
-			window.setTimeout(self.checkLiveProc, 500);
+				window.setTimeout(self.checkLiveProc, 6500);
+			});
 		}
 		
 		self.updateByCurrentData = function() {
@@ -218,11 +227,9 @@ $(function() {
 	var baseData = $('#chartDataSource').data("comet-info");
 	
 	if (baseData.hasComet) {
-		$(document).on("game-time-increases", function() {
-			viewModel.setLastUpdate(new Date().getTime());
-		});
 		$(document).on("new-chart-data", function(event, data) {
 			viewModel.addData(data);
+			viewModel.updateLastTime(data.value);
 		});
 		$(document).on("new-player-data", function(event, data) {
 			viewModel.addPlayer(data);
@@ -237,6 +244,5 @@ $(function() {
 		});
 	}
 	
-	console.log("bind chartbase");
 	ko.applyBindings(viewModel.basicChart, document.getElementById('chartbase'));
 });

@@ -59,7 +59,8 @@ object StatisticsReportService extends RestHelper with Loggable {
           pa <- Helpers.tryo(S.param("a").map(_.toInt).get);
           pb <- Helpers.tryo(S.param("b").map(_.toInt).get);
           start <- Helpers.tryo(S.param("start").map(_.toLong).get);
-          duration <- Helpers.tryo(S.param("duration").map(_.toLong).get)
+          duration <- Helpers.tryo(S.param("duration").map(_.toLong).get);
+          nPlayers <- Helpers.tryo(S.param("nrofplayers").map(_.toInt).get).orElse(Some(2))
       ) yield {
         val startTime = BigInteger.valueOf(start)
         val endTime = startTime.add(BigInteger.valueOf(duration))
@@ -78,7 +79,7 @@ object StatisticsReportService extends RestHelper with Loggable {
 		    	where(epoch(g.START_TIME).gt(startTime)).
 		    	and(epoch(g.END_TIME).lt(endTime)).
 	            groupBy(g.ID, g.WINNER_TEAM, ta.INGAME_ID, g.START_TIME, g.END_TIME).
-	            having(count(c.ID) === 2).
+	            having(count(c.ID) === nPlayers).
 	            orderBy(g.ID.desc()).
 	            fetch().asScala.toList
         }
@@ -317,20 +318,29 @@ object StatisticsReportService extends RestHelper with Loggable {
   serve {
     case "report" :: "get" :: "time" :: Nil Get _ =>
       Extraction decompose CurrentTimeMs(System.currentTimeMillis())
-
   }
 
   serve {
     case "report" :: "getplayerid" :: Nil Get _ =>
       try {
-          val r = for (name <- S.param("ubername")) yield {
-            CookieBox withSession { db => 
-              db.select(players.ID).from(players).where(players.UBER_NAME === name).
-              	fetchFirstPrimitiveIntoOption(classOf[Int]).getOrElse(-1)
-            }
-          }
+          def selectId(cond: Condition) = CookieBox withSession { db => 
+	          db.select(players.ID).from(players).where(cond.and(players.UBER_NAME.isNotNull())).limit(1).
+	          	fetchFirstPrimitiveIntoOption(classOf[Int]).getOrElse(-1)
+	      }
         
-          Extraction decompose r.getOrElse(-1)
+          def byUberName = for (name <- S.param("ubername")) yield {
+            selectId(players.UBER_NAME === name)
+          }
+          
+          def byDisplayName = for (name <- S.param("displayname")) yield {
+              val nameId = CookieBox withSession { db =>
+                val q = db.select(names.ID).from(names).where(names.DISPLAY_NAME === name)
+                 q.fetchFirstPrimitiveIntoOption(classOf[Int]).getOrElse(-1)
+              }
+              selectId(players.CURRENT_DISPLAY_NAME === nameId)
+          }
+          
+          Extraction decompose byUberName.getOrElse(byDisplayName.getOrElse(-1))
       } catch {
         case ex: Exception => {
           logger.error(ex, ex)

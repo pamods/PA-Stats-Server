@@ -8,10 +8,10 @@
 				<Set name="jdbcUrl">jdbc:postgresql://127.0.0.1/rbz</Set>
 				<Set name="user">cookie</Set>
 				<Set name="password">ibda1!</Set>
-				<Set name="maxPoolSize">10</Set>
+				<Set name="maxPoolSize">25</Set>
 				<Set name="testConnectionOnCheckin">true</Set>
-				<Set name="maxIdleTimeExcessConnections">600</Set>
-				<Set name="idleConnectionTestPeriod">5000</Set>
+				<Set name="maxIdleTimeExcessConnections">800</Set>
+				<Set name="idleConnectionTestPeriod">8000</Set>
 				<Set name="preferredTestQuery">SELECT 1</Set>
 			</New>
 		</Arg>
