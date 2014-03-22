@@ -21,7 +21,7 @@ object GameInfoCollector extends GameInfoLoader {
 trait GameInfoLoader {
 	def getGameInfo(db: DSLContext, gameId: Int) = {
 	  db.select(games.START_TIME, games.PA_VERSION, games.WINNER, 
-	      epoch(games.END_TIME.sub(games.START_TIME).mul(int2Num(1000)))).
+	      intervalInSecs(games.END_TIME.sub(games.START_TIME).mul(int2Num(1000)))).
 	  from(games).
 	  	where(games.ID === gameId).fetchOneIntoOption(classOf[GameInfo])
 	}

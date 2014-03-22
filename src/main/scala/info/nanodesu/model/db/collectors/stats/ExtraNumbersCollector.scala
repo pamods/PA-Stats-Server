@@ -53,7 +53,7 @@ object ExtraNumbersCollector extends RefreshRunner {
   private def getUsersCount(db: DSLContext) = db.selectCount().from(players).where(players.UBER_NAME.isNotNull()).fetchOne(0, classOf[Long])
   
   private def getGameLength(db: DSLContext, agg: Field[_ <: Number] => Field[_ <: Number]) = {
-    db.select(agg(epoch(games.END_TIME.sub(games.START_TIME)).mul(int2JBigD(1000)))).from(games).fetchOne(0, classOf[Long])
+    db.select(agg(intervalInSecs(games.END_TIME.sub(games.START_TIME)).mul(int2JBigD(1000)))).from(games).fetchOne(0, classOf[Long])
   }
   
   private def getGameLengthSum(db: DSLContext) = getGameLength(db, sum)

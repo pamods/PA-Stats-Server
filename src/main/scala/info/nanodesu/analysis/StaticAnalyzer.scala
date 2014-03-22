@@ -34,7 +34,7 @@ class StaticAnalyzer(db: DSLContext) {
     db.selectCount().
       from(games).
       where(games.PA_VERSION === patch).
-      and(epoch(games.END_TIME.sub(games.START_TIME)).ge(BigInteger.valueOf(minLengthInMin*60))).
+      and(intervalInSecs(games.END_TIME.sub(games.START_TIME)).ge(BigInteger.valueOf(minLengthInMin*60))).
       fetchOne().value1()
   }
 
@@ -47,7 +47,7 @@ class StaticAnalyzer(db: DSLContext) {
   }
 
   def avgGameTime(patch: String): Long = {
-    db.select(avg(epoch(games.END_TIME.sub(games.START_TIME)).mul(int2JBigD(1000)))).
+    db.select(avg(intervalInSecs(games.END_TIME.sub(games.START_TIME)).mul(int2JBigD(1000)))).
       from(games).
       where(games.PA_VERSION === patch).
       fetchOne(0, classOf[Long])
@@ -61,8 +61,8 @@ class StaticAnalyzer(db: DSLContext) {
       join(specKeys).onKey().
       where(armyEvents.WATCHTYPE === 0).
       and(games.PA_VERSION === patch).
-      and(epoch(armyEvents.TIMEPOINT.sub(games.START_TIME)).gt(BigInteger.valueOf(minTimeInMin*60))).
-      and(epoch(armyEvents.TIMEPOINT.sub(games.START_TIME)).lt(BigInteger.valueOf(maxTimeInMin*60))).
+      and(intervalInSecs(armyEvents.TIMEPOINT.sub(games.START_TIME)).gt(BigInteger.valueOf(minTimeInMin*60))).
+      and(intervalInSecs(armyEvents.TIMEPOINT.sub(games.START_TIME)).lt(BigInteger.valueOf(maxTimeInMin*60))).
       groupBy(specKeys.SPEC).orderBy(armyEvents.ID.count().desc()).fetch()
 
     val lines = for (line <- q.asScala) yield (line.value1(), line.value2(): Int)

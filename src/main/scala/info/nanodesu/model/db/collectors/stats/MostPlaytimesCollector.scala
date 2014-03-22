@@ -32,7 +32,7 @@ object MostPlaytimesCollector extends RefreshRunner {
       db.select(field("name"), field("pid"), field("count(diff)"), field("sum(diff) as t"), field("avg(diff) :: bigint")).
         from( // this is SLOW (30s+), as it calculates a list of all games and their length for all players => improve this once it is too slow
           db.select(
-            epoch(max(stats.TIMEPOINT).sub(min(stats.TIMEPOINT)).mul(int2Num(1000))).as("diff"),
+            intervalInSecs(max(stats.TIMEPOINT).sub(min(stats.TIMEPOINT)).mul(int2Num(1000))).as("diff"),
             names.DISPLAY_NAME.as("name"),
             players.ID.as("pid")).
             from(stats).

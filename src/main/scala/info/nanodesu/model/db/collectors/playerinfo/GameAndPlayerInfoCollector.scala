@@ -68,7 +68,7 @@ trait GameAndPlayerInfoCollectorBase {
   def getPlayerGameTime(db: DSLContext, player: Int, agg: Field[_] => Field[java.math.BigDecimal], forGame: Option[Int] = None) = {
     db.select(agg(field("diff", classOf[java.math.BigDecimal])))
       .from(
-        mayAddGameCondition(db.select(epoch(max(stats.TIMEPOINT).sub(min(stats.TIMEPOINT)).mul(int2Num(1000))).as("diff")).
+        mayAddGameCondition(db.select(intervalInSecs(max(stats.TIMEPOINT).sub(min(stats.TIMEPOINT)).mul(int2Num(1000))).as("diff")).
           from(stats).
           join(playerGameRels).onKey().
           join(games).onKey().

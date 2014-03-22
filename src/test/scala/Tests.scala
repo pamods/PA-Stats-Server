@@ -153,7 +153,7 @@ object Tests extends App{
 //	  )).getSQL()
 //    }
 //    
-//    val q = db.select(epoch(max(stats.TIMEPOINT).sub(min(stats.TIMEPOINT)).mul(int2Num(1000))).as("diff"),
+//    val q = db.select(intervalInSecs(max(stats.TIMEPOINT).sub(min(stats.TIMEPOINT)).mul(int2Num(1000))).as("diff"),
 //            names.DISPLAY_NAME.as("name"),
 //            players.ID.as("pid")).
 //            from(stats).
@@ -167,7 +167,7 @@ object Tests extends App{
 //    val q = db.select(field("name"), field("pid"), field("count(diff)"), field("sum(diff) as t"), field("avg(diff) :: bigint")).
 //        from( // this is SLOW (30s+), as it calculates a list of all games and their length for all players => improve this once it is too slow
 //          db.select(
-//            epoch(max(stats.TIMEPOINT).sub(min(stats.TIMEPOINT)).mul(int2Num(1000))).as("diff"),
+//            intervalInSecs(max(stats.TIMEPOINT).sub(min(stats.TIMEPOINT)).mul(int2Num(1000))).as("diff"),
 //            names.DISPLAY_NAME.as("name"),
 //            players.ID.as("pid")).
 //            from(stats).
@@ -241,7 +241,7 @@ object Tests extends App{
 //	      	from(games).
 //	      	where(games.END_TIME.gt(before3Hours)).
 //	      	and(games.END_TIME.le(before3Min)).
-//	      	and(epoch(games.END_TIME.sub(games.START_TIME)).lt(minLength)).fetch())
+//	      	and(intervalInSecs(games.END_TIME.sub(games.START_TIME)).lt(minLength)).fetch())
 //	  
     	  
     

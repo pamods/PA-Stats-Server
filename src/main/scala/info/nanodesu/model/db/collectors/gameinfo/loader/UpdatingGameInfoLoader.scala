@@ -11,7 +11,7 @@ import info.nanodesu.lib.db.CookieFunc._
 case class LiveGameInfoUpdate(winner: String, duration: Int)
 trait UpdatingGameInfoLoader {
   def selectWinnerAndDurationForGame(db: DSLContext, gameId: Int): Option[LiveGameInfoUpdate] = {
-    db.select(games.WINNER, epoch(games.END_TIME.sub(games.START_TIME)).mul(1000:Integer)).
+    db.select(games.WINNER, intervalInSecs(games.END_TIME.sub(games.START_TIME)).mul(1000:Integer)).
     	from(games).
     	where(games.ID === gameId).
     fetchOneIntoOption(classOf[LiveGameInfoUpdate])
