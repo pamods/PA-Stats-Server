@@ -50,17 +50,13 @@ object LadderService extends RestHelper with Loggable with RefreshRunner{
 		    registeredPlayers remove x._1
 		  }
 		  
-		  var hadStuff = false;
 		  if (!registeredPlayers.isEmpty) {
-		    hadStuff = true
 		    logger info "registered Players are => " + registeredPlayers
 		  }
 		  if (!registeredGames.isEmpty) {
-		    hadStuff = true
 		    logger info "registered Games are => " + registeredGames
 		  }
 		  if (!registeredLobbyIdByHost.isEmpty) {
-		    hadStuff = true
 		    logger info "registered Lobby id for hosts => " + registeredLobbyIdByHost
 		  }
 		  if (!clientsReadyByLobby.isEmpty) {
@@ -70,12 +66,7 @@ object LadderService extends RestHelper with Loggable with RefreshRunner{
 		    //logger info "clients ready for lobby => " + clientsReadyByLobby
 		  }
 		  if (!gameCreationTimes.isEmpty) {
-		    hadStuff = true
 		    logger info "game creation times => " + gameCreationTimes
-		  }
-		  
-		  if (hadStuff) {
-		    logger info "\n\n\n\n"
 		  }
 	  }
 	}
@@ -177,6 +168,8 @@ object LadderService extends RestHelper with Loggable with RefreshRunner{
 	    	
 	    	logger info "registered " + data.uber_name
 	    	
+	    	cleanDataForSearchingPlayer(data.uber_name)
+	    	
 		    if (registeredPlayers.size >= 2) {
 		      val iter = registeredPlayers.iterator
 		      val pA = iter.next._1
@@ -229,7 +222,13 @@ object LadderService extends RestHelper with Loggable with RefreshRunner{
 	  }
 	}
 	
-	private def timeOutFor(uberName: String) = gameCreationTimes.count(x => x._1._1 == uberName || x._1._2 == uberName) == 0
+	private def timeOutFor(uberName: String) = {
+	  val hasTimeOut = gameCreationTimes.count(x => x._1._1 == uberName || x._1._2 == uberName) == 0
+	  if (hasTimeOut) {
+	    cleanDataForSearchingPlayer(uberName)
+	  }
+	  hasTimeOut
+	}
 
 	private def resetTimeOutFor(uberName: String) = {
 	  for(game <- gameCreationTimes.find(x => x._1._1 == uberName || x._1._2 == uberName)) {
@@ -259,8 +258,8 @@ object LadderService extends RestHelper with Loggable with RefreshRunner{
 	    if (resp.shouldStart) {
 	      mutex synchronized {
 		      clientsReadyByLobby remove data.game_id
-		      registeredLobbyIdByHost remove data.uber_name
-		      registeredGames remove data.uber_name
+
+		      cleanDataForSearchingPlayer(data.uber_name)
 		      
 		      successfulGameIds += data.game_id
 		      
@@ -270,6 +269,11 @@ object LadderService extends RestHelper with Loggable with RefreshRunner{
 	    
 	    Extraction decompose resp
 	  }
+	}
+	
+	private def cleanDataForSearchingPlayer(uberName: String) = {
+		registeredLobbyIdByHost remove uberName
+		registeredGames remove uberName
 	}
 	
 	case class TimeOutInfo(hasTimeOut: Boolean)
