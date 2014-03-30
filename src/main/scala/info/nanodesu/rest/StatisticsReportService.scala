@@ -214,16 +214,25 @@ object StatisticsReportService extends RestHelper with Loggable {
   }
   serve {
     case "report" :: "winner" :: Nil JsonPut VictorNotification(data) -> _ =>
-
+    
       // -2 is the code the mod uses to say "unknown winner", -1 means "draw" and therefore will be stored
       val winnerTeam = if (data.teamIndex != -2) data.teamIndex: Integer else null
-
+      
       for (gameId <- ReportDataC.getGameIdForLink(data.gameLink)) {
+        
+        // log all reports, to understand problems if they should still occur
+        logger info s"Incoming VictorNotification for game: $gameId "+data
+        
+        // 10 min
+        val reportDeadLine = new Timestamp(System.currentTimeMillis() - 10 * 60 * 1000)
+        
         CookieBox withSession { db =>
           db.update(games).
             set(games.WINNER, data.victor).
             set(games.WINNER_TEAM, winnerTeam).
             where(games.ID === gameId).
+            // prevent the winner from being updated in case the game ended "long" ago
+            and(games.END_TIME.gt(reportDeadLine)).
             execute()
         }
         val server = GameServers.serverForGame(gameId) 
