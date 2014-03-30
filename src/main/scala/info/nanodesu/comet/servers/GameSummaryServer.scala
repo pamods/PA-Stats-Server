@@ -75,7 +75,8 @@ class GameSummaryServer(val gameId: Int, players: PlayersServer) {
   private var _winner = "unknown"
   
   def forcefulInit(initialData: ChartDataPackage) = {
-    println("[FIX ME]I was forced to init!")
+    // TODO this is still an issue, but let's not spam the logs
+    // println("[FIX ME]I was forced to init!")
     
     for (entry <- initialData.playerTimeData) {
       val playerId = entry._1.toInt
