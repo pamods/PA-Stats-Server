@@ -14,9 +14,10 @@ liveGameThreshold=14000
 
 listGamesPageSize = 35
 
-jslibs=jquery jqueryui knockout kodeferred globalize d3 d3layout rickshaw
+jslibs=jquery jqueryui knockout immediate kodeferred globalize d3 d3layout rickshaw
 csslibs=jqueryuicss rickshawcss
 
+immediate=http://ns393951.ip-176-31-115.eu/ext/lib/setImmediate.js
 kodeferred=http://ns393951.ip-176-31-115.eu/ext/lib/ko-deferred.js
 
 imagebase=http://ns393951.ip-176-31-115.eu/ext/img/

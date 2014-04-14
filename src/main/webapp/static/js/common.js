@@ -4,6 +4,13 @@ $.urlParam = function(name) {
 	return results == null ? undefined : (results[1] || undefined);
 }
 
+Array.prototype.extend = function(other_array) {
+	for (var i = 0; i < other_array.length; i++) {
+		var v = other_array[i];
+		this.push(v);
+	}
+}
+
 var fillZeroes = "00000000000000000000"; // max number of zero fill ever
 // asked for in global
 

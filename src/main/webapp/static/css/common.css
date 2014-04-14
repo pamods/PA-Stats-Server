@@ -328,6 +328,16 @@ body {
     width: 48x;
     top:0px;
     left:0px;
+    z-index: 51;
+    position:absolute;
+}
+
+.army_composition_sicon {
+	height: 32px;
+    width: 32x;
+    bottom:0px;
+    left:0px;
+    z-index: 101;
     position:absolute;
 }
 
@@ -337,7 +347,7 @@ body {
     position:relative;
     top: 34px;
     z-index:100;
-    color: #444;
+    color: #fff;
 }
 
 .army_team_box {

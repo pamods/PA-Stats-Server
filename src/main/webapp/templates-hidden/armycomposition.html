@@ -34,9 +34,10 @@
 							</div>
 							<div class="army_team_units_box" data-bind="foreach: $data.visibleUnits">
 								<div class="army_composition_unit">
-									<a data-bind="attr: {href: $data.linkToPaDb}" target="_blank"><span class="link-spanner"></span></a> <img
-										class="army_composition_img" src="" data-bind="attr: {src: $data.icon }" /> <span class="army_composition_unit_count"
-										data-bind="text: $data.count"></span>
+									<a data-bind="attr: {href: $data.linkToPaDb}" target="_blank"><span class="link-spanner"></span></a> 
+										<img class="army_composition_img" src="" data-bind="attr: {src: $data.icon }" />
+										<img class="army_composition_sicon" src="" data-bind="attr: {src: $data.sicon }" /> 
+										<span class="army_composition_unit_count" data-bind="text: $data.count"></span>
 								</div>
 							</div>
 						</div>
