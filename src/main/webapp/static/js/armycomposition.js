@@ -64,6 +64,7 @@ $(document).ready(function() {
 		
 		self.playerConcerningChanges = function(evt, direction) {
 			var change = evt.change * direction;
+			
 			if (!evt.is_ghost) {
 				var index = self.unitSpecIndex[evt.spec];
 				var found = index != undefined;
@@ -136,7 +137,7 @@ $(document).ready(function() {
 			
 			_addEvent(player, spec, timestamp, typ, x, y, z, planetId, false);
 			
-			if (!isStructure(spec) && typ !== 0) {
+			if (typ !== 0) {
 				// add ghosts of dead units
 				_addEvent(player, spec, timestamp, 0, x, y, z, planetId, true);
 				_addEvent(player, spec, timestamp+GHOSTERY_TIME, 2, x, y, z, planetId, true);
@@ -190,6 +191,7 @@ $(document).ready(function() {
 		}
 		
 		self.timeBefore = self.selectedTime();
+		self.directionBefore = 1;
 		
 		self.eventIndex = {};
 		
@@ -208,6 +210,26 @@ $(document).ready(function() {
 			});
 		}
 		
+		self.getEventsBetween = function(startInclusive, endInclusive) {
+			var firstBucket = Math.floor(startInclusive / hashBucketSize);
+			var lastBucket = Math.ceil(endInclusive / hashBucketSize);
+			
+			var results = [];
+			
+			for (var i = firstBucket; i <= lastBucket; i++) {
+				if (self.eventIndex[i] !== undefined) {
+					for (var j = 0; j < self.eventIndex[i].length; j++) {
+						var evt = self.eventIndex[i][j];
+						if (evt.timestamp >= startInclusive && evt.timestamp <= endInclusive) {
+							results.push(evt);
+						}
+					}
+				}
+			}
+			
+			return results;
+		};		
+		
 		self.selectedTime.subscribe(function(newT) {
 			var direction = newT > self.timeBefore ? 1 : -1;
 			var toR = newT > self.timeBefore;
@@ -215,22 +237,26 @@ $(document).ready(function() {
 			var a = self.timeBefore > newT ? newT : self.timeBefore;
 			var b = self.timeBefore > newT ? self.timeBefore : newT;
 			
-			var firstBucket = Math.floor(self.timeBefore / hashBucketSize);
-			var lastBucket = Math.floor(newT / hashBucketSize);
+			var changedDirection = direction !== self.directionBefore;
 			
-			for (var i = firstBucket; toR ? i <= lastBucket : i >= lastBucket; i+=direction) {
-				if (self.eventIndex[i] != undefined) {
-					for (var j = toR ? 0 : self.eventIndex[i].length-1; toR ? j < self.eventIndex[i].length : j >= 0; j+=direction) {
-						var evt = self.eventIndex[i][j];
-						if (evt.timestamp > a && evt.timestamp <= b) {
-							self.changeSpecForPlayer(evt, direction);
-						}
-					}
+			if (!changedDirection) {
+				if (direction === 1) {
+					a += 1;
+				} else {
+					b -= 1;
 				}
 			}
 			
+			var effectedEvents = self.getEventsBetween(a, b);
+			
+			for (var i = toR ? 0 : effectedEvents.length-1; toR ? i < effectedEvents.length : i >= 0; i+=direction) {
+				self.changeSpecForPlayer(effectedEvents[i], direction);
+			}
+			
 			self.timeBefore = newT;
+			self.directionBefore = direction;
 		});
+
 		
 		self.newPlayersHandler = function(event, data) {
 			ko.tasks.processImmediate(function() {
@@ -254,7 +280,7 @@ $(document).ready(function() {
 			newEventsQueue.sort(function(a, b) {
 				return a.time - b.time;
 			});
-			var processingSize = 10;
+			var processingSize = 250;
 			if (!workingOnQueue) {
 				var worker = function() {
 					workingOnQueue = true;
@@ -303,7 +329,7 @@ $(document).ready(function() {
 				}
 				
 				var reSimUntil = undefined; 
-				if (minTime < self.selectedTime()) {
+				if (minTime <= self.selectedTime()) { // = since there may be new elements for the current timestamp as well
 					reSimUntil = self.selectedTime();
 					ko.tasks.processImmediate(function() {
 						self.selectedTime(minTime-5000);
@@ -361,16 +387,45 @@ $(document).ready(function() {
 		
 		self.getImagePath = getIconForSpec;
 		
-		function addBillboard(x, y, z, spec, color, imageIndex) {
+		function loadImageIntoAtlas(imgPath, callback) {
+			var image = new Image();
+			image.crossOrigin = "anonymous"; // Resolve CORS issues
+			// TODO this introduces (?) a race condition that can lead to images being loaded multiple times
+			// should not affect program correctness apart from that though...
+			image.onload = function() {
+				var newIndex = self.textureAtlas.addImage(image);
+				self.imagesMap[imgPath] = newIndex;
+				if (callback) {
+					callback(newIndex);
+				}
+			};
+			image.src = imgPath;
+		}
+		
+		var starIndex = undefined;
+		loadImageIntoAtlas(imageBaseUrl+"redstar.png", function(index) {
+			starIndex = index;
+		});		
+		
+		function addBillboard(x, y, z, spec, color, imageIndex, isGhost) {
 			var distance = Math.sqrt(x * x + y * y + z * z);
 			var planetSizeFactor = 6378137/distance;
+			var cartesian3Position = new Cesium.Cartesian3(x*planetSizeFactor, y*planetSizeFactor, z*planetSizeFactor);
 			var handle = self.billboards.add({
-				position: new Cesium.Cartesian3(x*planetSizeFactor, y*planetSizeFactor, z*planetSizeFactor),
+				position: cartesian3Position,
 				color: new Cesium.Color(color[0], color[1], color[2], 1),
 				imageIndex: imageIndex
 			});
-
-			var key = x+"/"+y+"/"+z+"/"+spec;
+			
+			if (isGhost) {
+				handle.extra = self.billboards.add({
+					position: cartesian3Position,
+					color: new Cesium.Color(1, 1, 1, 0.2),
+					imageIndex: starIndex
+				});
+			}
+			
+			var key = x+"/"+y+"/"+z+"/"+spec+"/"+isGhost;
 			var value = self.billboardsMap[key]; 
 			if (value === undefined) {
 				value = [];
@@ -381,28 +436,25 @@ $(document).ready(function() {
 			return handle;
 		}
 		
-		function removeBillboard(x, y, z, spec) {
-			var key = x+"/"+y+"/"+z+"/"+spec;
+		function removeBillboard(x, y, z, spec, isGhost) {
+			var key = x+"/"+y+"/"+z+"/"+spec+"/"+isGhost;
 			var value = self.billboardsMap[key];
 			if (value !== undefined && value.length > 0) {
-				self.billboards.remove(value[value.length-1]);
+				var handle = value[value.length-1];
+				self.billboards.remove(handle);
+				if (handle.extra) {
+					self.billboards.remove(handle.extra);
+				}
 				value.length = value.length -1;
 				self.billboardsMap[key] = value;
 			}
 		}
 		
-		function handleNewImageCase(x, y, z, spec, parsedColor, imgPath) {
-			var billBoard = addBillboard(x, y, z, spec, parsedColor);
-			var image = new Image();
-			image.crossOrigin = "anonymous"; // Resolve CORS issues
-			// TODO this introduces (?) a race condition that can lead to images being loaded multiple times
-			// should not affect program correctness apart from that though...
-			image.onload = function() {
-				var newIndex = self.textureAtlas.addImage(image);
-				self.imagesMap[imgPath] = newIndex;
-				billBoard.setImageIndex(newIndex);
-			};
-			image.src = imgPath;
+		function handleNewImageCase(x, y, z, spec, parsedColor, imgPath, isGhost) {
+			var billBoard = addBillboard(x, y, z, spec, parsedColor, undefined, isGhost);
+			loadImageIntoAtlas(imgPath, function(i) {
+				billBoard.setImageIndex(i);
+			});
 		}
 		
 		self.eventsHandler = function(pColor, evt, direction) {
@@ -422,12 +474,12 @@ $(document).ready(function() {
 			for (var i = 0; i < changeCnt; i++) {
 				if (addElseRemove) {
 					if (imgIndex) {
-						addBillboard(evt.x, evt.y, evt.z, evt.spec, parsedColor, imgIndex);						
+						addBillboard(evt.x, evt.y, evt.z, evt.spec, parsedColor, imgIndex, evt.is_ghost);						
 					} else {
-						handleNewImageCase(evt.x, evt.y, evt.z, evt.spec, parsedColor, imgPath);
+						handleNewImageCase(evt.x, evt.y, evt.z, evt.spec, parsedColor, imgPath, evt.is_ghost);
 					}
 				} else {
-					removeBillboard(evt.x, evt.y, evt.z, evt.spec);
+					removeBillboard(evt.x, evt.y, evt.z, evt.spec, evt.is_ghost);
 				}
 			}
 		};
