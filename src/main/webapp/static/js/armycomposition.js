@@ -374,6 +374,11 @@ $(document).ready(function() {
 		self.ellipsoid = self.widget.centralBody.ellipsoid;
 		self.scene = self.widget.scene;
 		
+		self.scene.screenSpaceCameraController.enableTilt = false;
+		self.scene.screenSpaceCameraController.enableLook = false;
+		self.scene.screenSpaceCameraController.minimumZoomDistance = 500000;
+		self.scene.camera.controller.constrainedAxis = undefined;
+		
 		// unused, should be used once more plantes are listed
 		self.planetInfoMap = ko.observable(planetInfo);
 		
