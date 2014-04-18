@@ -359,110 +359,129 @@ $(document).ready(function() {
 	
 	function GlobeViewModel(planetInfo) {
 		var self = this;
-		self.widget = new Cesium.CesiumWidget('globediv', {
-			imageryProvider : new Cesium.TileCoordinatesImageryProvider({
-				color: Cesium.Color.BLACK,
-			})
-		});
+		var hasWebGL = true;
+		var webGLError = "";
 		
-		var layers = self.widget.centralBody.imageryLayers;
-	    var white = layers.addImageryProvider(new Cesium.SingleTileImageryProvider({
-	        url : imageBaseUrl+'white.png',
-	    }));
-		layers.lower(white);
-	    
-		self.ellipsoid = self.widget.centralBody.ellipsoid;
-		self.scene = self.widget.scene;
-		
-		self.scene.screenSpaceCameraController.enableTilt = false;
-		self.scene.screenSpaceCameraController.enableLook = false;
-		self.scene.screenSpaceCameraController.minimumZoomDistance = 500000;
-		self.scene.camera.controller.constrainedAxis = undefined;
-		
-		// unused, should be used once more plantes are listed
-		self.planetInfoMap = ko.observable(planetInfo);
-		
-		self.textureAtlas = self.scene.context.createTextureAtlas();
-		self.billboards = new Cesium.BillboardCollection();
-		self.billboards.textureAtlas = self.textureAtlas;
-		self.scene.primitives.add(self.billboards);
-		
-		self.imagesMap = {};
-		self.billboardsMap = {};
-		
-		self.getImagePath = getIconForSpec;
-		
-		function loadImageIntoAtlas(imgPath, callback) {
-			var image = new Image();
-			image.crossOrigin = "anonymous"; // Resolve CORS issues
-			// TODO this introduces (?) a race condition that can lead to images being loaded multiple times
-			// should not affect program correctness apart from that though...
-			image.onload = function() {
-				var newIndex = self.textureAtlas.addImage(image);
-				self.imagesMap[imgPath] = newIndex;
-				if (callback) {
-					callback(newIndex);
-				}
-			};
-			image.src = imgPath;
+		if (!window.WebGLRenderingContext) {
+			hasWebGL = false;
+			webGLError = 'Your browser has no idea what WebGL is, check out <a href="http://get.webgl.org">http://get.webgl.org</a>';
+		} else if (!document.createElement('canvas').getContext("webgl")) {
+			hasWebGL = false;
+			webGLError = 'Your browser seems to have troubles to initialize WebGL, check out <a href="http://get.webgl.org/troubleshooting">http://get.webgl.org/troubleshooting</a>';
 		}
 		
-		var starIndex = undefined;
-		loadImageIntoAtlas(imageBaseUrl+"redstar.png", function(index) {
-			starIndex = index;
-		});		
-		
-		function addBillboard(x, y, z, spec, color, imageIndex, isGhost) {
-			var distance = Math.sqrt(x * x + y * y + z * z);
-			var planetSizeFactor = 6378137/distance;
-			var cartesian3Position = new Cesium.Cartesian3(x*planetSizeFactor, y*planetSizeFactor, z*planetSizeFactor);
-			var handle = self.billboards.add({
-				position: cartesian3Position,
-				color: new Cesium.Color(color[0], color[1], color[2], 1),
-				imageIndex: imageIndex
+		if (hasWebGL) {
+			self.widget = new Cesium.CesiumWidget('globediv', {
+				imageryProvider : new Cesium.TileCoordinatesImageryProvider({
+					color: Cesium.Color.BLACK,
+				})
 			});
 			
-			if (isGhost) {
-				handle.extra = self.billboards.add({
+			var layers = self.widget.centralBody.imageryLayers;
+		    var white = layers.addImageryProvider(new Cesium.SingleTileImageryProvider({
+		        url : imageBaseUrl+'white.png',
+		    }));
+			layers.lower(white);
+			
+			self.ellipsoid = self.widget.centralBody.ellipsoid;
+			self.scene = self.widget.scene;
+			
+			self.scene.screenSpaceCameraController.enableTilt = false;
+			self.scene.screenSpaceCameraController.enableLook = false;
+			self.scene.screenSpaceCameraController.maximumZoomDistance = 25000000;
+			self.scene.screenSpaceCameraController.minimumZoomDistance = 500000;
+			self.scene.camera.controller.constrainedAxis = undefined;
+			
+			// unused, should be used once more plantes are listed
+			self.planetInfoMap = ko.observable(planetInfo);
+			
+			self.textureAtlas = self.scene.context.createTextureAtlas();
+			self.billboards = new Cesium.BillboardCollection();
+			self.billboards.textureAtlas = self.textureAtlas;
+			self.scene.primitives.add(self.billboards);
+			
+			self.imagesMap = {};
+			self.billboardsMap = {};
+			
+			self.getImagePath = getIconForSpec;
+			
+			function loadImageIntoAtlas(imgPath, callback) {
+				var image = new Image();
+				image.crossOrigin = "anonymous"; // Resolve CORS issues
+				// TODO this introduces (?) a race condition that can lead to images being loaded multiple times
+				// should not affect program correctness apart from that though...
+				image.onload = function() {
+					var newIndex = self.textureAtlas.addImage(image);
+					self.imagesMap[imgPath] = newIndex;
+					if (callback) {
+						callback(newIndex);
+					}
+				};
+				image.src = imgPath;
+			}
+			
+			var starIndex = undefined;
+			loadImageIntoAtlas(imageBaseUrl+"redstar.png", function(index) {
+				starIndex = index;
+			});
+			
+			function addBillboard(x, y, z, spec, color, imageIndex, isGhost) {
+				var distance = Math.sqrt(x * x + y * y + z * z);
+				var planetSizeFactor = 6378137/distance;
+				var cartesian3Position = new Cesium.Cartesian3(x*planetSizeFactor, y*planetSizeFactor, z*planetSizeFactor);
+				var handle = self.billboards.add({
 					position: cartesian3Position,
-					color: new Cesium.Color(1, 1, 1, 0.2),
-					imageIndex: starIndex
+					color: new Cesium.Color(color[0], color[1], color[2], 1),
+					imageIndex: imageIndex
+				});
+				
+				if (isGhost) {
+					handle.extra = self.billboards.add({
+						position: cartesian3Position,
+						color: new Cesium.Color(1, 1, 1, 0.2),
+						imageIndex: starIndex
+					});
+				}
+				
+				var key = x+"/"+y+"/"+z+"/"+spec+"/"+isGhost;
+				var value = self.billboardsMap[key]; 
+				if (value === undefined) {
+					value = [];
+				}
+				value.push(handle);
+				
+				self.billboardsMap[key] = value;
+				return handle;
+			}
+			
+			function removeBillboard(x, y, z, spec, isGhost) {
+				var key = x+"/"+y+"/"+z+"/"+spec+"/"+isGhost;
+				var value = self.billboardsMap[key];
+				if (value !== undefined && value.length > 0) {
+					var handle = value[value.length-1];
+					self.billboards.remove(handle);
+					if (handle.extra) {
+						self.billboards.remove(handle.extra);
+					}
+					value.length = value.length -1;
+					self.billboardsMap[key] = value;
+				}
+			}
+			
+			function handleNewImageCase(x, y, z, spec, parsedColor, imgPath, isGhost) {
+				var billBoard = addBillboard(x, y, z, spec, parsedColor, undefined, isGhost);
+				loadImageIntoAtlas(imgPath, function(i) {
+					billBoard.setImageIndex(i);
 				});
 			}
-			
-			var key = x+"/"+y+"/"+z+"/"+spec+"/"+isGhost;
-			var value = self.billboardsMap[key]; 
-			if (value === undefined) {
-				value = [];
-			}
-			value.push(handle);
-			
-			self.billboardsMap[key] = value;
-			return handle;
-		}
-		
-		function removeBillboard(x, y, z, spec, isGhost) {
-			var key = x+"/"+y+"/"+z+"/"+spec+"/"+isGhost;
-			var value = self.billboardsMap[key];
-			if (value !== undefined && value.length > 0) {
-				var handle = value[value.length-1];
-				self.billboards.remove(handle);
-				if (handle.extra) {
-					self.billboards.remove(handle.extra);
-				}
-				value.length = value.length -1;
-				self.billboardsMap[key] = value;
-			}
-		}
-		
-		function handleNewImageCase(x, y, z, spec, parsedColor, imgPath, isGhost) {
-			var billBoard = addBillboard(x, y, z, spec, parsedColor, undefined, isGhost);
-			loadImageIntoAtlas(imgPath, function(i) {
-				billBoard.setImageIndex(i);
-			});
+		} else {
+			$('#globediv').append("<div>"+webGLError+"</div>");
 		}
 		
 		self.eventsHandler = function(pColor, evt, direction) {
+			if (!hasWebGL) {
+				return;
+			}
 			if (!evt.is_ghost && !isStructure(evt.spec)) {
 				return;
 			}
@@ -488,6 +507,8 @@ $(document).ready(function() {
 				}
 			}
 		};
+
+		
 	}
 	
 	var cometInfo = $("#armyDataSource").data("comet-info");
