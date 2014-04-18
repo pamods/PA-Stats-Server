@@ -13,8 +13,19 @@
 	
 		<div>
 			<div id="globediv"></div>
-			<div id="globeconfig">Imagine fun configuration stuff to be here in the future! Like I am thinking of filters for specific
-				buildings/events and ofc a way to switch between planets.</div>
+			<div id="globeconfig">
+				<div class="globeSettings">
+					<h4>Globe</h4>
+						<div>Icons displayed in a red partially transparent star show units that died a few seconds ago.</div>
+						<div class="planetsToggle"><span data-bind="text: globe.planetsCount"></span> Planets, displayed planet: 
+							<select class="planetsToggleSelect" data-bind="options: globe.knownPlanets, value: globe.selectedPlanet"></select></div>
+				</div>
+				<div class="armyCompositionSettings">
+					<h4>Army composition</h4>
+					<div>The army composition shows unit data across all planets.</div>
+					<div>Show: <select class="armyCompositionTypeSelect" data-bind="options: showTypes, value: currentShowType"></select></div>
+				</div>
+			</div>
 		</div>
 		
 		<div class="column span-24 last">

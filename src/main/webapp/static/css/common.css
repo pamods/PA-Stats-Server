@@ -5,8 +5,8 @@
 	padding-bottom: 10px;
 }
 
-#globeconfig {
-	
+.planetsToggleSelect {
+	min-width: 80px;
 }
 
 .edit_error_class {

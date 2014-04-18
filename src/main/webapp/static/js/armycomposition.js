@@ -26,7 +26,7 @@ $(document).ready(function() {
     	return spec.substring(spec.search(start), spec.search(end));
     };
     
-	function ArmyUnit(spc) {
+	function ArmyUnit(spc, currentShowType) {
 		var self = this;
 		
 		self.spec = ko.observable(spc);
@@ -38,17 +38,32 @@ $(document).ready(function() {
 			// var link = /([^\/]+?\/[^\/]+?\/)(?=[^\/]*\.json)/.exec(self.spec());
 			return "http://www.nanodesu.info/pa-db/recent/unit/"+self.name();
 		});
-		self.count = ko.observable(0);
-		self.visible = ko.computed(function() {return self.count() > 0;});
+		
+		self.aliveCount = ko.observable(0);
+		self.constructedCount = ko.observable(0);
+		self.lostCount = ko.observable(0);
+		self.currentShowType = currentShowType; 
+		self.count = ko.computed(function() {
+			if (self.currentShowType() === 'ALIVE') {
+				return self.aliveCount();
+			} else if (self.currentShowType() === 'CONSTRUCTED') {
+				return self.constructedCount();
+			} else if (self.currentShowType() === 'LOST') {
+				return Math.abs(self.lostCount());
+			}
+		});
+		self.visible = ko.computed(function() {return self.count() != 0;});
 	}
 	
-	function PlayerArmy(i, n, pClr, sClr, eventLocationsHandler) {
+	function PlayerArmy(i, n, pClr, sClr, currentShowType, eventLocationsHandler) {
 		var self = this;
 		self.id = i;
 		self.name = ko.observable(n);
 		self.primaryColor = ko.observable(pClr);
 		self.secondaryColor = ko.observable(sClr);
 		self.units = ko.observableArray([]);
+		
+		self.currentShowType = currentShowType;
 		
 		self.visibleUnits = ko.computed(function() {
 			return ko.utils.arrayFilter(self.units(), function(unit) {
@@ -72,12 +87,25 @@ $(document).ready(function() {
 				if (found) {// found is executed once per event in the game
 					// so it needs to be fast
 					var unt = self.units()[index];
-					unt.count(unt.count()+change);
+					
+					unt.aliveCount(unt.aliveCount()+change);
+					if (evt.change > 0) {
+						unt.constructedCount(unt.constructedCount()+change);
+					}
+					if (evt.change < 0) {
+						unt.lostCount(unt.lostCount()+change);
+					}
 					ux = unt;
 				} else { // else is only executed once per unit type that occurs in the entire game
 					// so the following code can be slow
-					var newUnit = new ArmyUnit(evt.spec);
-					newUnit.count(change);
+					var newUnit = new ArmyUnit(evt.spec, self.currentShowType);
+					newUnit.aliveCount(change);
+					if (evt.change > 0) {
+						newUnit.constructedCount(change);
+					}
+					if (evt.change < 0) {
+						newUnit.lostCount(change);
+					}
 					ux = newUnit;
 					self.units.push(newUnit);
 					self.units.sort(function(left, right) {
@@ -91,18 +119,23 @@ $(document).ready(function() {
 					}
 				}
 			}
-			if (eventLocationsHandler && evt.planet_id === 0) {  // TODO support more planets
+			if (eventLocationsHandler) {
 				eventLocationsHandler(self.primaryColor(), evt, direction);
 			}
 		}
 	}
 	
-	function ArmyCompositionModel(start, eventLocationsHandler) {
+	function ArmyCompositionModel(start, globe) {
 		var self = this;
 
 		self.startTime = ko.observable(start);
 		self.endTime = ko.observable(start);
 		self.selectedTime = ko.observable(start);
+		
+		self.globe = globe;
+		
+		self.showTypes = ko.observableArray(['ALIVE', 'CONSTRUCTED', 'LOST']);
+		self.currentShowType = ko.observable('ALIVE');
 		
 		self.formattedSelectedTime = ko.computed(function() {
 			return fmtTime(self.startTime(), self.selectedTime());
@@ -146,23 +179,23 @@ $(document).ready(function() {
 			if (self.endTime() < timestamp) {
 				self.endTime(timestamp);
 			}
-		}
+		};
 		
 		self.lockWasOnEnd = function() {
 			var prevEnd = self.endTime();
 			var border = (prevEnd - self.startTime()) * 0.05;
 			self.wasOnEnd = prevEnd - self.selectedTime() < border;
-		}
+		};
 		
 		self.selectEnd = function() {
 			self.selectedTime(self.endTime());
-		}
+		};
 		
 		self.maySelectEnd = function() {
 			if (self.wasOnEnd) {
 				self.selectEnd();
 			}
-		}
+		};
 		
 		self.players = ko.observableArray([]);
 		
@@ -173,8 +206,8 @@ $(document).ready(function() {
 		}, self);
 		
 		self.addPlayer = function (id, name, pColor, sColor) {
-			self.players.push(new PlayerArmy(id, name, pColor, sColor, eventLocationsHandler));
-		}
+			self.players.push(new PlayerArmy(id, name, pColor, sColor, self.currentShowType, globe.eventsHandler));
+		};
 		
 		var findPlayer = function(playerId) {
 			for (var i = 0; i < self.players().length; i++) {
@@ -188,7 +221,7 @@ $(document).ready(function() {
 		self.changeSpecForPlayer = function(evt, direction) {
 			var player = findPlayer(evt.player);
 			player.playerConcerningChanges(evt, direction);
-		}
+		};
 		
 		self.timeBefore = self.selectedTime();
 		self.directionBefore = 1;
@@ -208,7 +241,7 @@ $(document).ready(function() {
 			self.eventIndex[hashBucket].sort(function(a, b) {
 				return a.timestamp - b.timestamp;
 			});
-		}
+		};
 		
 		self.getEventsBetween = function(startInclusive, endInclusive) {
 			var firstBucket = Math.floor(startInclusive / hashBucketSize);
@@ -256,7 +289,6 @@ $(document).ready(function() {
 			self.timeBefore = newT;
 			self.directionBefore = direction;
 		});
-
 		
 		self.newPlayersHandler = function(event, data) {
 			ko.tasks.processImmediate(function() {
@@ -370,6 +402,12 @@ $(document).ready(function() {
 			webGLError = 'Your browser seems to have troubles to initialize WebGL, check out <a href="http://get.webgl.org/troubleshooting">http://get.webgl.org/troubleshooting</a>';
 		}
 		
+		self.knownPlanets = ko.observableArray([0]);
+		self.selectedPlanet = ko.observable(0);
+		self.planetsCount = ko.computed(function() {
+			return self.knownPlanets().length;
+		});
+		
 		if (hasWebGL) {
 			self.widget = new Cesium.CesiumWidget('globediv', {
 				imageryProvider : new Cesium.TileCoordinatesImageryProvider({
@@ -403,6 +441,8 @@ $(document).ready(function() {
 			self.imagesMap = {};
 			self.billboardsMap = {};
 			
+			self.currentBillboardsByPlanet = {};
+			
 			self.getImagePath = getIconForSpec;
 			
 			function loadImageIntoAtlas(imgPath, callback) {
@@ -425,7 +465,16 @@ $(document).ready(function() {
 				starIndex = index;
 			});
 			
-			function addBillboard(x, y, z, spec, color, imageIndex, isGhost) {
+			function addToListInMap(map, key, obj) {
+				var value = map[key];
+				if (value === undefined) {
+					value = [];
+				}
+				value.push(obj);
+				map[key] = value;
+			}
+			
+			function addBillboard(planet_id, x, y, z, spec, color, imageIndex, isGhost) {
 				var distance = Math.sqrt(x * x + y * y + z * z);
 				var planetSizeFactor = 6378137/distance;
 				var cartesian3Position = new Cesium.Cartesian3(x*planetSizeFactor, y*planetSizeFactor, z*planetSizeFactor);
@@ -443,33 +492,75 @@ $(document).ready(function() {
 					});
 				}
 				
-				var key = x+"/"+y+"/"+z+"/"+spec+"/"+isGhost;
-				var value = self.billboardsMap[key]; 
-				if (value === undefined) {
-					value = [];
+				var key = x+"/"+y+"/"+z+"/"+spec+"/"+isGhost+"/"+planet_id;
+				addToListInMap(self.billboardsMap, key, handle);
+
+				var planetMap = self.currentBillboardsByPlanet[planet_id+""];
+				if (planetMap === undefined) {
+					planetMap = {};
 				}
-				value.push(handle);
+				addToListInMap(planetMap, key, handle);
+				self.currentBillboardsByPlanet[planet_id+""] = planetMap;
+
+				handle.setShow(self.selectedPlanet() === planet_id);
+				if (handle.extra) {
+					handle.extra.setShow(self.selectedPlanet() === planet_id);
+				}
 				
-				self.billboardsMap[key] = value;
 				return handle;
 			}
 			
-			function removeBillboard(x, y, z, spec, isGhost) {
-				var key = x+"/"+y+"/"+z+"/"+spec+"/"+isGhost;
-				var value = self.billboardsMap[key];
+			var planetBefore = 0;
+			self.selectedPlanet.subscribe(function(v) {
+				var o = self.currentBillboardsByPlanet[planetBefore+""];
+				var n = self.currentBillboardsByPlanet[v+""];
+				
+				var setVisible = function(a, visible) {
+					for (p in a) {
+						if (a.hasOwnProperty(p)) {
+							for (var i = 0; i < a[p].length; i++) {
+								a[p][i].setShow(visible);
+								if (a[p][i].extra) {
+									a[p][i].extra.setShow(visible);
+								}
+							}
+						}
+					}
+				}
+				setVisible(o, false);
+				setVisible(n, true);
+				
+				planetBefore = v;
+			});
+			
+			function removeFromMap(map, key) {
+				var value = map[key];
 				if (value !== undefined && value.length > 0) {
 					var handle = value[value.length-1];
+					value.length = value.length -1;
+					map[key] = value;
+					return handle;
+				}
+			}
+			
+			function removeBillboard(planet_id, x, y, z, spec, isGhost) {
+				var key = x+"/"+y+"/"+z+"/"+spec+"/"+isGhost+"/"+planet_id;
+				
+				var handle = removeFromMap(self.billboardsMap, key);
+				if (handle) {
 					self.billboards.remove(handle);
 					if (handle.extra) {
 						self.billboards.remove(handle.extra);
 					}
-					value.length = value.length -1;
-					self.billboardsMap[key] = value;
+				}
+				
+				if (self.currentBillboardsByPlanet[planet_id+""]) {
+					removeFromMap(self.currentBillboardsByPlanet[planet_id+""], key);
 				}
 			}
 			
-			function handleNewImageCase(x, y, z, spec, parsedColor, imgPath, isGhost) {
-				var billBoard = addBillboard(x, y, z, spec, parsedColor, undefined, isGhost);
+			function handleNewImageCase(planet_id, x, y, z, spec, parsedColor, imgPath, isGhost) {
+				var billBoard = addBillboard(planet_id, x, y, z, spec, parsedColor, undefined, isGhost);
 				loadImageIntoAtlas(imgPath, function(i) {
 					billBoard.setImageIndex(i);
 				});
@@ -485,6 +576,9 @@ $(document).ready(function() {
 			if (!evt.is_ghost && !isStructure(evt.spec)) {
 				return;
 			}
+			if (self.knownPlanets.indexOf(evt.planet_id) === -1) {
+				self.knownPlanets.push(evt.planet_id);
+			}
 			
 			var changeCnt = evt.change * direction;
 			
@@ -498,23 +592,21 @@ $(document).ready(function() {
 			for (var i = 0; i < changeCnt; i++) {
 				if (addElseRemove) {
 					if (imgIndex) {
-						addBillboard(evt.x, evt.y, evt.z, evt.spec, parsedColor, imgIndex, evt.is_ghost);						
+						addBillboard(evt.planet_id, evt.x, evt.y, evt.z, evt.spec, parsedColor, imgIndex, evt.is_ghost);						
 					} else {
-						handleNewImageCase(evt.x, evt.y, evt.z, evt.spec, parsedColor, imgPath, evt.is_ghost);
+						handleNewImageCase(evt.planet_id, evt.x, evt.y, evt.z, evt.spec, parsedColor, imgPath, evt.is_ghost);
 					}
 				} else {
-					removeBillboard(evt.x, evt.y, evt.z, evt.spec, evt.is_ghost);
+					removeBillboard(evt.planet_id, evt.x, evt.y, evt.z, evt.spec, evt.is_ghost);
 				}
 			}
 		};
-
-		
 	}
 	
 	var cometInfo = $("#armyDataSource").data("comet-info");
 	
 	var globeModel = new GlobeViewModel(cometInfo.planets);
-	var armyModel = new ArmyCompositionModel(cometInfo.gameStart, globeModel.eventsHandler);
+	var armyModel = new ArmyCompositionModel(cometInfo.gameStart, globeModel);
 	
 	$(document).on("new-players", armyModel.newPlayersHandler);
 	$(document).on("new-army-events", armyModel.newArmyEventsHandler);
