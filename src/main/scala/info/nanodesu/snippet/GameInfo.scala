@@ -60,7 +60,8 @@ object GameInfo extends DispatchSnippet with Loggable {
 			  "#version *+" #> game.paVersion &
 			  "#winner *+" #> game.winner &
 			  "#start *+" #> JSLocalTime.jsTimeSnipFor(game.startTime) &
-			  "#length *+" #> prettyTimespan(game.duration)
+			  "#length *+" #> prettyTimespan(game.duration) &
+			  "#replaylink [href]" #> ("startpa://replay="+game.lobbyId)
 			  
 			  planetTransform match {
 			    case Some(tx) => base & tx
