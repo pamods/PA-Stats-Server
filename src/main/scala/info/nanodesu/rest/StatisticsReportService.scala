@@ -212,6 +212,7 @@ object StatisticsReportService extends RestHelper with Loggable {
     def apply(in: JValue): Box[VictorNotification] = Helpers.tryo(in.extract[VictorNotification])
     def unapply(in: JValue): Option[VictorNotification] = apply(in)
   }
+  // TODO add session verification
   serve {
     case "report" :: "winner" :: Nil JsonPut VictorNotification(data) -> _ =>
     
@@ -249,6 +250,7 @@ object StatisticsReportService extends RestHelper with Loggable {
     def apply(in: JValue): Box[PlayerDeathNotification] = Helpers.tryo(in.extract[PlayerDeathNotification])
     def unapply(in: JValue): Option[PlayerDeathNotification] = apply(in)
   }
+  // TODO add session verification
   serve {
     case "report" :: "idied" :: Nil JsonPut PlayerDeathNotification(data) -> _ =>
       CookieBox withSession { db =>
@@ -260,6 +262,7 @@ object StatisticsReportService extends RestHelper with Loggable {
       OkResponse()
   }
 
+  // TODO add session verification
   case class PlayerGameLinkIdResponse(gameLink: Int)
   serve {
     case "report" :: Nil JsonPut ReportDataC(data) -> _ =>
@@ -295,6 +298,7 @@ object StatisticsReportService extends RestHelper with Loggable {
       }
   }
 
+  	// TODO add session verification
   serve {
     case "report" :: Nil JsonPut RunningGameDataC(data) -> _ =>
       val now = new Date
@@ -329,6 +333,7 @@ object StatisticsReportService extends RestHelper with Loggable {
       Extraction decompose CurrentTimeMs(System.currentTimeMillis())
   }
 
+  
   serve {
     case "report" :: "getplayerid" :: Nil Get _ =>
       try {
@@ -358,7 +363,7 @@ object StatisticsReportService extends RestHelper with Loggable {
       }
   }
   
-  // TODO careful redundant code incoming...
+  // careful redundant code incoming...
   
   serve {
     case "report" :: "get" :: Nil Get _ =>

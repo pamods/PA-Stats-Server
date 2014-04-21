@@ -60,7 +60,7 @@ object LadderService extends RestHelper with Loggable with RefreshRunner{
 		    logger info "registered Lobby id for hosts => " + registeredLobbyIdByHost
 		  }
 		  if (!clientsReadyByLobby.isEmpty) {
-		    // TODO clearing that set somehow fails sometimes.
+		    // clearing that set somehow fails sometimes.
 		    // no idea why. It is probably not worth it to investigate, I'll really do a rewrite in maybe a week or so
 		    //hadStuff = true
 		    //logger info "clients ready for lobby => " + clientsReadyByLobby
@@ -133,12 +133,14 @@ object LadderService extends RestHelper with Loggable with RefreshRunner{
 	    }
 	}
 	
+	// TODO add session verification
 	case class NameMessage(uber_name: String, game_id: String)
 	object NameMessage {
 	    def apply(in: JValue): Box[NameMessage] = Helpers.tryo(in.extract[NameMessage])
 	    def unapply(in: JValue): Option[NameMessage] = apply(in)
 	}
-
+	
+	// TODO add session verification	
 	serve {
 	  case "unregister" :: Nil JsonPost NameMessage(data) -> _ => {
 	    mutex synchronized {
@@ -161,6 +163,7 @@ object LadderService extends RestHelper with Loggable with RefreshRunner{
 	  }
 	}
 	
+	// TODO add session verification
 	serve {
 	  case "register" :: Nil JsonPost NameMessage(data) -> _ => {
 	    mutex synchronized {
@@ -192,6 +195,7 @@ object LadderService extends RestHelper with Loggable with RefreshRunner{
 	
 	case class HasGameResponse(hasGame: Boolean, isHost: Boolean)
 	
+		// TODO add session verification
 	serve {
 	  case "hasGame" :: Nil JsonPost NameMessage(data) -> _ => {
 	    val r = mutex synchronized  {
@@ -208,6 +212,7 @@ object LadderService extends RestHelper with Loggable with RefreshRunner{
 	  }
 	}
 	
+		// TODO add session verification
 	serve {
 	  case "gameHosted" :: Nil JsonPost NameMessage(data) -> _ => {
 	    mutex synchronized {
@@ -243,6 +248,7 @@ object LadderService extends RestHelper with Loggable with RefreshRunner{
 	  }
 	}
 	
+	// TODO add session verification
 	case class ShouldStartResponse(shouldStart: Boolean, hasTimeOut: Boolean)
 	serve {
 	  case "shouldStartServer" :: Nil JsonPost NameMessage(data) -> _ => {
@@ -277,6 +283,8 @@ object LadderService extends RestHelper with Loggable with RefreshRunner{
 	}
 	
 	case class TimeOutInfo(hasTimeOut: Boolean)
+
+	// TODO add session verification
 	serve {
 	  case "readyToStart" :: Nil JsonPost NameMessage(data) -> _ => {
 	    
