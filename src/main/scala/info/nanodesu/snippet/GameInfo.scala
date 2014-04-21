@@ -17,6 +17,7 @@ import info.nanodesu.lib.db.CookieBox
 import info.nanodesu.lib.Formattings._
 import info.nanodesu.model.db.collectors.gameinfo._
 import info.nanodesu.model.db.collectors.gameinfo.HasSomeLockedPlayersCollector
+import info.nanodesu.model.db.collectors.gameinfo.loader.PlanetJsonLoader
 
 object GameInfo extends DispatchSnippet with Loggable {
 	val dispatch: DispatchIt = {
@@ -42,18 +43,6 @@ object GameInfo extends DispatchSnippet with Loggable {
 		  gameTitleCollector.shouldCreateLinks = true
 		  val transform = for (game <- getGame(gId)) yield {
 			  val playerList = gameTitleCollector.createGameTitle(gId)
-	
-			  val planetTransform = for (planet <- CookieBox withSession (db => PlanetCollector(db, gId))) yield {
-			      "#size *+" #> planet.size &
-		  		  "#radius *+" #> planet.radius &
-		  		  "#heightrange *+" #> planet.heightRange &
-		  		  "#waterheight *+" #> planet.waterHeight &
-		  		  "#planetimg [src]" #> planet.imagePath &
-		  		  "#planetimg [title+]" #> planet.biome &
-		  		  "#planetseed *+" #> planet.seed &
-		  		  "#planetname *+" #> planet.name &
-		  		  "#temp *+" #> planet.temp
-			  }
 			  
 			  val base = "#gamenum *+" #> gId &
 			  "#players *+" #> playerList &
@@ -63,10 +52,7 @@ object GameInfo extends DispatchSnippet with Loggable {
 			  "#length *+" #> prettyTimespan(game.duration) &
 			  "#replaylink [href]" #> ("startpa://replay="+game.lobbyId)
 			  
-			  planetTransform match {
-			    case Some(tx) => base & tx
-			    case _ => base
-			  }
+			  base
 		  }
 		  
 		  val foo = transform getOrElse "*" #> ""

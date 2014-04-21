@@ -45,6 +45,7 @@ import info.nanodesu.comet.WinnerSet
 import info.nanodesu.comet.PushUpdate
 import info.nanodesu.comet.UnlockPlayer
 import net.liftweb.http.OkResponse
+import info.nanodesu.model.db.collectors.gameinfo.loader.PlanetJsonLoader
 
 
 object StatisticsReportService extends RestHelper with Loggable {
@@ -355,6 +356,23 @@ object StatisticsReportService extends RestHelper with Loggable {
           }
           
           Extraction decompose byUberName.getOrElse(byDisplayName.getOrElse(-1))
+      } catch {
+        case ex: Exception => {
+          logger.error(ex, ex)
+          InternalServerErrorResponse()
+        }
+      }
+  }
+  
+  serve {
+    case "report" :: "getsystem" :: Nil Get _ => 
+      try {
+        CookieBox withSession { db =>
+          for (id <- GamePage.getGameId) yield {
+            val planetJson = new PlanetJsonLoader(db).selectJsonForGame(id)
+            planetJson.map(PlainTextResponse(_)).getOrElse(ResponseWithReason(NotFoundResponse(), "could not find planet for game "+id))
+          }
+        }
       } catch {
         case ex: Exception => {
           logger.error(ex, ex)

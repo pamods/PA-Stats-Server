@@ -103,7 +103,7 @@ object CookieFunc {
   val playerGameRels = V2_PLAYER_GAME_REL
   val stats = V2_TIMEPOINT_STATS
   val historyNames = V2_DISPLAY_NAME_HISTORY
-  val planets = V2_PLANET
+  val planets = V2_PLANET_JSON
   val settings = V2_SETTINGS
   val teams = V2_TEAMS
   val teamIdSeq = Sequences.TEAM_ID

@@ -11,7 +11,7 @@ CREATE TABLE v2_settings (
 	report_version integer
 );
 
-INSERT INTO v2_settings (report_version) VALUES (14);
+INSERT INTO v2_settings (report_version) VALUES (17);
 
 CREATE TABLE v2_planet (
 	id serial PRIMARY KEY,
@@ -24,12 +24,17 @@ CREATE TABLE v2_planet (
 	water_height numeric NOT NULL
 );
 
+CREATE TABLE v2_planet_json (
+	id serial PRIMARY KEY,
+	planet text NOT NULL
+);
+
 CREATE TABLE v2_game (
 	id serial PRIMARY KEY,
 	ident varchar UNIQUE NOT NULL,
 	start_time timestamp NOT NULL,
 	end_time timestamp NOT NULL,
-	planet integer references v2_planet (id) NOT NULL,
+	planet integer references v2_planet_json (id) NOT NULL,
 	pa_version varchar default 'unknown',
 	winner varchar default 'unknown',
 	winner_team integer

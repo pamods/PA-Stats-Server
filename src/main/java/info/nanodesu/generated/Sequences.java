@@ -34,9 +34,9 @@ public class Sequences {
 	public static final org.jooq.Sequence<java.lang.Long> V2_GAME_ID_SEQ = new org.jooq.impl.SequenceImpl<java.lang.Long>("v2_game_id_seq", info.nanodesu.generated.Public.PUBLIC, org.jooq.impl.SQLDataType.BIGINT.nullable(false));
 
 	/**
-	 * The sequence <code>public.v2_planet_id_seq</code>
+	 * The sequence <code>public.v2_planet_json_id_seq</code>
 	 */
-	public static final org.jooq.Sequence<java.lang.Long> V2_PLANET_ID_SEQ = new org.jooq.impl.SequenceImpl<java.lang.Long>("v2_planet_id_seq", info.nanodesu.generated.Public.PUBLIC, org.jooq.impl.SQLDataType.BIGINT.nullable(false));
+	public static final org.jooq.Sequence<java.lang.Long> V2_PLANET_JSON_ID_SEQ = new org.jooq.impl.SequenceImpl<java.lang.Long>("v2_planet_json_id_seq", info.nanodesu.generated.Public.PUBLIC, org.jooq.impl.SQLDataType.BIGINT.nullable(false));
 
 	/**
 	 * The sequence <code>public.v2_player_display_name_id_seq</code>

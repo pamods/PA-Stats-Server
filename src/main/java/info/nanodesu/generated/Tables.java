@@ -29,9 +29,9 @@ public class Tables {
 	public static final info.nanodesu.generated.tables.V2Game V2_GAME = info.nanodesu.generated.tables.V2Game.V2_GAME;
 
 	/**
-	 * The table public.v2_planet
+	 * The table public.v2_planet_json
 	 */
-	public static final info.nanodesu.generated.tables.V2Planet V2_PLANET = info.nanodesu.generated.tables.V2Planet.V2_PLANET;
+	public static final info.nanodesu.generated.tables.V2PlanetJson V2_PLANET_JSON = info.nanodesu.generated.tables.V2PlanetJson.V2_PLANET_JSON;
 
 	/**
 	 * The table public.v2_player

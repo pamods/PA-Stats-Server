@@ -11,7 +11,7 @@ package info.nanodesu.generated;
 @java.lang.SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Public extends org.jooq.impl.SchemaImpl {
 
-	private static final long serialVersionUID = -673642765;
+	private static final long serialVersionUID = -56768871;
 
 	/**
 	 * The singleton instance of <code>public</code>
@@ -38,7 +38,7 @@ public class Public extends org.jooq.impl.SchemaImpl {
 			info.nanodesu.generated.Sequences.V2_ARMY_EVENTS_ID_SEQ,
 			info.nanodesu.generated.Sequences.V2_DISPLAY_NAME_HISTORY_ID_SEQ,
 			info.nanodesu.generated.Sequences.V2_GAME_ID_SEQ,
-			info.nanodesu.generated.Sequences.V2_PLANET_ID_SEQ,
+			info.nanodesu.generated.Sequences.V2_PLANET_JSON_ID_SEQ,
 			info.nanodesu.generated.Sequences.V2_PLAYER_DISPLAY_NAME_ID_SEQ,
 			info.nanodesu.generated.Sequences.V2_PLAYER_GAME_REL_ID_SEQ,
 			info.nanodesu.generated.Sequences.V2_PLAYER_ID_SEQ,
@@ -58,7 +58,7 @@ public class Public extends org.jooq.impl.SchemaImpl {
 			info.nanodesu.generated.tables.V2ArmyEvents.V2_ARMY_EVENTS,
 			info.nanodesu.generated.tables.V2DisplayNameHistory.V2_DISPLAY_NAME_HISTORY,
 			info.nanodesu.generated.tables.V2Game.V2_GAME,
-			info.nanodesu.generated.tables.V2Planet.V2_PLANET,
+			info.nanodesu.generated.tables.V2PlanetJson.V2_PLANET_JSON,
 			info.nanodesu.generated.tables.V2Player.V2_PLAYER,
 			info.nanodesu.generated.tables.V2PlayerDisplayName.V2_PLAYER_DISPLAY_NAME,
 			info.nanodesu.generated.tables.V2PlayerGameRel.V2_PLAYER_GAME_REL,

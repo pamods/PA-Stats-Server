@@ -95,10 +95,8 @@ object InitialReportUpdater {
       import _root_.scala.language.implicitConversions
       implicit def s2B(s: String) = try { new java.math.BigDecimal(s) } catch { case e: Exception => java.math.BigDecimal.ZERO }
 
-      db.insertInto(planets, planets.SEED, planets.TEMPERATURE, planets.WATER_HEIGHT, planets.HEIGHT_RANGE,
-        planets.RADIUS, planets.BIOME, planets.PLANET_NAME).
-        values(planet.seed, planet.temperature, planet.water_height,
-          planet.height_range, planet.radius, planet.biome, planet.planet_name).returning().fetchOne().getId()
+      
+      db.insertInto(planets, planets.PLANET).values(planet.json).returning().fetchOne().getId()
     }
 
     def insertNewGame(ident: String, paVersion: String, startDate: Timestamp, reportDate: Timestamp, planetId: Int): Int = {

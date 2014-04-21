@@ -79,14 +79,8 @@ object ReportDataGenerators {
   implicit val arbRunningGame: Arbitrary[RunningGameData] = Arbitrary(genGameData)
 
   val genPlanet: Gen[ReportedPlanet] = for {
-    seed <- ix
-    temp <- dx
-    water <- dx
-    height <- dx
-    radius <- dx
-    biome <- nonEmptyString
-    name <- nonEmptyString
-  } yield ReportedPlanet(seed, temp.toString, water.toString, height.toString, radius.toString, biome, name)
+    notReallyJson <- nonEmptyString
+  } yield ReportedPlanet(notReallyJson)
   implicit val arbRepPlanet: Arbitrary[ReportedPlanet] = Arbitrary(genPlanet)
 
   val genPlayer: Gen[ReportPlayer] = for {

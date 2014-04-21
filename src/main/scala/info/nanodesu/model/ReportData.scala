@@ -43,14 +43,7 @@ case class ReportTeam(
 
 case class ReportPlayer(displayName: String)
   
-case class ReportedPlanet(
-  seed: Int,
-  temperature: String,
-  water_height: String,
-  height_range: String,
-  radius: String,
-  biome: String,
-  planet_name: String)
+case class ReportedPlanet(json: String)
 
 case class RunningGameData(
   gameLink: Int,

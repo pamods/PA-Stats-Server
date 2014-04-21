@@ -20,18 +20,13 @@ import info.nanodesu.model.db.collectors.gameinfo.HasSomeLockedPlayersCollector
 import net.liftweb.json._
 import net.liftweb.json.DefaultFormats
 import info.nanodesu.model.db.collectors.gameinfo.loader.GameTimesLoader
-import info.nanodesu.model.db.collectors.gameinfo.loader.PlanetSizeLoader
-
 class ArmyCompositionRenderer(val gId: Int, val hasComet: Boolean = false) extends CometRenderer with Loggable{
   def render = {
     implicit val formats = DefaultFormats
 
     val gameStart = CookieBox withSession { db => new GameTimesLoader(db).selectStartTimeForGame(gId) }
-    val planetSizes = CookieBox withSession { db => new PlanetSizeLoader(db).selectPlanetSizes(gId) }
-
     "#armyDataSource [data-comet-info]" #> compact(net.liftweb.json.render(
-        Extraction decompose Map("hasComet" -> hasComet, "gameStart" -> gameStart.getOrElse(-1),
-            "planets" -> planetSizes)
+        Extraction decompose Map("hasComet" -> hasComet, "gameStart" -> gameStart.getOrElse(-1))
     ))
   }
 }
