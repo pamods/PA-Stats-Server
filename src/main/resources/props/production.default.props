@@ -14,8 +14,8 @@ liveGameThreshold=14000
 
 listGamesPageSize = 35
 
-jslibs=jquery jqueryui knockout immediate kodeferred globalize d3 d3layout rickshaw
-csslibs=jqueryuicss rickshawcss
+jslibs=jquery jqueryui lodash immediate knockout kodeferred globalize d3 d3layout rickshaw
+csslibs=jqueryuicss rickshawcss paiconfont
 
 immediate=http://ns393951.ip-176-31-115.eu/ext/lib/setImmediate.js
 kodeferred=http://ns393951.ip-176-31-115.eu/ext/lib/ko-deferred.js
@@ -24,11 +24,13 @@ imagebase=http://ns393951.ip-176-31-115.eu/ext/img/
 
 jqueryuicss=http://ns393951.ip-176-31-115.eu/ext/lib/ui/jquery-ui-1.10.3.min.css
 rickshawcss=http://ns393951.ip-176-31-115.eu/ext/lib/rickshaw.a.min.css
+paiconfont=http://ns393951.ip-176-31-115.eu/ext/css/pa-icon-font.css
 
 jquery=http://ns393951.ip-176-31-115.eu/ext/lib/jquery-1.10.2.min.js
 jqueryui=http://ns393951.ip-176-31-115.eu/ext/lib/ui/jquery-ui-1.10.3.min.js
 knockout=http://ns393951.ip-176-31-115.eu/ext/lib/knockout-min-2.3.0.js
 globalize=http://ns393951.ip-176-31-115.eu/ext/lib/globalize-0.1.1.min.js
+lodash=http://ns393951.ip-176-31-115.eu/ext/lib/lodash.min.js
 
 d3=http://ns393951.ip-176-31-115.eu/ext/lib/d3.a.min.js
 d3layout=http://ns393951.ip-176-31-115.eu/ext/lib/d3.layout.a.min.js

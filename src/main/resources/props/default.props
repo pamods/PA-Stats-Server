@@ -26,7 +26,7 @@ imagebase=/static/outsourced/img/
 
 jqueryuicss=/static/outsourced/lib/ui/jquery-ui-1.10.3.min.css
 rickshawcss=/static/outsourced/lib/rickshaw.a.min.css
-paiconfont=/static/css/pa-icon-font.css
+paiconfont=/static/outsourced/css/pa-icon-font.css
 
 jquery=/static/outsourced/lib/jquery-1.10.2.min.js
 jqueryui=/static/outsourced/lib/ui/jquery-ui-1.10.3.min.js

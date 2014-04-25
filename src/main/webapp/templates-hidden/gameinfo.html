@@ -13,7 +13,7 @@
                 <td id="length">Duration: </td>
                 <td id="version">PA: v.</td>
                 <td>	<span id="gamenum">Game #</span>
-                  <a id="replaylink">(Launch replay in PA)</a>
+                  <a id="replaylink">(Launch replay in PA)</a> <a href="https://forums.uberent.com/threads/rel-pa-stats-63180.50690/page-23#post-918834">(?)</a>
                   <span id="livenote" data-lift="GameInfo.livenote" style="display: none"><span class="white bold" id="live_note_txt"></span></span> <br />
                 </td>
               </tr>
@@ -67,26 +67,7 @@
           <ul class="planet-list" data-bind="template: {name:'templatePlanet', foreach: Planets}, style: { textAlign: align}"></ul>
 
         </div>
-
-        <script type="text/javascript">
-          $(document).ready(function(){
-            var gameId = $('#systemInfo').data('gameid');
-            $.getJSON('/report/getsystem?gameId=' + gameId, function(data){
-              function SystemModel(){
-                this.name = data.name
-                this.align = data.planets.length > 1 ? "left":"center";
-                this.Planets = data.planets; //_.sortBy(data.planets, function(p){return p.planet.radius * -1});
-                _.map( this.Planets, function(planet){
-                  planet.imagePath = imageBaseUrl + 'planets/' + planet.planet.biome + '.png';
-                  planet.imageWidth = planet.planet.radius >= 1000 ? '200px' : Math.round(200 * planet.planet.radius / 1000) + 'px';
-                  planet.imageOffset = planet.planet.radius < 420 ? Math.round(200 * (420 - planet.planet.radius)/2000) + 'px': '0';
-                  planet.starting_planet = planet.starting_planet || false; //ensure field presence
-                });
-              }
-              ko.applyBindings( new SystemModel(), document.getElementById('systemInfo'))
-            })
-          })
-        </script>
+        	<script type="text/javascript" src="static/js/systemview.js"></script>
 			</div>
 			<div class="shiny_comet" data-lift="CometInit.playerGameInfo">
 				<table id="playerstatstable">
