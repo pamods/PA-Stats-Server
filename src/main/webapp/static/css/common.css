@@ -428,6 +428,7 @@ body {
     border-bottom: 1px solid rgba(255,255,255,0.1);
     font-weight: normal;
     font-size: 18px;
+
 }
 .system-name {
     font-weight: bold;
@@ -437,7 +438,7 @@ body {
 .system-view {
     background: url(../img/deep_space_bg.png);
     color: white;
-    overflow: auto;
+    overflow: hidden;
     padding-bottom: 12px;
 }
 .system-view * {
@@ -486,6 +487,7 @@ body {
     vertical-align: middle;
     text-align: right;
     max-width: 116px;
+    width: 116px;
     position: relative;
 }
 .planet-hud-caption img {

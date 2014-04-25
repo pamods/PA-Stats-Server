@@ -5,7 +5,7 @@
 		<div class="greybox">
 			<div data-lift="GameInfo.info">
         <div>
-          <h1 id="players"></h1>
+          <h4 id="players" style="text-align:center"></h4>
           <table class="greyborder" id="gameinfotable">
             <tbody>
               <tr>
@@ -28,7 +28,7 @@
           <script type="text/html" id="templatePlanet">
             <li class="planet-view">
               <!-- ko if: $index()%2 -->
-              <div class="planet-hud-caption" data-bind="style: {width: imageWidth}">
+              <div class="planet-hud-caption">
                 <img style="right:0" data-bind="style: {width: imageWidth, top: imageOffset}, attr: {src:imagePath}">
               </div>
               <div class="planet-hud-pre">
@@ -56,7 +56,7 @@
               <div class="planet-hud-pre reverse">
                 <div></div>
               </div>
-              <div class="planet-hud-caption" data-bind="style: {width: imageWidth}">
+              <div class="planet-hud-caption">
                 <img style="left:0" data-bind="style: {width: imageWidth, top: imageOffset}, attr: {src:imagePath}">
               </div>
               <!-- /ko -->
@@ -75,7 +75,7 @@
               function SystemModel(){
                 this.name = data.name
                 this.align = data.planets.length > 1 ? "left":"center";
-                this.Planets = _.sortBy(data.planets, function(p){return p.planet.radius * -1});
+                this.Planets = data.planets; //_.sortBy(data.planets, function(p){return p.planet.radius * -1});
                 _.map( this.Planets, function(planet){
                   planet.imagePath = imageBaseUrl + 'planets/' + planet.planet.biome + '.png';
                   planet.imageWidth = planet.planet.radius >= 1000 ? '200px' : Math.round(200 * planet.planet.radius / 1000) + 'px';
