@@ -42,13 +42,13 @@
                     <td title="Starting planet"><i class="pa-target"></i> <span class="start" data-bind="css: { 'starting-planet': starting_planet}"></span></td>
                     <td title="Radius"><i class="pa-radius"></i> <span data-bind="text: planet.radius"></span></td>
                     <td title="Water height"><i class="pa-water"></i> <span data-bind="text: planet.waterHeight"></span></td>
-                    <td title="Metal density"><i class="pa-dot-circled"></i> <span data-bind="text: planet.metal_density"></span></td>
+                    <td title="Metal density"><i class="pa-dot-circled"></i> <span data-bind="text: planet.metal_density||planet.metalDensity"></span></td>
                   </tr>
                   <tr>
                     <td title="Haley emplacements"><i class="pa-haley"></i> <span data-bind="text: required_thrust_to_move"></span> </td>
                     <td title="Temperature"><i class="pa-temperatire"></i> <span data-bind="text: planet.temperature"></span></td>
                     <td title="Height range"><i class="pa-resize-vertical"></i> <span data-bind="text: planet.heightRange"></span></td>
-                    <td title="Metal clusters"><i class="pa-spread"></i> <span data-bind="text: planet.metal_clusters"></span></td>
+                    <td title="Metal clusters"><i class="pa-spread"></i> <span data-bind="text: planet.metal_clusters||planet.metalClusters"></span></td>
                   </tr>
                 </table>
               </div>

@@ -10,6 +10,7 @@
           planet.imageWidth = planet.planet.radius >= 1000 ? '200px' : Math.round(200 * planet.planet.radius / 1000) + 'px';
           planet.imageOffset = planet.planet.radius < 420 ? Math.round(200 * (420 - planet.planet.radius)/2000) + 'px': '0';
           planet.starting_planet = planet.starting_planet || false; //ensure field presence
+          planet.required_thrust_to_move = planet.required_thrust_to_move || 0; //ensure field presence
         });
       }
       ko.applyBindings( new SystemModel(), document.getElementById('systemInfo'))
