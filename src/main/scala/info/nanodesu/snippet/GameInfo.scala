@@ -45,6 +45,7 @@ object GameInfo extends DispatchSnippet with Loggable {
 			  val playerList = gameTitleCollector.createGameTitle(gId)
 			  
 			  val base = "#gamenum *+" #> gId &
+			  "#systemInfo [data-gameid]" #> gId &
 			  "#players *+" #> playerList &
 			  "#version *+" #> game.paVersion &
 			  "#winner *+" #> game.winner &

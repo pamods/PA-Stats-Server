@@ -16,8 +16,8 @@ listGamesPageSize = 35
 
 allowStarOrigin = true
 
-jslibs=jquery jqueryui immediate knockout kodeferred globalize d3 d3layout rickshaw
-csslibs=jqueryuicss rickshawcss
+jslibs=jquery jqueryui lodash immediate knockout kodeferred globalize d3 d3layout rickshaw
+csslibs=jqueryuicss rickshawcss paiconfont
 
 immediate=/static/outsourced/lib/setImmediate.js
 kodeferred=/static/outsourced/lib/ko-deferred.js
@@ -26,11 +26,13 @@ imagebase=/static/outsourced/img/
 
 jqueryuicss=/static/outsourced/lib/ui/jquery-ui-1.10.3.min.css
 rickshawcss=/static/outsourced/lib/rickshaw.a.min.css
+paiconfont=/static/css/pa-icon-font.css
 
 jquery=/static/outsourced/lib/jquery-1.10.2.min.js
 jqueryui=/static/outsourced/lib/ui/jquery-ui-1.10.3.min.js
 knockout=/static/outsourced/lib/knockout-min-2.3.0.js
 globalize=/static/outsourced/lib/globalize-0.1.1.min.js
+lodash=/static/outsourced/lib/lodash.min.js
 
 d3=/static/outsourced/lib/d3.a.min.js
 d3layout=/static/outsourced/lib/d3.layout.a.min.js

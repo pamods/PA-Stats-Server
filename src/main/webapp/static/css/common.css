@@ -161,7 +161,7 @@ tbody tr:nth-child(odd) td,tbody tr.odd td {
 }
 
 body {
-	font-family: Helvetica, Arial
+	font-family: "Open Sans", Helvetica, Arial
 }
 
 .stat {
@@ -417,4 +417,100 @@ body {
   top:0;
   left: 0;
   z-index: 1000;
+}
+
+
+/* SYSTEM INFO PANEL */
+#systemInfo > h2 {
+    color: cyan;
+    padding: 10px 20px;
+    background: rgba(50,50,50,0.4);
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+    font-weight: normal;
+    font-size: 18px;
+}
+.system-name {
+    font-weight: bold;
+    font-size: 24px;
+}
+
+.system-view {
+    background: url(../img/deep_space_bg.png);
+    color: white;
+    overflow: auto;
+    padding-bottom: 12px;
+}
+.system-view * {
+    overflow: visible !important;
+}
+.planet-list {
+}
+.planet-view {
+    display: inline-block;
+
+}
+.start:after {
+    content: "no";
+    color: red;
+}
+.start.starting-planet:after {
+    content: "yes";
+    color: green;
+}
+[class^="planet-hud"] {
+    display: table-cell;
+    vertical-align: middle;
+}
+
+.planet-hud-pre {
+    min-width: 80px;
+    text-align: center;
+}
+
+.planet-hud-pre div {
+    border: 1px solid cyan;
+    width: 24px;
+    display: inline-block;
+    height: 18px;
+    -webkit-transform: skew(-72deg);
+    border-width: 1px 0 0 1px;
+    margin-bottom: 22px;
+}
+
+.planet-hud-pre.reverse div {
+    -webkit-transform: skew(72deg);
+    border-width: 1px 1px 0 0;
+}
+
+.planet-hud-caption {
+    vertical-align: middle;
+    text-align: right;
+    max-width: 116px;
+    position: relative;
+}
+.planet-hud-caption img {
+    position: absolute;
+    top: 0;
+}
+
+.planet-view caption {
+    background: transparent;
+    font-size: 1.618em;
+    padding: 3px;
+    color: cyan;
+}
+.planet-view .biome {
+    font-size: 0.5em;
+    float:right;
+    padding-top: 0.618em;
+}
+.planet-view table {
+    width: 250px;
+}
+
+.planet-view td {
+    background-color: transparent !important;
+    line-height: 0.764em;
+    padding: 0.238em;
+    width: 25%
 }
