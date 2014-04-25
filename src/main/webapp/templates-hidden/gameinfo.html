@@ -4,43 +4,89 @@
 	<div id="gameinfo">
 		<div class="greybox">
 			<div data-lift="GameInfo.info">
-				<div style="float: left">
-					<img id="planetimg" alt="planet biome"
-						src="/static/img/planets/unknown.png" width=auto height=150px title="Biome: " />
-					<div class="planetemblem" id="planetname"></div>
-				</div>
+        <div>
+          <h4 id="players" style="text-align:center"></h4>
+          <table class="greyborder" id="gameinfotable">
+            <tbody>
+              <tr>
+                <td id="start">Start: </td>
+                <td id="length">Duration: </td>
+                <td id="version">PA: v.</td>
+                <td>	<span id="gamenum">Game #</span>
+                  <a id="replaylink">(Launch replay in PA)</a>
+                  <span id="livenote" data-lift="GameInfo.livenote" style="display: none"><span class="white bold" id="live_note_txt"></span></span> <br />
+                </td>
+              </tr>
+              <tr id="infline">
+                <td colspan=4 id="winner">Winner: </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div id="systemInfo" class="system-view">
+          <h2>System : <span data-bind="text:name" class="system-name"></span></h2>
+          <script type="text/html" id="templatePlanet">
+            <li class="planet-view">
+              <!-- ko if: $index()%2 -->
+              <div class="planet-hud-caption">
+                <img style="right:0" data-bind="style: {width: imageWidth, top: imageOffset}, attr: {src:imagePath}">
+              </div>
+              <div class="planet-hud-pre">
+                <div></div>
+              </div>
+              <!-- /ko -->
+              <div class="planet-hud-description">
+                <table>
+                  <caption><span data-bind="text: name"></span><span class="biome" data-bind="text: planet.biome"></span></caption>
+                  <tr>
+                    <td title="Starting planet"><i class="pa-target"></i> <span class="start" data-bind="css: { 'starting-planet': starting_planet}"></span></td>
+                    <td title="Radius"><i class="pa-radius"></i> <span data-bind="text: planet.radius"></span></td>
+                    <td title="Water height"><i class="pa-water"></i> <span data-bind="text: planet.waterHeight"></span></td>
+                    <td title="Metal density"><i class="pa-dot-circled"></i> <span data-bind="text: planet.metal_density"></span></td>
+                  </tr>
+                  <tr>
+                    <td title="Haley emplacements"><i class="pa-haley"></i> <span data-bind="text: required_thrust_to_move"></span> </td>
+                    <td title="Temperature"><i class="pa-temperatire"></i> <span data-bind="text: planet.temperature"></span></td>
+                    <td title="Height range"><i class="pa-resize-vertical"></i> <span data-bind="text: planet.heightRange"></span></td>
+                    <td title="Metal clusters"><i class="pa-spread"></i> <span data-bind="text: planet.metal_clusters"></span></td>
+                  </tr>
+                </table>
+              </div>
+              <!-- ko ifnot: $index()%2 -->
+              <div class="planet-hud-pre reverse">
+                <div></div>
+              </div>
+              <div class="planet-hud-caption">
+                <img style="left:0" data-bind="style: {width: imageWidth, top: imageOffset}, attr: {src:imagePath}">
+              </div>
+              <!-- /ko -->
+            </li>
+          </script>
 
-				<div style="margin-left: 150px;">
-					<div id="gameheader">
-						<span id="gamenum">Game #</span>
-						<a id="replaylink">(Launch replay in PA)</a>
-						<span id="livenote" data-lift="GameInfo.livenote" style="display: none"><span class="white bold" id="live_note_txt"></span></span> <br /> <span id="players"></span>
-					</div>
-					<table class="greyborder" id="gameinfotable">
-						<tbody>
-							<tr>
-								<td id="version">PA: v.</td>
-								<td id="temp">Temperature: </td>
-							</tr>
-							<tr id="infline">
-								<td id="planetseed">Seed: </td>
-								<td id="winner">Winner: </td>
-							</tr>
-							<tr>
-								<td id="radius">Radius: </td>
-								<td id="size">Size: </td>
-							</tr>
-							<tr>
-								<td id="heightrange">Heightrange: </td>
-								<td id="start">Start: </td>
-							</tr>
-							<tr>
-								<td id="waterheight">Waterheight: </td>
-								<td id="length">Duration: </td>
-							</tr>
-						</tbody>
-					</table>
-				</div>
+
+          <ul class="planet-list" data-bind="template: {name:'templatePlanet', foreach: Planets}, style: { textAlign: align}"></ul>
+
+        </div>
+
+        <script type="text/javascript">
+          $(document).ready(function(){
+            var gameId = $('#systemInfo').data('gameid');
+            $.getJSON('/report/getsystem?gameId=' + gameId, function(data){
+              function SystemModel(){
+                this.name = data.name
+                this.align = data.planets.length > 1 ? "left":"center";
+                this.Planets = data.planets; //_.sortBy(data.planets, function(p){return p.planet.radius * -1});
+                _.map( this.Planets, function(planet){
+                  planet.imagePath = imageBaseUrl + 'planets/' + planet.planet.biome + '.png';
+                  planet.imageWidth = planet.planet.radius >= 1000 ? '200px' : Math.round(200 * planet.planet.radius / 1000) + 'px';
+                  planet.imageOffset = planet.planet.radius < 420 ? Math.round(200 * (420 - planet.planet.radius)/2000) + 'px': '0';
+                  planet.starting_planet = planet.starting_planet || false; //ensure field presence
+                });
+              }
+              ko.applyBindings( new SystemModel(), document.getElementById('systemInfo'))
+            })
+          })
+        </script>
 			</div>
 			<div class="shiny_comet" data-lift="CometInit.playerGameInfo">
 				<table id="playerstatstable">
@@ -79,5 +125,6 @@
 			</div>
 		</div>
 	</div>
+
 </body>
 </html>
