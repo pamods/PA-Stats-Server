@@ -365,6 +365,10 @@ object StatisticsReportService extends RestHelper with Loggable {
   }
   
   serve {
+    case "replay" :: id :: Nil Get _ => RedirectResponse(s"startpa://replay=$id")
+  }
+  
+  serve {
     case "report" :: "getsystem" :: Nil Get _ => 
       try {
         CookieBox withSession { db =>
