@@ -51,7 +51,7 @@ object GameInfo extends DispatchSnippet with Loggable {
 			  "#winner *+" #> game.winner &
 			  "#start *+" #> JSLocalTime.jsTimeSnipFor(game.startTime) &
 			  "#length *+" #> prettyTimespan(game.duration) &
-			  "#replaylink [href]" #> ("startpa://replay="+game.lobbyId)
+			  "#replaylink [href]" #> ("/replay/"+game.lobbyId)
 			  
 			  base
 		  }
