@@ -474,17 +474,21 @@ body {
     display: inline-block;
     height: 18px;
     -webkit-transform: skew(-72deg);
+    -ms-transform: skew(-72deg);
+    transform: skew(-72deg);
     border-width: 1px 0 0 1px;
     margin-bottom: 22px;
 }
 
 .planet-hud-pre.reverse div {
     -webkit-transform: skew(72deg);
+    -ms-transform: skew(72deg);
+    transform: skew(72deg);
     border-width: 1px 1px 0 0;
 }
 
 .planet-hud-caption {
-    vertical-align: middle;
+    vertical-align: top;
     text-align: right;
     max-width: 116px;
     width: 116px;

@@ -29,7 +29,9 @@
             <li class="planet-view">
               <!-- ko if: $index()%2 -->
               <div class="planet-hud-caption">
-                <img style="right:0" data-bind="style: {width: imageWidth, top: imageOffset}, attr: {src:imagePath}">
+                <div style="position:relative">
+                  <img style="right:0" data-bind="style: {width: imageWidth, top: imageOffset}, attr: {src:imagePath}">
+                </div>
               </div>
               <div class="planet-hud-pre">
                 <div></div>
@@ -57,7 +59,9 @@
                 <div></div>
               </div>
               <div class="planet-hud-caption">
-                <img style="left:0" data-bind="style: {width: imageWidth, top: imageOffset}, attr: {src:imagePath}">
+                <div style="position:relative">
+                   <img style="left:0" data-bind="style: {width: imageWidth, top: imageOffset}, attr: {src:imagePath}">
+                </div>
               </div>
               <!-- /ko -->
             </li>
