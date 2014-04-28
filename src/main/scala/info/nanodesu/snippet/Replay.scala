@@ -16,6 +16,9 @@ import net.liftweb.common.Empty
 import net.liftweb.common.Full
 import info.nanodesu.pages.GamePage
 import info.nanodesu.pages.GameIdParam
+import info.nanodesu.model.db.collectors.gameinfo.GameTitleCollector
+import info.nanodesu.model.db.collectors.gameinfo.GameInfoCollector
+import info.nanodesu.snippet.lib.JSLocalTime
 
 object Replay extends DispatchSnippet{
 	val dispatch: DispatchIt = {
@@ -40,10 +43,18 @@ object Replay extends DispatchSnippet{
 	    case _ => Empty
 	  }
 	  
+	  val gameTitle = gameId.map(x => (CookieBox withSession (GameTitleCollector(_, true))).createGameTitle(x))
+	  
+	  def getGame(gameId: Int) = CookieBox withSession { db =>  GameInfoCollector(db, gameId) }
+	  
+	  val replayDate = gameId.map(x => getGame(x).map(g => JSLocalTime.jsTimeSnipFor(g.startTime)).getOrElse(NodeSeq.Empty))
+	  
 	  "#replayinfo *+" #> lobbyId &
 	  "#replayinfo [href]" #> lobbyId.map(startPa+_) &
 	  "#redirectmeta" #> lobbyId.map(x => (<meta data-lift="head" http-equiv="Refresh"></meta> %
 	      Attribute(None, "content", Text(s"0; url=$startPa$x"), Null))) &
-	  "#gameLink" #> gameId.map(x => GamePage.makeLink("Game #"+x, GameIdParam(x)))
+	  "#gameLink" #> gameId.map(x => GamePage.makeLink("Game #"+x, GameIdParam(x))) & 
+	  "#playerlist *" #> gameTitle &
+	  "#replaydate" #> replayDate
 	}
 }

@@ -80,7 +80,11 @@ trait GameTitleDbLayer {
 }
 
 object GameTitleCollector extends Loggable {
-  def apply(db: DSLContext) = new GameTitleCollector(new DbLayer(db))
+  def apply(db: DSLContext, shouldCreateLinks: Boolean = false) = {
+    val r = new GameTitleCollector(new DbLayer(db))
+    r.shouldCreateLinks = shouldCreateLinks
+    r
+   }
   
   private class DbLayer(db: DSLContext) extends GameTitleDbLayer {
     def selectPlayerInfoForGame(gameId: Int): List[PlayerInfoForTitle] = {
