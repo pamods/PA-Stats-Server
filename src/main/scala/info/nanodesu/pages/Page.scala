@@ -22,7 +22,7 @@ trait Page {
   }
   
   protected def makeLinkAttribute0(p: PageParam*) = {
-    val fullLinkString = pageName + Page.makeLinkString(p:_*)
+    val fullLinkString = "/"+pageName + Page.makeLinkString(p:_*)
     Attribute(None, "href", Text(fullLinkString), Null)
   }
   

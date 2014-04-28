@@ -14,6 +14,11 @@
 	color: red;
 }
 
+#replayheader {
+	font-size: 25px;
+	margin-bottom: 5px;
+}
+
 a {
 	color: #000;
 }

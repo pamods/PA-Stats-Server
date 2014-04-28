@@ -32,6 +32,8 @@ import info.nanodesu.model.db.collectors.stats.RuntimeInfoCollector
 import info.nanodesu.model.db.collectors.stats.ExtraNumbersCollector
 import info.nanodesu.snippet.lib.IFrameSnip
 import info.nanodesu.rest.LadderService
+import info.nanodesu.snippet.Replay
+import info.nanodesu.pages.ReplayPage
 
 // see: http://cookbook.liftweb.net/#InstallAndRunning
 /**
@@ -70,6 +72,7 @@ class Boot extends Loggable {
       case "CometInit" => CometInit
       case "PlayerSearch" => PlayerSearch
       case "IFrameSnip" => IFrameSnip
+      case "Replay" => Replay
     }
 
     CookieBox.init()
@@ -92,7 +95,8 @@ class Boot extends Loggable {
       Menu.i("Extra") / StatsPage.pageName,
       Menu.i("Player") / PlayerPage.pageName >> Hidden,
       Menu.i("Chart") / GamePage.pageName >> Hidden,
-      Menu.i("Ingamechart") / "ingamechart" >> Hidden)
+      Menu.i("Ingamechart") / "ingamechart" >> Hidden,
+      Menu.i("Replay") / ReplayPage.pageName >> Hidden)
 
     // set the sitemap.  Note if you don't want access control for
     // each page, just comment this line out.
@@ -104,9 +108,18 @@ class Boot extends Loggable {
     // Use HTML5 for rendering
     LiftRules.htmlProperties.default.set((r: Req) =>
       new Html5Properties(r.userAgent))
-
+      
+    initRewrites()
+      
     logger info "BOOT complete! run.mode=" + System.getProperty("run.mode")
     logger info "min comet interval is " + Props.getInt("minCometInterval")
     logger info "comet serve threshold is " + Props.getInt("cometServeThreshold")
+  }
+  
+  def initRewrites() = {
+    LiftRules.statelessRewrite.prepend(NamedPF("Replay Rewrite") {
+      case RewriteRequest(ParsePath("replay" :: id :: Nil, _, _, _), _, _) =>
+          RewriteResponse("replay" :: Nil, Map("replayid" -> id))
+    })
   }
 }
