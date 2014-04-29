@@ -509,7 +509,7 @@ body {
     padding: 3px;
     color: cyan;
 }
-.planet-view .biome {
+.planet-view .title-right {
     font-size: 0.5em;
     float:right;
     padding-top: 0.618em;
