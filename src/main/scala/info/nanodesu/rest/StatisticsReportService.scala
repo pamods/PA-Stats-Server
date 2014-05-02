@@ -114,7 +114,7 @@ object StatisticsReportService extends RestHelper with Loggable {
   
   case class Player(playerId: Int, playerName: String)
   case class Team(teamId: Int, players: List[Player])
-  case class Game(gameId: Int, teams: List[Team], winner: Int, startTime: Long)
+  case class Game(gameId: Int, teams: List[Team], winner: Int, startTime: Long, version: String)
   serve {
     case "report" :: "winners" :: Nil Get _ =>
       val maxQueryDays = 3 
@@ -131,7 +131,7 @@ object StatisticsReportService extends RestHelper with Loggable {
           throw new RuntimeException(s"You cannot query more that $maxQueryDays days at once!")
         } else {
           CookieBox withSession { db =>
-            val result = db.select(teams.INGAME_ID, playerGameRels.P, names.DISPLAY_NAME, games.WINNER_TEAM, games.ID, players.UBER_NAME, games.START_TIME).
+            val result = db.select(teams.INGAME_ID, playerGameRels.P, names.DISPLAY_NAME, games.WINNER_TEAM, games.ID, players.UBER_NAME, games.START_TIME, games.PA_VERSION).
               from(playerGameRels).
               join(games).onKey().
               join(players).onKey().
@@ -156,7 +156,7 @@ object StatisticsReportService extends RestHelper with Loggable {
                 }
                 Team(t._1, playersInTeam)
               }).toList
-              Game(x._1, teamsWithPlayers, x._2.head.getValue(games.WINNER_TEAM), x._2.head.getValue(games.START_TIME).getTime())
+              Game(x._1, teamsWithPlayers, x._2.head.getValue(games.WINNER_TEAM), x._2.head.getValue(games.START_TIME).getTime(), x._2.head.getValue(games.PA_VERSION))
             }).toList.sortBy(_.gameId)
           }
         }
