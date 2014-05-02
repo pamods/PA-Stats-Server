@@ -26,6 +26,7 @@ object PlayerInfo extends DispatchSnippet with Loggable {
   val dispatch: DispatchIt = {
     case "info" => doInfo
     case "listNameHistory" => doNameHistory
+    case "linkLadder" => linkLadder
   }
 
   private def selectedPlayer = PlayerPage.getPlayerId openOr -1
@@ -59,6 +60,8 @@ object PlayerInfo extends DispatchSnippet with Loggable {
     }
   }
 
+  private def linkLadder = "#ladderlink [href]" #> ("http://ladder.pastats.tk/player/"+selectedPlayer)
+  
   private def doNameHistory = "#line" #> {
     val nameHistory = CookieBox withSession { db =>
       PlayerHistoryInfo(db, selectedPlayer).displayNameHistory
