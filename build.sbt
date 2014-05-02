@@ -52,4 +52,12 @@ libraryDependencies += "org.jooq" % "jooq-meta" % "3.2.0"
 libraryDependencies += "org.jooq" % "jooq-codegen" % "3.2.0"
 
 libraryDependencies += "commons-lang" % "commons-lang" % "2.3"
-            
+
+libraryDependencies += "org.igniterealtime.jbosh" % "jbosh" % "0.8.0"
+
+libraryDependencies += "org.igniterealtime.smack" % "smack-core" % "4.0.0-rc1"
+  
+libraryDependencies += "org.igniterealtime.smack" % "smack-bosh" % "4.0.0-rc1" exclude("org.igniterealtime.smack", "core")
+
+libraryDependencies += "org.apache.commons" % "commons-io" % "1.3.2"
+
