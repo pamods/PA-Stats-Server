@@ -10,7 +10,7 @@ $(function() {
 				speed = 1;
 			}
 			return speed;
-		}
+		};
 
 		var buildSpeedByMetal = {
 			getValue : function(timepoint, i) {
@@ -21,7 +21,7 @@ $(function() {
 			},
 			text : "Build efficiency by metal",
 			accumulates : false
-		}
+		};
 
 		var buildSpeedByEnergy = {
 			getValue : function(timepoint, i) {
@@ -32,7 +32,7 @@ $(function() {
 			},
 			text : "Build efficiency by energy",
 			accumulates : false
-		}
+		};
 
 		var buildSpeed = {
 			getValue : function(timepoint, i) {
@@ -41,7 +41,7 @@ $(function() {
 			},
 			text : 'Build efficiency',
 			accumulates : false
-		}
+		};
 		var metalIncome = makeDefStat("metalIncome", "Metal income gross");
 		var energyIncome = makeDefStat("energyIncome", "Energy income gross");
 		var metalIncomeNet = makeDefStat("metalIncomeNet", "Metal income net");
@@ -73,7 +73,7 @@ $(function() {
 					return timeFound == 0 ? apm.getValue(tp, i+1) : sum / (timeFound / 60000);
 				},			text : 'APM',
 			accumulates : false,
-		}
+		};
 		
 		var armyCount = makeDefStat("armyCount", "Units alive");
 		var metalStored = makeDefStat("metalStored", "Metal stored");
@@ -83,10 +83,34 @@ $(function() {
 		var energyProduced = makeDefStat("energyProduced", "Energy produced", true);
 		var energyWasted = makeDefStat("energyWasted", "Energy wasted", true);
 		
+		var growthSinceLast = function(val, timepoint, i) {
+			if (i === 0) {
+				return 0;
+			} else {
+				return val.getValue(timepoint, i) - val.getValue(timepoint, i-1);
+			}
+		};
+		
+		var metalSpent = {
+			getValue: function(timepoint, i) {
+				return metalProduced.getValue(timepoint, i) - metalWasted.getValue(timepoint, i) - growthSinceLast(metalStored, timepoint, i);
+			},
+			text: "Metal spent",
+			accumulates: true
+		};
+		
+		var energySpent = {
+			getValue: function(timepoint, i) {
+				return energyProduced.getValue(timepoint, i) - energyWasted.getValue(timepoint, i) - growthSinceLast(energyStored, timepoint, i);
+			},
+			text: "Energy spent",
+			accumulates: true
+		};
+		
 		self.sts = [ armyCount, buildSpeed, buildSpeedByMetal, buildSpeedByEnergy, metalIncome, metalSpending,
-				metalIncomeNet, metalWasted, metalStored, metalProduced,
+				metalIncomeNet, metalWasted, metalStored, metalProduced, metalSpent,
 				energyIncome, energySpending, energyIncomeNet, energyWasted,
-				energyStored, energyProduced, apm ]
+				energyStored, energyProduced, energySpent, apm ]
 		
 		var firstTime = undefined;
 		var lastTime = undefined;
@@ -98,7 +122,7 @@ $(function() {
 		var graphConf = {
 				element : document.querySelector("#chartcontainer"),
 				width : 700,
-				height : 450,
+				height : 530,
 				min : 'auto',
 				interpolation : 'step-after',
 				renderer : 'line'
