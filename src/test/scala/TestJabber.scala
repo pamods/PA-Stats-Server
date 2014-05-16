@@ -15,9 +15,30 @@ import org.jivesoftware.smack.Chat
 import org.jivesoftware.smack.packet.Packet
 import org.jivesoftware.smack.packet.Message
 
+    // it seems the ssl cert uber uses is not part of the jdk by default. It needs to be imported by hand via the keytool to make this code work!
 object TestJabber extends App {
-  val loginForm = "https://uberent.com/User/Login?titleId=42"
+  val loginForm = "https://uberent.com/GC/Authenticate"
 
+  def getSessionToken(user: String, pass: String) = {
+    val url = new URL(loginForm)
+    val urlCon = url.openConnection().asInstanceOf[HttpURLConnection]
+    val postData = s"""{TitleId: 4, AuthMethod: "UberCredentials", UberName: "$user", Password: "$pass"}"""
+    urlCon.addRequestProperty("Content-Type", "application/json")
+    urlCon.setRequestMethod("POST")
+    urlCon.setDoOutput(true)
+    val wr = new DataOutputStream(urlCon.getOutputStream())
+    wr.writeBytes(postData)
+    wr.flush()
+    wr.close()
+    val resp = getResponse(urlCon)
+    val pattern = "\"?SessionTicket\"?\\s*:\\s*\"(.*?)\""
+    getGroup(resp, pattern)
+  }
+  
+  def getUberIdForUberName(session: String, uberName: String) = {
+    
+  }
+  
   private def getResponse(urlCon: HttpURLConnection) = {
     val in = urlCon.getInputStream()
     val out = new ByteArrayOutputStream
@@ -32,38 +53,8 @@ object TestJabber extends App {
     matcher.group(grpIndex)
   }
 
-  def getRegKey = {
-    // it seems the ssl cert uber uses is not part of the jdk by default. It needs to be imported by hand via the keytool to make this code work!
-    val url = new URL(loginForm)
-    val urlCon = url.openConnection().asInstanceOf[HttpURLConnection]
-    urlCon.setRequestMethod("GET")
-    val html = getResponse(urlCon)
-    urlCon.disconnect()
-    getGroup(html, "RegistrationSessionId=([0-9]*)")
-  }
-
-  def getSessionToken(user: String, pass: String) = {
-    val url = new URL(loginForm)
-    val urlCon = url.openConnection().asInstanceOf[HttpURLConnection]
-    def enc(in: String) = URLEncoder.encode(in, "UTF-8")
-    val postData = s"UberName=${enc(user)}&Password=${enc(pass)}&RegistrationSessionId=${enc(getRegKey)}"
-    urlCon.setRequestMethod("POST")
-    urlCon.setDoOutput(true)
-    val wr = new DataOutputStream(urlCon.getOutputStream())
-    wr.writeBytes(postData)
-    wr.flush()
-    wr.close()
-    val resp = getResponse(urlCon)
-    val headers = urlCon.getHeaderFields().asScala
-    urlCon.disconnect()
-    val setCookie = headers.find(x => x._1 == "Set-Cookie" && x._2.size() == 1)
-    val authCookie = setCookie.map(_._2.get(0))
-    val sessionToken = authCookie.map(getGroup(_, "auth=([^;]*)"))
-    sessionToken
-  }
-
-  val session = getSessionToken("user", "pass").getOrElse(throw new RuntimeException("getting the session failed"))
-
+  val session = getSessionToken("", "")
+  
   val con = new XMPPBOSHConnection(false, "xmpp.uberent.com", 5280, "/http-bind", "xmpp.uberent.com")
   println("created con object")
   con.connect()
