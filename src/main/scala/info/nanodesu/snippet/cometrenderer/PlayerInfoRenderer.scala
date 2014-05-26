@@ -16,6 +16,7 @@ import info.nanodesu.model.db.collectors.playerinfo.GamePlayerInfo
 import info.nanodesu.comet.GameServers
 import info.nanodesu.comet.GameServerActor
 import info.nanodesu.lib.Formattings._
+import org.apache.commons.lang.StringUtils
 
 class PlayerInfoRenderer(val gId: Int, val server: Option[GameServerActor] = None) extends CometRenderer with Loggable {
   def render = {
@@ -24,8 +25,8 @@ class PlayerInfoRenderer(val gId: Int, val server: Option[GameServerActor] = Non
     import PlayerGameInfo._
     
     def makeTransform(pid: Int, inf: GamePlayerInfo) = {
-        val primColor = if (inf.primaryColor == null) "#000" else inf.primaryColor
-        val secColor = if (inf.secondaryColor == null) "#000" else inf.secondaryColor
+        val primColor = if (StringUtils.isBlank(inf.primaryColor)) "rgb(16,16,16)" else inf.primaryColor
+        val secColor = if (StringUtils.isBlank(inf.secondaryColor)) "rgb(168,0,0)" else inf.secondaryColor
         
         ".playername *+" #> inf.name &
           ".army_primary_color [style]" #> ("background:"+primColor+";") &
