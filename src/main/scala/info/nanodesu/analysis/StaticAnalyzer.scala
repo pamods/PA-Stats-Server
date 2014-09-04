@@ -23,6 +23,9 @@ class StaticAnalyzer(db: DSLContext) {
   // list new players:
   //select p.id, uber_name, display_name, min(start_time) from v2_player p, v2_player_display_name n, v2_player_game_rel r, v2_game g where r.g = g.id and r.p = p.id and p.current_display_name = n.id and p.uber_name is not null group by uber_name, display_name, p.id order by p.id desc;
   
+  // player counts by day:
+  // select count(distinct r.p), date_trunc('day', g.start_time) from v2_player_game_rel r, v2_game g where g.id = r.g and r.p is not null group by date_trunc('day', g.start_time);
+  
   def listPatches: List[String] = {
     db.selectDistinct(games.PA_VERSION).from(games).fetch().asScala.map(_.value1()).toList.sorted
   }
