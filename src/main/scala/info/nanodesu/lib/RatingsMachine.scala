@@ -17,7 +17,10 @@ object RatingsMachine extends RefreshRunner {
   var lastQuery = 0L
 
   def runQuery() = {
-    val candidates = StatisticsReportService.selectGameListForWinners((lastQuery - RUN_INTERVAL) / 1000, Long.MaxValue, true)
+    val start = (lastQuery - RUN_INTERVAL * 60) / 1000
+    val duration = Long.MaxValue
+    logger info "ratings for start="+start+", duration="+duration
+    val candidates = StatisticsReportService.selectGameListForWinners(start, duration, true)
     val filteredBy1v1 = candidates.filter(g => g.teams.size == 2 && g.teams.head.players.size == 1 && g.teams.tail.head.players.size == 1)
     
     for (g <- filteredBy1v1) {
