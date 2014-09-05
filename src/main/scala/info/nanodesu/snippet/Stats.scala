@@ -13,6 +13,7 @@ import info.nanodesu.pages.IdParam
 import info.nanodesu.pages.GamePage
 import info.nanodesu.pages.GameIdParam
 import info.nanodesu.lib.Formattings
+import info.nanodesu.rest.LadderServiceV2
 
 object Stats extends DispatchSnippet {
   val dispatch: DispatchIt = {
@@ -41,7 +42,7 @@ object Stats extends DispatchSnippet {
       ".playernlst *" #> x._1.name &
       ".gamecnt *" #> x._1.gameCount &
       ".playtime *" #> Formattings.prettyTime(x._1.fullTime) &
-      ".avgtime *" #> Formattings.prettyTime(x._1.avgTime)
+      ".avgtime *" #> Formattings.prettyTime(x._1.avgTime) 
   })
 
   private def doHighscores = {
@@ -75,6 +76,7 @@ object Stats extends DispatchSnippet {
     "#gamelength" #> numbers.sumGameTime &
     "#users" #> numbers.userCount &
     "#unitsCreated -*" #> numbers.unitsCreated &
-    "#unitsDestroyed -*" #> numbers.unitsDestroyed
+    "#unitsDestroyed -*" #> numbers.unitsDestroyed &
+    "#automatchcnt -*" #> LadderServiceV2.confirmedGames
   }
 }

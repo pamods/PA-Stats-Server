@@ -47,126 +47,131 @@ import info.nanodesu.comet.UnlockPlayer
 import net.liftweb.http.OkResponse
 import info.nanodesu.model.db.collectors.gameinfo.loader.PlanetJsonLoader
 
-
 object StatisticsReportService extends RestHelper with Loggable {
 
   def init(): Unit = {
     LiftRules.statelessDispatch append StatisticsReportService
   }
-  
+
   serve {
     case "report" :: "matchesof" :: Nil Get _ =>
       val resultMaps = for (
-          pa <- Helpers.tryo(S.param("a").map(_.toInt).get);
-          pb <- Helpers.tryo(S.param("b").map(_.toInt).get);
-          start <- Helpers.tryo(S.param("start").map(_.toLong).get);
-          duration <- Helpers.tryo(S.param("duration").map(_.toLong).get);
-          nPlayers <- Helpers.tryo(S.param("nrofplayers").map(_.toInt).get).orElse(Some(2))
+        pa <- Helpers.tryo(S.param("a").map(_.toInt).get);
+        pb <- Helpers.tryo(S.param("b").map(_.toInt).get);
+        start <- Helpers.tryo(S.param("start").map(_.toLong).get);
+        duration <- Helpers.tryo(S.param("duration").map(_.toLong).get);
+        nPlayers <- Helpers.tryo(S.param("nrofplayers").map(_.toInt).get).orElse(Some(2))
       ) yield {
         val startTime = BigInteger.valueOf(start)
         val endTime = startTime.add(BigInteger.valueOf(duration))
         val results = CookieBox withSession { db =>
-			val a = playerGameRels as "a"
-			val b = playerGameRels as "b"
-			val c = playerGameRels as "c"
-			val g = games as "g"
-			val ta = teams as "ta"
-			db.select(g.ID, g.WINNER_TEAM, ta.INGAME_ID, g.START_TIME, g.END_TIME).
-		    	from(a).
-		    	join(b).on(a.P === pa).and(b.P === pb).and(a.ID !== b.ID).and(b.G === a.G).
-		    	join(c).on(c.G === a.G).
-		    	join(g).on(a.G === g.ID).
-		    	join(ta).on(ta.ID === a.T).
-		    	where(epoch(g.START_TIME).gt(startTime)).
-		    	and(epoch(g.END_TIME).lt(endTime)).
-	            groupBy(g.ID, g.WINNER_TEAM, ta.INGAME_ID, g.START_TIME, g.END_TIME).
-	            having(count(c.ID) === nPlayers).
-	            orderBy(g.ID.desc()).
-	            fetch().asScala.toList
+          val a = playerGameRels as "a"
+          val b = playerGameRels as "b"
+          val c = playerGameRels as "c"
+          val g = games as "g"
+          val ta = teams as "ta"
+          db.select(g.ID, g.WINNER_TEAM, ta.INGAME_ID, g.START_TIME, g.END_TIME).
+            from(a).
+            join(b).on(a.P === pa).and(b.P === pb).and(a.ID !== b.ID).and(b.G === a.G).
+            join(c).on(c.G === a.G).
+            join(g).on(a.G === g.ID).
+            join(ta).on(ta.ID === a.T).
+            where(epoch(g.START_TIME).gt(startTime)).
+            and(epoch(g.END_TIME).lt(endTime)).
+            groupBy(g.ID, g.WINNER_TEAM, ta.INGAME_ID, g.START_TIME, g.END_TIME).
+            having(count(c.ID) === nPlayers).
+            orderBy(g.ID.desc()).
+            fetch().asScala.toList
         }
-        
+
         for (game <- results) yield {
-	      val winner = if (game.value2() != null) {
-	        if (game.value2() == -1)  -1 
-	        else {
-	          if (game.value2() == game.value3()) {
-	            pa
-	          } else {
-	            pb
-	          } 
-	        }
-	      } else null
-	        
-	      Map("gameId" -> game.value1(), "start" -> game.value4().getTime(),
-	    		  "end" -> game.value5().getTime(), "winner" -> winner)
-	    }
+          val winner = if (game.value2() != null) {
+            if (game.value2() == -1) -1
+            else {
+              if (game.value2() == game.value3()) {
+                pa
+              } else {
+                pb
+              }
+            }
+          } else null
+
+          Map("gameId" -> game.value1(), "start" -> game.value4().getTime(),
+            "end" -> game.value5().getTime(), "winner" -> winner)
+        }
       }
-      
+
       resultMaps match {
         case Failure(msg, exc, chain) =>
           ResponseWithReason(BadResponse(), msg)
-        case Full(valid) => 
+        case Full(valid) =>
           Extraction decompose valid
         case wtf =>
-          ResponseWithReason(BadResponse(), "something went wrong somewhere :( data is:\n"+wtf)
+          ResponseWithReason(BadResponse(), "something went wrong somewhere :( data is:\n" + wtf)
       }
   }
-  
+
   case class Player(playerId: Int, playerName: String)
   case class Team(teamId: Int, players: List[Player])
   case class Game(gameId: Int, teams: List[Team], winner: Int, startTime: Long, version: String)
   serve {
     case "report" :: "winners" :: Nil Get _ =>
-      val maxQueryDays = 3 
+
       val gameList = for (
         start <- Helpers.tryo(S.param("start").map(Long.valueOf).get);
         duration <- Helpers.tryo(S.param("duration").map(Long.valueOf).get)
       ) yield tryo {
-        val startTime = BigInteger.valueOf(start)
-        val endTime = startTime.add(BigInteger.valueOf(duration))
-        
-        // currently this isn't really that necessary, but if someday there will be issues it can be changed
-        // so false && to deactivate it for now
-        if (false && duration > maxQueryDays * 24 * 60 * 60) { 
-          throw new RuntimeException(s"You cannot query more that $maxQueryDays days at once!")
-        } else {
-          CookieBox withSession { db =>
-            val result = db.select(teams.INGAME_ID, playerGameRels.P, names.DISPLAY_NAME, games.WINNER_TEAM, games.ID, players.UBER_NAME, games.START_TIME, games.PA_VERSION).
-              from(playerGameRels).
-              join(games).onKey().
-              join(players).onKey().
-              join(names).onKey().
-              join(teams).onKey().
-              where(games.WINNER_TEAM.isNotNull()).
-              and(epoch(games.START_TIME).gt(startTime)).
-              and(epoch(games.START_TIME).lt(endTime)).
-              groupBy(teams.INGAME_ID, playerGameRels.P, names.DISPLAY_NAME, games.WINNER_TEAM, games.ID, players.UBER_NAME, games.START_TIME).fetch()
-
-            val lst = result.asScala.toList
-            val byGames = lst.groupBy(_.getValue(games.ID))
-
-            byGames.map(x => {
-              val byTeam = x._2.groupBy(_.getValue(teams.INGAME_ID))
-              val teamsWithPlayers = byTeam.map(t => {
-                val playersInTeam = t._2.map { foo =>
-                  val uberNameIsEmpty = StringUtils.isBlank(foo.getValue(players.UBER_NAME))
-                  val id: Int = if (uberNameIsEmpty) -1 else foo.getValue(playerGameRels.P)
-                  val name = if (uberNameIsEmpty) "Anon" else foo.getValue(names.DISPLAY_NAME)
-                  Player(id, name)
-                }
-                Team(t._1, playersInTeam)
-              }).toList
-              Game(x._1, teamsWithPlayers, x._2.head.getValue(games.WINNER_TEAM), x._2.head.getValue(games.START_TIME).getTime(), x._2.head.getValue(games.PA_VERSION))
-            }).toList.sortBy(_.gameId)
-          }
-        }
+        selectGameListForWinners(start, duration, false)
       }
-      
+
       gameList match {
-        case Full(Failure(msg, exc, chain)) => ResponseWithReason(BadResponse(), msg) 
+        case Full(Failure(msg, exc, chain)) => ResponseWithReason(BadResponse(), msg)
         case Full(Full(x)) => Extraction decompose x
-        case wtf => ResponseWithReason(BadResponse(), "something went wrong somewhere :( data is:\n"+wtf)
+        case wtf => ResponseWithReason(BadResponse(), "something went wrong somewhere :( data is:\n" + wtf)
       }
+  }
+
+  def selectGameListForWinners(start: Long, duration: Long, onlyNotYetRatedGames: Boolean) = {
+    val maxQueryDays = 3
+    val startTime = BigInteger.valueOf(start)
+    val endTime = startTime.add(BigInteger.valueOf(duration))
+
+    // currently this isn't really that necessary, but if someday there will be issues it can be changed
+    // so false && to deactivate it for now
+    if (false && duration > maxQueryDays * 24 * 60 * 60) {
+      throw new RuntimeException(s"You cannot query more that $maxQueryDays days at once!")
+    } else {
+      CookieBox withSession { db =>
+        val result = db.select(teams.INGAME_ID, playerGameRels.P, names.DISPLAY_NAME, games.WINNER_TEAM, games.ID, players.UBER_NAME, games.START_TIME, games.PA_VERSION).
+          from(playerGameRels).
+          join(games).onKey().
+          join(players).onKey().
+          join(names).onKey().
+          join(teams).onKey().
+          where(games.WINNER_TEAM.isNotNull()).and(games.RATED.isFalse().or(games.RATED.isDistinctFrom(onlyNotYetRatedGames))).
+          and(epoch(games.START_TIME).gt(startTime)).
+          and(epoch(games.START_TIME).lt(endTime)).
+          groupBy(teams.INGAME_ID, playerGameRels.P, names.DISPLAY_NAME, games.WINNER_TEAM, games.ID, players.UBER_NAME, games.START_TIME).fetch()
+
+        val lst = result.asScala.toList
+        val byGames = lst.groupBy(_.getValue(games.ID))
+
+        byGames.map(x => {
+          val byTeam = x._2.groupBy(_.getValue(teams.INGAME_ID))
+          val teamsWithPlayers = byTeam.map(t => {
+            val playersInTeam = t._2.map { foo =>
+              val uberNameIsEmpty = StringUtils.isBlank(foo.getValue(players.UBER_NAME))
+              val id: Int = if (uberNameIsEmpty) -1 else foo.getValue(playerGameRels.P)
+              val name = if (uberNameIsEmpty) "Anon" else foo.getValue(names.DISPLAY_NAME)
+              Player(id, name)
+            }
+            Team(t._1, playersInTeam)
+          }).toList
+          Game(x._1, teamsWithPlayers, x._2.head.getValue(games.WINNER_TEAM), x._2.head.getValue(games.START_TIME).getTime(), x._2.head.getValue(games.PA_VERSION))
+        }).toList.sortBy(_.gameId)
+      }
+    }
+
   }
 
   case class GameShortInfo(id: Int, start: Long, reporters: List[String])
@@ -197,8 +202,10 @@ object StatisticsReportService extends RestHelper with Loggable {
             where(playerGameRels.ID === link).
             execute()
         }
-        for (gameId <- ReportDataC.getGameIdForLink(link);
-    		playerId <- CookieBox.withSession(new PlayerIdForLinkLoader(_).selectPlayerId(link))) {
+        for (
+          gameId <- ReportDataC.getGameIdForLink(link);
+          playerId <- CookieBox.withSession(new PlayerIdForLinkLoader(_).selectPlayerId(link))
+        ) {
           val server = GameServers.serverForGame(gameId)
           server ! UnlockPlayer(playerId)
           server ! PushUpdate(true)
@@ -216,18 +223,18 @@ object StatisticsReportService extends RestHelper with Loggable {
   // TODO add session verification
   serve {
     case "report" :: "winner" :: Nil JsonPut VictorNotification(data) -> _ =>
-    
+
       // -2 is the code the mod uses to say "unknown winner", -1 means "draw" and therefore will be stored
       val winnerTeam = if (data.teamIndex != -2) data.teamIndex: Integer else null
-      
+
       for (gameId <- ReportDataC.getGameIdForLink(data.gameLink)) {
-        
+
         // log all reports, to understand problems if they should still occur
-        logger info s"Incoming VictorNotification for game: $gameId "+data
-        
+        logger info s"Incoming VictorNotification for game: $gameId " + data
+
         // 10 min
         val reportDeadLine = new Timestamp(System.currentTimeMillis() - 10 * 60 * 1000)
-        
+
         CookieBox withSession { db =>
           db.update(games).
             set(games.WINNER, data.victor).
@@ -237,7 +244,7 @@ object StatisticsReportService extends RestHelper with Loggable {
             and(games.END_TIME.gt(reportDeadLine)).
             execute()
         }
-        val server = GameServers.serverForGame(gameId) 
+        val server = GameServers.serverForGame(gameId)
         server ! WinnerSet(data.victor)
         server ! PushUpdate(true)
       }
@@ -278,10 +285,12 @@ object StatisticsReportService extends RestHelper with Loggable {
         }
 
         val playerData = CookieBox withSession (CometUpdatePlayerDataCollector(_, link))
-        
-        for (gameId <- playerData.gameId;
-        	 playerId <- playerData.playerId;
-        	 playerName <- playerData.playerName) {
+
+        for (
+          gameId <- playerData.gameId;
+          playerId <- playerData.playerId;
+          playerName <- playerData.playerName
+        ) {
 
           // this is the normal location that causes the server to be created
           // here the server really can be empty so far, so it does not need any init from the database
@@ -294,12 +303,12 @@ object StatisticsReportService extends RestHelper with Loggable {
           server ! NewChartStats(playerId, now.getTime(), data.firstStats)
           server ! PushUpdate(false)
         }
-        
+
         Extraction decompose PlayerGameLinkIdResponse(link)
       }
   }
 
-  	// TODO add session verification
+  // TODO add session verification
   serve {
     case "report" :: Nil JsonPut RunningGameDataC(data) -> _ =>
       val now = new Date
@@ -307,16 +316,16 @@ object StatisticsReportService extends RestHelper with Loggable {
       CookieBox withTransaction { db => // needs autocommit = off for batch inserts
         RunningGameStatsReporter(db).insertRunningGameData(data, now)
       }
-  
+
       for (gameId <- ReportDataC.getGameIdForLink(data.gameLink)) {
-	      for (playerId <- CookieBox.withSession(new PlayerIdForLinkLoader(_).selectPlayerId(data.gameLink))) {
-	        val server = GameServers.serverForGame(gameId)
-	        if (data.armyEvents.nonEmpty) {
-	          server ! NewPlayerEvents(playerId, data.armyEvents)
-	        }
-		    server ! NewChartStats(playerId, now.getTime(), data.stats)
-		    server ! PushUpdate(false)
-		  }
+        for (playerId <- CookieBox.withSession(new PlayerIdForLinkLoader(_).selectPlayerId(data.gameLink))) {
+          val server = GameServers.serverForGame(gameId)
+          if (data.armyEvents.nonEmpty) {
+            server ! NewPlayerEvents(playerId, data.armyEvents)
+          }
+          server ! NewChartStats(playerId, now.getTime(), data.stats)
+          server ! PushUpdate(false)
+        }
       }
 
       OkResponse()
@@ -334,28 +343,27 @@ object StatisticsReportService extends RestHelper with Loggable {
       Extraction decompose CurrentTimeMs(System.currentTimeMillis())
   }
 
-  
   serve {
     case "report" :: "getplayerid" :: Nil Get _ =>
       try {
-          def selectId(cond: Condition) = CookieBox withSession { db => 
-	          db.select(players.ID).from(players).where(cond.and(players.UBER_NAME.isNotNull())).limit(1).
-	          	fetchFirstPrimitiveIntoOption(classOf[Int]).getOrElse(-1)
-	      }
-        
-          def byUberName = for (name <- S.param("ubername")) yield {
-            selectId(players.UBER_NAME === name)
+        def selectId(cond: Condition) = CookieBox withSession { db =>
+          db.select(players.ID).from(players).where(cond.and(players.UBER_NAME.isNotNull())).limit(1).
+            fetchFirstPrimitiveIntoOption(classOf[Int]).getOrElse(-1)
+        }
+
+        def byUberName = for (name <- S.param("ubername")) yield {
+          selectId(players.UBER_NAME === name)
+        }
+
+        def byDisplayName = for (name <- S.param("displayname")) yield {
+          val nameId = CookieBox withSession { db =>
+            val q = db.select(names.ID).from(names).where(names.DISPLAY_NAME === name)
+            q.fetchFirstPrimitiveIntoOption(classOf[Int]).getOrElse(-1)
           }
-          
-          def byDisplayName = for (name <- S.param("displayname")) yield {
-              val nameId = CookieBox withSession { db =>
-                val q = db.select(names.ID).from(names).where(names.DISPLAY_NAME === name)
-                 q.fetchFirstPrimitiveIntoOption(classOf[Int]).getOrElse(-1)
-              }
-              selectId(players.CURRENT_DISPLAY_NAME === nameId)
-          }
-          
-          Extraction decompose byUberName.getOrElse(byDisplayName.getOrElse(-1))
+          selectId(players.CURRENT_DISPLAY_NAME === nameId)
+        }
+
+        Extraction decompose byUberName.getOrElse(byDisplayName.getOrElse(-1))
       } catch {
         case ex: Exception => {
           logger.error(ex, ex)
@@ -365,12 +373,12 @@ object StatisticsReportService extends RestHelper with Loggable {
   }
 
   serve {
-    case "report" :: "getsystem" :: Nil Get _ => 
+    case "report" :: "getsystem" :: Nil Get _ =>
       try {
         CookieBox withSession { db =>
           for (id <- GamePage.getGameId) yield {
             val planetJson = new PlanetJsonLoader(db).selectJsonForGame(id)
-            planetJson.map(PlainTextResponse(_)).getOrElse(ResponseWithReason(NotFoundResponse(), "could not find planet for game "+id))
+            planetJson.map(PlainTextResponse(_)).getOrElse(ResponseWithReason(NotFoundResponse(), "could not find planet for game " + id))
           }
         }
       } catch {
@@ -380,9 +388,9 @@ object StatisticsReportService extends RestHelper with Loggable {
         }
       }
   }
-  
+
   // careful redundant code incoming...
-  
+
   serve {
     case "report" :: "get" :: Nil Get _ =>
       try {
@@ -396,7 +404,7 @@ object StatisticsReportService extends RestHelper with Loggable {
         }
       }
   }
-  
+
   serve {
     case "report" :: "get" :: "events" :: Nil Get _ =>
       try {
@@ -405,9 +413,9 @@ object StatisticsReportService extends RestHelper with Loggable {
           for (id <- GamePage.getGameId) yield {
             val result = Extraction decompose ArmyEventDataCollector(db).collectEventsFor(id)
             val timeUsed = System.currentTimeMillis() - before
-	        if (timeUsed > 1000) {
-	      	  logger info s"used a rather big amount of time to generate eventdata: game=$id; time=" + (System.currentTimeMillis() - before) + "ms"            
-	        }
+            if (timeUsed > 1000) {
+              logger info s"used a rather big amount of time to generate eventdata: game=$id; time=" + (System.currentTimeMillis() - before) + "ms"
+            }
             result
           }
         }
@@ -418,5 +426,5 @@ object StatisticsReportService extends RestHelper with Loggable {
         }
       }
   }
-  
+
 }

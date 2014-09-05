@@ -17,8 +17,8 @@ import net.liftweb.util.Helpers
 object LadderService extends RestHelper with Loggable with RefreshRunner{
   
 	def initService(): Unit = {
-	  LiftRules.statelessDispatch append LadderService
-	  init();
+	  //LiftRules.statelessDispatch append LadderService
+	  //init();
 	}
 	
 	val gameTimeOut = 30 * 1000

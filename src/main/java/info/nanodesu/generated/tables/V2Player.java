@@ -11,7 +11,7 @@ package info.nanodesu.generated.tables;
 @java.lang.SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class V2Player extends org.jooq.impl.TableImpl<info.nanodesu.generated.tables.records.V2PlayerRecord> {
 
-	private static final long serialVersionUID = -1925419024;
+	private static final long serialVersionUID = 743908522;
 
 	/**
 	 * The singleton instance of <code>public.v2_player</code>
@@ -40,6 +40,11 @@ public class V2Player extends org.jooq.impl.TableImpl<info.nanodesu.generated.ta
 	 * The column <code>public.v2_player.current_display_name</code>. 
 	 */
 	public final org.jooq.TableField<info.nanodesu.generated.tables.records.V2PlayerRecord, java.lang.Integer> CURRENT_DISPLAY_NAME = createField("current_display_name", org.jooq.impl.SQLDataType.INTEGER, this);
+
+	/**
+	 * The column <code>public.v2_player.rating</code>. 
+	 */
+	public final org.jooq.TableField<info.nanodesu.generated.tables.records.V2PlayerRecord, java.lang.Float> RATING = createField("rating", org.jooq.impl.SQLDataType.REAL.defaulted(true), this);
 
 	/**
 	 * Create a <code>public.v2_player</code> table reference

@@ -11,7 +11,7 @@ package info.nanodesu.generated.tables;
 @java.lang.SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class V2PlayerGameRel extends org.jooq.impl.TableImpl<info.nanodesu.generated.tables.records.V2PlayerGameRelRecord> {
 
-	private static final long serialVersionUID = -1462784758;
+	private static final long serialVersionUID = 836752710;
 
 	/**
 	 * The singleton instance of <code>public.v2_player_game_rel</code>
@@ -42,9 +42,9 @@ public class V2PlayerGameRel extends org.jooq.impl.TableImpl<info.nanodesu.gener
 	public final org.jooq.TableField<info.nanodesu.generated.tables.records.V2PlayerGameRelRecord, java.lang.Integer> G = createField("g", org.jooq.impl.SQLDataType.INTEGER.nullable(false), this);
 
 	/**
-	 * The column <code>public.v2_player_game_rel.died</code>. 
+	 * The column <code>public.v2_player_game_rel.t</code>. 
 	 */
-	public final org.jooq.TableField<info.nanodesu.generated.tables.records.V2PlayerGameRelRecord, java.lang.Boolean> DIED = createField("died", org.jooq.impl.SQLDataType.BOOLEAN.nullable(false).defaulted(true), this);
+	public final org.jooq.TableField<info.nanodesu.generated.tables.records.V2PlayerGameRelRecord, java.lang.Integer> T = createField("t", org.jooq.impl.SQLDataType.INTEGER.nullable(false), this);
 
 	/**
 	 * The column <code>public.v2_player_game_rel.locked</code>. 
@@ -52,9 +52,9 @@ public class V2PlayerGameRel extends org.jooq.impl.TableImpl<info.nanodesu.gener
 	public final org.jooq.TableField<info.nanodesu.generated.tables.records.V2PlayerGameRelRecord, java.lang.Boolean> LOCKED = createField("locked", org.jooq.impl.SQLDataType.BOOLEAN.nullable(false).defaulted(true), this);
 
 	/**
-	 * The column <code>public.v2_player_game_rel.t</code>. 
+	 * The column <code>public.v2_player_game_rel.died</code>. 
 	 */
-	public final org.jooq.TableField<info.nanodesu.generated.tables.records.V2PlayerGameRelRecord, java.lang.Integer> T = createField("t", org.jooq.impl.SQLDataType.INTEGER.nullable(false), this);
+	public final org.jooq.TableField<info.nanodesu.generated.tables.records.V2PlayerGameRelRecord, java.lang.Boolean> DIED = createField("died", org.jooq.impl.SQLDataType.BOOLEAN.nullable(false).defaulted(true), this);
 
 	/**
 	 * Create a <code>public.v2_player_game_rel</code> table reference

@@ -41,7 +41,7 @@ trait RefreshRunner extends Loggable {
   
   private def doWork() = {
     while (containerIsAlive) {
-      if (lastUpdate + RUN_INTERVAL < System.currentTimeMillis()) {
+      if (lastUpdate + RUN_INTERVAL <= System.currentTimeMillis()) {
         try {
           if (shouldLog) {
             logger info "starting task "+processName

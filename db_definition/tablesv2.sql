@@ -31,7 +31,8 @@ CREATE TABLE v2_game (
 	planet integer references v2_planet_json (id) NOT NULL,
 	pa_version varchar default 'unknown',
 	winner varchar default 'unknown',
-	winner_team integer
+	winner_team integer,
+	rated boolean default false
 );
 
 CREATE TABLE v2_player_display_name (
@@ -42,6 +43,7 @@ CREATE TABLE v2_player_display_name (
 CREATE TABLE v2_player (
 	id serial PRIMARY KEY,
 	uber_name varchar UNIQUE,
+	rating real default 1600,
 	current_display_name integer REFERENCES v2_player_display_name(id)
 );
 

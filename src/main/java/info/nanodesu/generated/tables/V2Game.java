@@ -11,7 +11,7 @@ package info.nanodesu.generated.tables;
 @java.lang.SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class V2Game extends org.jooq.impl.TableImpl<info.nanodesu.generated.tables.records.V2GameRecord> {
 
-	private static final long serialVersionUID = 2134616187;
+	private static final long serialVersionUID = -2095026755;
 
 	/**
 	 * The singleton instance of <code>public.v2_game</code>
@@ -67,6 +67,11 @@ public class V2Game extends org.jooq.impl.TableImpl<info.nanodesu.generated.tabl
 	public final org.jooq.TableField<info.nanodesu.generated.tables.records.V2GameRecord, java.lang.Integer> WINNER_TEAM = createField("winner_team", org.jooq.impl.SQLDataType.INTEGER, this);
 
 	/**
+	 * The column <code>public.v2_game.rated</code>. 
+	 */
+	public final org.jooq.TableField<info.nanodesu.generated.tables.records.V2GameRecord, java.lang.Boolean> RATED = createField("rated", org.jooq.impl.SQLDataType.BOOLEAN.defaulted(true), this);
+
+	/**
 	 * Create a <code>public.v2_game</code> table reference
 	 */
 	public V2Game() {
@@ -109,7 +114,7 @@ public class V2Game extends org.jooq.impl.TableImpl<info.nanodesu.generated.tabl
 	 */
 	@Override
 	public java.util.List<org.jooq.ForeignKey<info.nanodesu.generated.tables.records.V2GameRecord, ?>> getReferences() {
-		return java.util.Arrays.<org.jooq.ForeignKey<info.nanodesu.generated.tables.records.V2GameRecord, ?>>asList(info.nanodesu.generated.Keys.V2_GAME__V2_GAME_PLANET_JSON_FKEY);
+		return java.util.Arrays.<org.jooq.ForeignKey<info.nanodesu.generated.tables.records.V2GameRecord, ?>>asList(info.nanodesu.generated.Keys.V2_GAME__V2_GAME_PLANET_FKEY);
 	}
 
 	/**
