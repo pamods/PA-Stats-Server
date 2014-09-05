@@ -8,6 +8,18 @@
         _.map( this.Planets, function(planet){
           //--compat fixes
           if(planet.planet.radius <= 0 ) planet.planet.radius = 500;
+          try {
+	          planet.planet.biomeScale = planet.planet.biomeScale ? planet.planet.biomeScale.toFixed(2) : 0;
+	          planet.planet.heightRange = planet.planet.heightRange ? planet.planet.heightRange.toFixed(2) : 0;
+	          planet.planet.metalClusters = planet.planet.metalClusters ? planet.planet.metalClusters.toFixed(2) : 0;
+	          planet.planet.metalDensity = planet.planet.metalDensity ? planet.planet.metalDensity.toFixed(2) : 0 ;
+	          planet.planet.radius = planet.planet.radius ? planet.planet.radius.toFixed(2) : 0;
+	          planet.planet.seed = planet.planet.seed ? planet.planet.seed.toFixed(2) : 0;
+	          planet.planet.temperature = planet.planet.temperature ? planet.planet.temperature.toFixed(2) : 0;
+	          planet.planet.waterHeight =  planet.planet.waterHeight ? planet.planet.waterHeight.toFixed(2) : 0;
+          } catch (ex) {
+        	  console.log(ex);
+          }
           planet.starting_planet = planet.starting_planet || false; //ensure field presence
           planet.required_thrust_to_move = planet.required_thrust_to_move || 0; //ensure field presence
           // --end compat fixes
