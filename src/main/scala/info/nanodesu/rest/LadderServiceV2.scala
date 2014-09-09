@@ -27,7 +27,7 @@ object LadderServiceV2 extends RestHelper with Loggable with RefreshRunner {
   val matcher = new MatchCreator()
 
   override val firstLoadDelay = 15 * 1000
-  override val RUN_INTERVAL = 5 * 1000
+  override val RUN_INTERVAL = 3 * 1000
   val processName = "ladder service v2"
 
   var confirmedLobbys = List[String]()  
@@ -72,30 +72,33 @@ object LadderServiceV2 extends RestHelper with Loggable with RefreshRunner {
   serve {
     case "minutesTillMatch" :: Nil Get _ =>
       for (
-        uberName <- S.param("ubername");
-        minutes <- matcher.minutesTillPlayerFindsAGame(uberName)
+        uberName <- S.param("ubername")
       ) yield {
-        Extraction decompose Map("minutes" -> minutes)
+        val minutes = matcher.minutesTillPlayerFindsAGame(uberName)
+        Extraction decompose Map("minutes" -> minutes.openOr(-1))
       }
   }
 
+  // this is the only method whose hasTimeout value is actually used by the clients.
+  // they constantly poll this while gamesetup happens
   serve {
     case "resetMyTimeout" :: Nil Get _ =>
-      for (uberName <- S.param("ubername")) {
+      for (uberName <- S.param("ubername")) yield {
         logger info "resetMyTimeout("+uberName+")"
         matcher.resetTimeout(uberName)
+        Extraction decompose Map("hasTimeout" -> matcher.findGameFor(uberName).isEmpty, "hasGameReset" -> matcher.checkResetFor(uberName))
       }
-      OkResponse()
   }
 
   serve {
-    case "register" :: Nil JsonPost NameMessage(data) -> _ =>
-      logger info "will register " + data.uber_name
-      matcher.registerPlayer(data.uber_name)
-      matcher.resetTimeout(data.uber_name)
-      OkResponse()
+    case "resetGameSetup" :: Nil Get _ =>
+      for (uberName <- S.param("ubername")) yield {
+        logger info "resetGameSetup("+uberName+")"
+        matcher.resetGameBy(uberName)
+        OkResponse()
+      }
   }
-
+  
   case class HasGameResponse(hasGame: Boolean, isHost: Boolean)
 
   serve {
@@ -109,6 +112,8 @@ object LadderServiceV2 extends RestHelper with Loggable with RefreshRunner {
           logger info data.uber_name + " HasGame(hasGame = true, isHost = "+isHost+")";
           Extraction decompose HasGameResponse(true, isHost)
         case _ =>
+          logger info "register player for search " + data.uber_name
+          matcher.registerPlayer(data.uber_name)
           Extraction decompose HasGameResponse(false, false)
       }
   }
@@ -173,7 +178,7 @@ object LadderServiceV2 extends RestHelper with Loggable with RefreshRunner {
         logger info "got empty game_id from " + data.uber_name
         BadResponse()
       } else {
-        matcher.setClientReady(data.uber_name)
+        matcher.setClientReady(data.uber_name, data.game_id)
         val result = TimeOutInfo(matcher.findGameFor(data.uber_name).isEmpty)
         logger info "readyToStart for " + data.uber_name + " yields a timeout = " + result.hasTimeOut
         Extraction decompose result

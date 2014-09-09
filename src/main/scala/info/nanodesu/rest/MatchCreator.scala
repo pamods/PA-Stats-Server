@@ -7,17 +7,18 @@ import net.liftweb.common.Loggable
 import info.nanodesu.lib.RatingsMachine
 
 class MatchCreator extends Loggable {
-  val PLAYER_TIMEOUT = 60 * 1000
-  val MINUTES_RATING_GROW = 50
+  val PLAYER_TIMEOUT = 45 * 1000
+  val MINUTES_RATING_GROW = 60
   val DEFAULT_SKILL = 1600
   
   type LobbyId = Box[String]
 
-  case class Player(ubername: String, rating: Float, searchingSince: Long, lastMessageTime: Long, wantsToLeave: Boolean = false, clientReady: Boolean = false, host: Boolean = false) {
+  case class Player(ubername: String, rating: Float, searchingSince: Long, lastMessageTime: Long, wantsToLeave: Boolean = false, clientReady: Boolean = false, host: Boolean = false, shouldReset: Boolean = false) {
     def isReady = (clientReady || host) && !wantsToLeave
   }
   case class Game(lobbyId: LobbyId, playerA: Player, playerB: Player) {
     def hasPlayer(uberName: String) = playerA.ubername == uberName || playerB.ubername == uberName
+    def getPlayer(uberName: String) = if (playerA.ubername == uberName) playerA else playerB
   }
 
   case class MatchMakerState(playersInPool: Set[Player], games: Set[Game])
@@ -57,8 +58,19 @@ class MatchCreator extends Loggable {
 	    if (gameBox.isDefined) {
 	      val game = gameBox.get
 	      val gamesWithout = games.filterNot(_ == game)
+	      val hadLobbyAlready = game.lobbyId.isDefined
 	      val modGame = game.copy(lobbyId = Full(lobbyId))
-	      gamesWithout + modGame
+	      
+	      gamesWithout + (if (hadLobbyAlready) {
+	    	  val isPlayerA = game.playerA.ubername == uberName
+	    	  if (isPlayerA) {
+	    	    logger info "got a new lobby, reset for " + modGame.playerB.ubername
+	    	    modGame.copy(playerB = modGame.playerB.copy(shouldReset = true, clientReady = false))
+	    	  } else {
+	    	    logger info "got a new lobby, reset for " + modGame.playerA.ubername
+	    	    modGame.copy(playerA = modGame.playerA.copy(shouldReset = true, clientReady = false))
+	    	  }
+	      } else modGame)
 	    } else {
 	      games
 	    }
@@ -81,15 +93,24 @@ class MatchCreator extends Loggable {
     }
   }
 
-  def setClientReady(uberName: String) = {
+  def setClientReady(uberName: String, lobbyId: String) = {
     def setForGames(games: Set[Game]) = {
       val game = games.find(_.hasPlayer(uberName))
       if (game.isDefined) {
         val gamesWithout = games.filterNot(_ == game.get)
+        val correctLobby = game.get.lobbyId == lobbyId
         val modGame = if (game.get.playerA.ubername == uberName) {
-          game.get.copy(playerA = game.get.playerA.copy(clientReady = true))
+          if (correctLobby) game.get.copy(playerA = game.get.playerA.copy(clientReady = true))
+          else {
+            logger info "client ready resulted in should reset for " + game.get.playerA.ubername
+            game.get.copy(playerA = game.get.playerA.copy(shouldReset = true))
+          }
         } else {
-          game.get.copy(playerB = game.get.playerB.copy(clientReady = true))
+          if (correctLobby) game.get.copy(playerB = game.get.playerB.copy(clientReady = true))
+          else {
+            logger info "client ready resulted in should reset for " + game.get.playerB.ubername
+            game.get.copy(playerA = game.get.playerB.copy(shouldReset = true))
+          }
         }
         gamesWithout + modGame
       } else {
@@ -98,6 +119,44 @@ class MatchCreator extends Loggable {
     }
     
     state = state.copy(games = setForGames(state.games))
+  }
+  
+  def resetGameBy(uberName: String) = {
+    def setForGames(games: Set[Game]) = {
+      val game = games.find(_.hasPlayer(uberName))
+      if (game.isDefined) {
+        val gamesWithout = games.filterNot(_ == game.get)
+        val modGame = if(game.get.playerA.ubername == uberName) {
+          game.get.copy(lobbyId = Empty, playerB = game.get.playerB.copy(shouldReset = true, clientReady = false))
+        } else {
+          game.get.copy(lobbyId = Empty, playerA = game.get.playerA.copy(shouldReset = true, clientReady = false))
+        }
+        gamesWithout + modGame
+      } else {
+        games
+      }
+    }
+    
+    state = state.copy(games = setForGames(state.games))
+  }
+  
+  def checkResetFor(uberName: String) = {
+    val hadReset = state.games.find(_.hasPlayer(uberName)).map(x => x.getPlayer(uberName).shouldReset).getOrElse(false)
+    
+    def setForGames(games: Set[Game]) = {
+      val game = games.find(_.hasPlayer(uberName))
+      if (game.isDefined) {
+        val gamesWithout = games.filterNot(_ == game.get)
+        gamesWithout + (if (uberName == game.get.playerA.ubername) game.get.copy(playerA = game.get.playerA.copy(shouldReset = false))
+        			   else game.get.copy(playerB = game.get.playerB.copy(shouldReset = false)))
+      } else {
+        games
+      }
+    }
+    
+    state = state.copy(games = setForGames(state.games))
+    logger info "had reset for " + uberName + " = " + hadReset
+    hadReset
   }
   
   def resetTimeout(uberName: String) = {
@@ -161,13 +220,28 @@ class MatchCreator extends Loggable {
   }
   
   def minutesTillPlayerFindsAGame(ubername: String): Box[Int] = {
-    val ratingOfView = lookupRating(ubername)
-    val minutes = for (p <- state.playersInPool) yield {
-      minutesTillPlayersAreMatched(ratingOfView, p.rating)
+    val playerInQueue = state.playersInPool.find(_.ubername == ubername);
+    
+    val minutes = playerInQueue match {
+      case Some(player) =>
+        for (p <- state.playersInPool if p.ubername != ubername) yield {
+          val ptsDiff = Math.abs(player.rating - p.rating)
+          val aOffset = playerTimeBasedMatchOffset(player)
+          val bOffset = playerTimeBasedMatchOffset(p)
+          val minOffset = Math.min(aOffset, bOffset)
+          if (minOffset >= ptsDiff) 0
+          else Math.ceil((ptsDiff - minOffset) / MINUTES_RATING_GROW) 
+        }
+      case None =>
+		val ratingOfView = lookupRating(ubername)
+		 for (p <- state.playersInPool) yield {
+		  minutesTillPlayersAreMatched(ratingOfView, p.rating)
+		}
     }
-    val sortedList = minutes.toList.sorted
-    if (sortedList.isEmpty) Empty
-    else Full(sortedList.head.toInt)
+    
+	val sortedList = minutes.toList.sorted
+	if (sortedList.isEmpty) Empty
+	else Full(sortedList.head.toInt)
   }
 
   def hasPlayersSearching = !state.playersInPool.isEmpty
@@ -189,7 +263,7 @@ class MatchCreator extends Loggable {
 
   private def minutesTillPlayersAreMatched(skillA: Float, skillB: Float) = {
     val diff = Math.abs(skillA - skillB)
-    Math.floor(diff / MINUTES_RATING_GROW)
+    Math.ceil(diff / MINUTES_RATING_GROW)
   }
 
   private def lookupRating(ubername: String) = RatingsMachine.querySkill(ubername).map(_.toFloat).getOrElse(DEFAULT_SKILL.toFloat)
