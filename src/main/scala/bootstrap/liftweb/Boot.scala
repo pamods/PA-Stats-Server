@@ -31,7 +31,6 @@ import info.nanodesu.lib.db.CookieBox
 import info.nanodesu.model.db.collectors.stats.RuntimeInfoCollector
 import info.nanodesu.model.db.collectors.stats.ExtraNumbersCollector
 import info.nanodesu.snippet.lib.IFrameSnip
-import info.nanodesu.rest.LadderService
 import info.nanodesu.snippet.Replay
 import info.nanodesu.pages.ReplayPage
 import info.nanodesu.rest.LadderServiceV2
