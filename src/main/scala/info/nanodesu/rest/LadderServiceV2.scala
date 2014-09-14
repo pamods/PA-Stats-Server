@@ -30,8 +30,6 @@ object LadderServiceV2 extends RestHelper with Loggable with RefreshRunner {
   override val RUN_INTERVAL = 3 * 1000
   val processName = "ladder service v2"
 
-  var confirmedLobbys = List[String]()  
-    
   def initService(): Unit = {
     LiftRules.statelessDispatch append LadderServiceV2
     init();
@@ -54,16 +52,6 @@ object LadderServiceV2 extends RestHelper with Loggable with RefreshRunner {
     def unapply(in: JValue): Option[NameMessage] = apply(in)
   }
 
-  def confirmedGames = confirmedLobbys.groupBy(x => x).mapValues(_.size).filter(_._2 == 2).size
-  
-  serve {
-    case "confirmLobby" :: Nil Get _ =>
-      for (lobby <- S.param("lobby")) {
-        confirmedLobbys ::= lobby
-      }
-      OkResponse()
-  }
-  
   serve {
     case "hasPlayersSearching" :: Nil Get _ =>
       Extraction decompose Map("hasPlayers" -> matcher.hasPlayersSearching)

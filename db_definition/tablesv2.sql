@@ -16,7 +16,7 @@ CREATE TABLE v2_settings (
 	report_version integer
 );
 
-INSERT INTO v2_settings (report_version) VALUES (17);
+INSERT INTO v2_settings (report_version) VALUES (19);
 
 CREATE TABLE v2_planet_json (
 	id serial PRIMARY KEY,
@@ -32,7 +32,8 @@ CREATE TABLE v2_game (
 	pa_version varchar default 'unknown',
 	winner varchar default 'unknown',
 	winner_team integer,
-	rated boolean default false
+	rated boolean default false,
+	automatch boolean default false
 );
 
 CREATE TABLE v2_player_display_name (

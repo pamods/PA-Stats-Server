@@ -33,7 +33,7 @@ import net.liftweb.common.Loggable
 // useful for testing
 trait InitialReportDbLayer {
   def insertNewPlanet(planet: ReportedPlanet): Int
-  def insertNewGame(ident: String, paVersion: String, startDate: Timestamp, reportDate: Timestamp, planetId: Int): Int
+  def insertNewGame(ident: String, paVersion: String, startDate: Timestamp, reportDate: Timestamp, planetId: Int, isAutomatch: Boolean): Int
 
   def generateNewTeamId(): Int
   def insertTeam(team: ReportTeam, teamId: Int)
@@ -55,7 +55,7 @@ trait InitialReport {
 class InitialReportUpdater() extends InitialReport {
   def createGameAndReturnId(report: ReportData, reportDate: Timestamp): Int = {
     val planetId = dbLayer.insertNewPlanet(report.planet)
-    val gameId = dbLayer.insertNewGame(report.ident, report.paVersion, new Timestamp(report.gameStartTime), reportDate, planetId)
+    val gameId = dbLayer.insertNewGame(report.ident, report.paVersion, new Timestamp(report.gameStartTime), reportDate, planetId, report.isAutomatch)
 
     var linkedPlayerIds = List[Int]()
 
@@ -99,9 +99,9 @@ object InitialReportUpdater {
       db.insertInto(planets, planets.PLANET).values(planet.json).returning().fetchOne().getId()
     }
 
-    def insertNewGame(ident: String, paVersion: String, startDate: Timestamp, reportDate: Timestamp, planetId: Int): Int = {
-      db.insertInto(games, games.IDENT, games.START_TIME, games.END_TIME, games.PA_VERSION, games.PLANET).
-        values(ident, startDate, reportDate, paVersion, planetId).returning(games.ID).fetchOne().getId()
+    def insertNewGame(ident: String, paVersion: String, startDate: Timestamp, reportDate: Timestamp, planetId: Int, isAutomatch: Boolean): Int = {
+      db.insertInto(games, games.IDENT, games.START_TIME, games.END_TIME, games.PA_VERSION, games.PLANET, games.AUTOMATCH).
+        values(ident, startDate, reportDate, paVersion, planetId, isAutomatch).returning(games.ID).fetchOne().getId()
     }
 
     def generateNewTeamId(): Int = db.nextval(teamIdSeq).toInt

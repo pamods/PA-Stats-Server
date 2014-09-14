@@ -33,7 +33,8 @@ case class ReportData(
   planet: ReportedPlanet,
   paVersion: String,
   armyEvents: List[ArmyEvent],
-  gameStartTime: Long)
+  gameStartTime: Long,
+  isAutomatch: Boolean)
 
 case class ReportTeam(
   index: Int,

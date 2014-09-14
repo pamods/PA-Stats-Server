@@ -266,5 +266,5 @@ class MatchCreator extends Loggable {
     Math.ceil(diff / MINUTES_RATING_GROW)
   }
 
-  private def lookupRating(ubername: String) = RatingsMachine.querySkill(ubername).map(_.toFloat).getOrElse(DEFAULT_SKILL.toFloat)
+  private def lookupRating(ubername: String) = 5 //RatingsMachine.querySkill(ubername).map(_.toFloat).getOrElse(DEFAULT_SKILL.toFloat)
 }

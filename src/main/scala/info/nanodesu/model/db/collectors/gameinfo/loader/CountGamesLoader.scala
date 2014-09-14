@@ -11,4 +11,5 @@ import info.nanodesu.lib.Formattings._
 
 class CountGamesLoader(val db: DSLContext) {
 	def selectGameCount = db.selectCount().from(games).fetchOne(0, classOf[Long])
+	def selectAutomatchCount = db.selectCount().from(games).where(games.AUTOMATCH.isTrue().and(games.WINNER_TEAM.isNotNull())).fetchOne(0, classOf[Long])
 }

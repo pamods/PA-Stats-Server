@@ -14,6 +14,7 @@ import info.nanodesu.pages.GamePage
 import info.nanodesu.pages.GameIdParam
 import info.nanodesu.lib.Formattings
 import info.nanodesu.rest.LadderServiceV2
+import info.nanodesu.model.db.collectors.gameinfo.loader.CountGamesLoader
 
 object Stats extends DispatchSnippet {
   val dispatch: DispatchIt = {
@@ -77,6 +78,6 @@ object Stats extends DispatchSnippet {
     "#users" #> numbers.userCount &
     "#unitsCreated -*" #> numbers.unitsCreated &
     "#unitsDestroyed -*" #> numbers.unitsDestroyed &
-    "#automatchcnt -*" #> LadderServiceV2.confirmedGames
+    "#automatchcnt -*" #> (CookieBox withSession (new CountGamesLoader(_).selectAutomatchCount))
   }
 }
