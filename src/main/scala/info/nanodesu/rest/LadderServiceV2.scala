@@ -154,22 +154,7 @@ object LadderServiceV2 extends RestHelper with Loggable with RefreshRunner {
       OkResponse()
   }
 
-  case class ShouldStartResponse(shouldStart: Boolean, hasTimeOut: Boolean)
-  serve {
-    case "shouldStartServer" :: Nil JsonPost NameMessage(data) -> _ =>
-      Extraction decompose (matcher.findGameFor(data.uber_name) match {
-        case Some(g) if (g.playerA.isReady) && (g.playerB.isReady) =>
-          logger info data.uber_name + " should start server"
-          ShouldStartResponse(true, false)
-        case Some(g) =>
-          logger info data.uber_name + " has to wait for the client player"
-          ShouldStartResponse(false, false)
-        case _ =>
-          logger info data.uber_name + " has a timeout and should leave the game"
-          ShouldStartResponse(false, true)
-      })
-  }
-
+  // this is only used to verify the lobby id by now
   case class TimeOutInfo(hasTimeOut: Boolean)
   serve {
     case "readyToStart" :: Nil JsonPost NameMessage(data) -> _ =>
