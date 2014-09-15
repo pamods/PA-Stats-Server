@@ -23,10 +23,11 @@ class MatchCreator extends Loggable {
 
   case class MatchMakerState(playersInPool: Set[Player], games: Set[Game])
 
-  @volatile
+  val mutex = new Object()
+  
   var state = MatchMakerState(Set.empty, Set.empty)
   
-  def processMatching() = {
+  def processMatching() = mutex synchronized {
     val workState = state
     
     val pairs = workState.playersInPool.toSet[Player].subsets.map(_.toList).toList.filter(_.size == 2).map(x => (x.head, x.tail.head))
@@ -44,7 +45,7 @@ class MatchCreator extends Loggable {
         games = state.games ++ newGames)
   }
 
-  def processCleanTimeouts() = {
+  def processCleanTimeouts() = mutex synchronized {
     def isTimeout(time: Long) = System.currentTimeMillis() - time > PLAYER_TIMEOUT
     def cleanedPool(pool: Set[Player]) = pool.filter(p => !isTimeout(p.lastMessageTime) && !p.wantsToLeave)
     def cleanedGames(games: Set[Game]) = games.filter(g => !g.playerA.wantsToLeave && !g.playerB.wantsToLeave && 
@@ -52,7 +53,7 @@ class MatchCreator extends Loggable {
     state = state.copy(playersInPool = cleanedPool(state.playersInPool), games = cleanedGames(state.games))
   }
   
-  def setLobbyIdForPlayer(uberName: String, lobbyId: String) = {
+  def setLobbyIdForPlayer(uberName: String, lobbyId: String) = mutex synchronized {
     def updateForGames(games: Set[Game]) = {
 	    val gameBox = games.find(g => g.playerA.ubername == uberName || g.playerB.ubername == uberName)
 	    if (gameBox.isDefined) {
@@ -60,6 +61,8 @@ class MatchCreator extends Loggable {
 	      val gamesWithout = games.filterNot(_ == game)
 	      val hadLobbyAlready = game.lobbyId.isDefined
 	      val modGame = game.copy(lobbyId = Full(lobbyId))
+	      
+	      logger info "modGame = " + modGame
 	      
 	      gamesWithout + (if (hadLobbyAlready) {
 	    	  val isPlayerA = game.playerA.ubername == uberName
@@ -79,21 +82,21 @@ class MatchCreator extends Loggable {
     state = state.copy(games = updateForGames(state.games))
   }
   
-  def hasTimeout(ubername: String) = {
+  def hasTimeout(ubername: String) = mutex synchronized {
     val checkedState = state
     !checkedState.playersInPool.exists(_.ubername == ubername) && !checkedState.games.exists(g => g.playerA.ubername == ubername || g.playerB.ubername == ubername)
   }
 
   def findGameFor(uberName: String) = state.games.find(_.hasPlayer(uberName))
   
-  def registerPlayer(uberName: String) = {
+  def registerPlayer(uberName: String) = mutex synchronized {
     if (findGameFor(uberName).isEmpty && !state.playersInPool.exists(_.ubername == uberName)) {
 	    val newPlayer = Player(uberName, lookupRating(uberName), System.currentTimeMillis(), System.currentTimeMillis())
 	    state = state.copy(playersInPool = state.playersInPool + newPlayer)
     }
   }
 
-  def setClientReady(uberName: String, lobbyId: String) = {
+  def setClientReady(uberName: String, lobbyId: String) = mutex synchronized {
     def setForGames(games: Set[Game]) = {
       val game = games.find(_.hasPlayer(uberName))
       if (game.isDefined) {
@@ -121,7 +124,7 @@ class MatchCreator extends Loggable {
     state = state.copy(games = setForGames(state.games))
   }
   
-  def resetGameBy(uberName: String) = {
+  def resetGameBy(uberName: String) = mutex synchronized {
     def setForGames(games: Set[Game]) = {
       val game = games.find(_.hasPlayer(uberName))
       if (game.isDefined) {
@@ -140,7 +143,7 @@ class MatchCreator extends Loggable {
     state = state.copy(games = setForGames(state.games))
   }
   
-  def checkResetFor(uberName: String) = {
+  def checkResetFor(uberName: String) = mutex synchronized {
     val hadReset = state.games.find(_.hasPlayer(uberName)).map(x => x.getPlayer(uberName).shouldReset).getOrElse(false)
     
     def setForGames(games: Set[Game]) = {
@@ -159,7 +162,7 @@ class MatchCreator extends Loggable {
     hadReset
   }
   
-  def resetTimeout(uberName: String) = {
+  def resetTimeout(uberName: String) = mutex synchronized {
     def resetForPool(pool: Set[Player]) = {
       val player = pool.find(_.ubername == uberName)
       if (player.isDefined) {
@@ -189,7 +192,7 @@ class MatchCreator extends Loggable {
     state = state.copy(playersInPool = resetForPool(state.playersInPool), games = resetForGames(state.games))
   }
   
-  def unregisterPlayer(uberName: String) = {
+  def unregisterPlayer(uberName: String) = mutex synchronized {
     def cleanPool(pool: Set[Player]) = {
       val player = pool.find(_.ubername == uberName)
       if (player.isDefined) {
