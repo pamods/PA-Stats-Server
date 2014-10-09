@@ -35,6 +35,7 @@ import info.nanodesu.snippet.Replay
 import info.nanodesu.pages.ReplayPage
 import info.nanodesu.rest.LadderServiceV2
 import info.nanodesu.lib.RatingsMachine
+import info.nanodesu.rest.GamesListing
 
 // see: http://cookbook.liftweb.net/#InstallAndRunning
 /**
@@ -84,6 +85,7 @@ class Boot extends Loggable {
     ExtraNumbersCollector.init()
     LadderServiceV2.initService()
     RatingsMachine.init()
+    GamesListing.initService();
     
     // Build SiteMap
     val entries = List(
