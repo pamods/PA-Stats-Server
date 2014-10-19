@@ -33,7 +33,8 @@ case class ChartDataPoint(
   energyProduced: Int,
   metalWasted: Int,
   energyWasted: Int,
-  apm: Int){}
+  apm: Int,
+  simSpeed: Int){}
 
 case class ChartPlayer(
   name: String,
@@ -63,7 +64,8 @@ object ChartDataPackage {
 	      s.energyProducedSinceLastTick,
 	      s.metalWastedSinceLastTick,
 	      s.energyWastedSinceLastTick,
-	      s.apm)    
+	      s.apm,
+	      s.simSpeed)    
   }
 }
 
@@ -100,7 +102,7 @@ object ChartDataCollector {
     def selectDataPointsForGame(gameId: Int, ignoreLocks: Boolean): List[ChartDataDbResult] = {
       val lst = db.select(teams.PRIMARY_COLOR, players.ID, names.DISPLAY_NAME, stats.TIMEPOINT, stats.ARMY_COUNT, stats.METAL_INCOME, stats.ENERGY_INCOME, stats.METAL_INCOME_NET,
         stats.ENERGY_INCOME_NET, stats.METAL_SPENDING, stats.ENERGY_SPENDING, stats.METAL_STORED, stats.ENERGY_STORED, stats.METAL_COLLECTED,
-        stats.ENERGY_COLLECTED, stats.METAL_WASTED, stats.ENERGY_WASTED, stats.APM).
+        stats.ENERGY_COLLECTED, stats.METAL_WASTED, stats.ENERGY_WASTED, stats.APM, stats.SIM_SPEED).
         from(stats).
         join(playerGameRels).onKey().
         join(players).onKey().
@@ -115,7 +117,7 @@ object ChartDataCollector {
         def v[T](f: Field[T]) = r.getValue(f)
         val dat = ChartDataPoint(v(stats.TIMEPOINT).getTime(), v(stats.ARMY_COUNT), v(stats.METAL_INCOME), v(stats.ENERGY_INCOME), v(stats.METAL_INCOME_NET),
           v(stats.ENERGY_INCOME_NET), v(stats.METAL_SPENDING), v(stats.ENERGY_SPENDING), v(stats.METAL_STORED), v(stats.ENERGY_STORED), v(stats.METAL_COLLECTED),
-          v(stats.ENERGY_COLLECTED), v(stats.METAL_WASTED), v(stats.ENERGY_WASTED), v(stats.APM))
+          v(stats.ENERGY_COLLECTED), v(stats.METAL_WASTED), v(stats.ENERGY_WASTED), v(stats.APM), v(stats.SIM_SPEED))
         ChartDataDbResult(v(players.ID), v(names.DISPLAY_NAME), v(teams.PRIMARY_COLOR), dat)
       }
       buf.toList

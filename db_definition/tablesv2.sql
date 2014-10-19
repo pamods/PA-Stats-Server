@@ -91,7 +91,8 @@ CREATE TABLE v2_timepoint_stats (
 	energy_collected integer NOT NULL,
 	metal_wasted integer NOT NULL,
 	energy_wasted integer NOT NULL,
-	apm integer NOT NULL
+	apm integer NOT NULL,
+	sim_speed integer default 100 NOT NULL
 );
 
 create index on v2_timepoint_stats (player_game);

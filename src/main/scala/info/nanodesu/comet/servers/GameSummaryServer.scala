@@ -84,7 +84,7 @@ class GameSummaryServer(val gameId: Int, players: PlayersServer) {
       for (data <- entry._2) {
         addStats(playerId, data.timepoint, StatsReportData(data.armyCount, data.metalIncome, data.energyIncome, 
             data.metalSpending, data.energySpending, data.metalIncomeNet, data.energyIncomeNet, data.metalStored, 
-            data.energyStored, data.metalProduced, data.energyProduced, data.metalWasted, data.energyWasted, data.apm))
+            data.energyStored, data.metalProduced, data.energyProduced, data.metalWasted, data.energyWasted, data.apm, data.simSpeed))
       }
     }
     

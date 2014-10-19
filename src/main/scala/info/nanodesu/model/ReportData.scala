@@ -65,7 +65,8 @@ case class StatsReportData(
   energyProducedSinceLastTick: Int,
   metalWastedSinceLastTick: Int,
   energyWastedSinceLastTick: Int,
-  apm: Int)
+  apm: Int,
+  simSpeed: Int)
 
 // can't have the usual companion name because overloading apply would result in problems in the tests 
 object RunningGameDataC {

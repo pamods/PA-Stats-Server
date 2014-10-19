@@ -11,7 +11,7 @@ package info.nanodesu.generated.tables;
 @java.lang.SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class V2TimepointStats extends org.jooq.impl.TableImpl<info.nanodesu.generated.tables.records.V2TimepointStatsRecord> {
 
-	private static final long serialVersionUID = -1663407655;
+	private static final long serialVersionUID = -1078508385;
 
 	/**
 	 * The singleton instance of <code>public.v2_timepoint_stats</code>
@@ -110,6 +110,11 @@ public class V2TimepointStats extends org.jooq.impl.TableImpl<info.nanodesu.gene
 	 * The column <code>public.v2_timepoint_stats.apm</code>. 
 	 */
 	public final org.jooq.TableField<info.nanodesu.generated.tables.records.V2TimepointStatsRecord, java.lang.Integer> APM = createField("apm", org.jooq.impl.SQLDataType.INTEGER.nullable(false), this);
+
+	/**
+	 * The column <code>public.v2_timepoint_stats.sim_speed</code>. 
+	 */
+	public final org.jooq.TableField<info.nanodesu.generated.tables.records.V2TimepointStatsRecord, java.lang.Integer> SIM_SPEED = createField("sim_speed", org.jooq.impl.SQLDataType.INTEGER.nullable(false).defaulted(true), this);
 
 	/**
 	 * Create a <code>public.v2_timepoint_stats</code> table reference

@@ -103,6 +103,7 @@ object RunningGameStatsReporter {
     def updateGameEndTime(gameId: Int, time: Date) = updateGameEndTime(db, gameId, time.getTime())
     def insertStatsData(data: StatsReportData, link: Int, time: Date) = {
       db.insertInto(stats,
+        stats.SIM_SPEED,
         stats.ARMY_COUNT,
         stats.METAL_INCOME,
         stats.ENERGY_INCOME,
@@ -120,6 +121,7 @@ object RunningGameStatsReporter {
         stats.PLAYER_GAME,
         stats.TIMEPOINT).
         values(
+          data.simSpeed,
           data.armyCount,
           data.metalIncome,
           data.energyIncome,

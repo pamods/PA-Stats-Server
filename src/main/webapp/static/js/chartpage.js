@@ -48,6 +48,7 @@ $(function() {
 		var energyIncomeNet = makeDefStat("energyIncomeNet", "Energy income net");
 		var metalSpending = makeDefStat("metalSpending", "Metal spending");
 		var energySpending = makeDefStat("energySpending", "Energy spending");
+		var simSpeed = makeDefStat("simSpeed", "Sim Speed in %");
 		
 		var apm = {
 				getValue : function(tp, i) {
@@ -110,7 +111,7 @@ $(function() {
 		self.sts = [ armyCount, buildSpeed, buildSpeedByMetal, buildSpeedByEnergy, metalIncome, metalSpending,
 				metalIncomeNet, metalWasted, metalStored, metalProduced, metalSpent,
 				energyIncome, energySpending, energyIncomeNet, energyWasted,
-				energyStored, energyProduced, energySpent, apm ]
+				energyStored, energyProduced, energySpent, apm, simSpeed ]
 		
 		var firstTime = undefined;
 		var lastTime = undefined;
