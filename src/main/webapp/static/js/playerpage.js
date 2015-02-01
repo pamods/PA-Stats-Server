@@ -4,10 +4,10 @@ $(function() {
 		
 		var gamesSingle = makeDefStat("games", "Games")
 		var gamesAcc = makeDefStat("games", "Games accumulated", true)
-		var metalUsage = makeDefStat("metalUsage", "Metal usage")
-		var energyUsage = makeDefStat("energyUsage", "Energy usage")
+	//	var metalUsage = makeDefStat("metalUsage", "Metal usage")
+	//	var energyUsage = makeDefStat("energyUsage", "Energy usage")
 		
-		self.sts = [gamesSingle, gamesAcc, metalUsage, energyUsage];
+		self.sts = [gamesSingle, gamesAcc /*, metalUsage, energyUsage*/];
 		
 		var xTimeFormat = function(d) {return new Date(d*1000).toLocaleDateString()};
 		

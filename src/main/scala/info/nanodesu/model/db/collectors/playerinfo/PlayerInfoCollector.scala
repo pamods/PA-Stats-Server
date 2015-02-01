@@ -25,7 +25,7 @@ import net.liftweb.util.StringHelpers
 
 case class DailyValue(day: Long, value: Double)
 
-case class ValuesPoint(timepoint: Long, games: Int, metalUsage: Double, energyUsage: Double)
+case class ValuesPoint(timepoint: Long, games: Int) // , metalUsage: Double, energyUsage: Double
 case class NameValue(name: String)
 case class DailyValues(
     data: Map[String, List[ValuesPoint]],
@@ -43,15 +43,15 @@ class PlayerInfoCollector(db: DSLContext, player: Int, gameId: Option[Int])
   val isReporter = selectIsReporter(db, player)
   
   private val dailyGames = selectDailyGames(db, player)
-  private val dailyMetalUsage = selectDailyResouceUsage(db, player, stats.METAL_COLLECTED, stats.METAL_WASTED)
-  private val dailyEnergyUsage = selectDailyResouceUsage(db, player, stats.ENERGY_COLLECTED, stats.ENERGY_WASTED)
+//  private val dailyMetalUsage = selectDailyResouceUsage(db, player, stats.METAL_COLLECTED, stats.METAL_WASTED)
+//  private val dailyEnergyUsage = selectDailyResouceUsage(db, player, stats.ENERGY_COLLECTED, stats.ENERGY_WASTED)
   
   def dailyValues = {
-    val values = for (d <- (dailyGames, dailyMetalUsage, dailyEnergyUsage).zipped.toList) yield {
-      if (!(d._1.day == d._2.day && d._2.day == d._3.day)) {
-        logger warn s"something is wrong player = $player => " + d
-      }
-      ValuesPoint(d._1.day, d._1.value.toInt, d._2.value, d._3.value)
+    val values = for (d <- dailyGames) yield { // 
+//      if (!(d._1.day == d._2.day && d._2.day == d._3.day)) {
+//        logger warn s"something is wrong player = $player => " + d
+//      }
+      ValuesPoint(d.day , d.value.toInt /*, d._2.value, d._3.value*/)
     }
     																			// we need to escape here or are in danger of weird illegal characters on the page :(
     DailyValues(Map(player.toString -> values), Map(player.toString -> NameValue(StringEscapeUtils.escapeHtml(currentDisplayName))))
@@ -76,7 +76,7 @@ object PlayerInfoCollector extends GameAndPlayerInfoCollectorBase with Loggable 
       epoch(dayTrunk(games.START_TIME)),
       playerGameRels.ID.countDistinct()).
       from(playerGameRels).
-      join(stats).onKey().
+//      join(stats).onKey(). // so why exactly was this joined into that?
       join(games).onKey().
       join(players).onKey().
       where(players.ID === player).
@@ -86,6 +86,7 @@ object PlayerInfoCollector extends GameAndPlayerInfoCollectorBase with Loggable 
       fetchInto(classOf[DailyValue]).toList
   }
 
+  // this is currently not used. It was waaaaaay too slow for players with many games
   private def selectDailyResouceUsage(db: DSLContext, player: Int, resCollected: Field[_ <: Number], resWasted: Field[_ <: Number]) = {
     db.select(epoch(dayTrunk(games.START_TIME)), 
         decode().when(sum(resCollected) > 0, -(sum(resWasted).cast(PostgresDataType.NUMERIC) / sum(resCollected)) 
