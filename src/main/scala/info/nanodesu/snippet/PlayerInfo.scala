@@ -60,7 +60,7 @@ object PlayerInfo extends DispatchSnippet with Loggable {
     }
   }
 
-  private def linkLadder = "#ladderlink [href]" #> ("http://ladder.pastats.tk/player/"+selectedPlayer)
+  private def linkLadder = "#ladderlink [href]" #> ("http://paladder.com/player/"+selectedPlayer)
   
   private def doNameHistory = "#line" #> {
     val nameHistory = CookieBox withSession { db =>
