@@ -46,6 +46,7 @@ object ReportDataGenerators {
     metalWastedSinceLastTick <- ix
     energyWastedSinceLastTick <- ix
     apm <- ix
+    simspeed <- ix
   } yield StatsReportData(
     armyCount,
     metalIncome,
@@ -60,7 +61,8 @@ object ReportDataGenerators {
     energyProducedSinceLastTick,
     metalWastedSinceLastTick,
     energyWastedSinceLastTick,
-    apm)
+    apm,
+    simspeed)
   implicit val arbStatsReport: Arbitrary[StatsReportData] = Arbitrary(genStatsReportData)
   
   val genArmyEvent: Gen[ArmyEvent] = for {

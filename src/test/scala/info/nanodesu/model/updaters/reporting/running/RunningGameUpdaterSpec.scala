@@ -21,7 +21,7 @@ import info.nanodesu.model.ArmyEvent
 @RunWith(classOf[JUnitRunner])
 class RunningGameUpdaterSpec extends Specification with Mockito with ThrownExpectations{
 	
-    def makeSomeData = new RunningGameData(12, new StatsReportData(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14), List(ArmyEvent("foo", 1, 2, 3, 4, 5, 110)))
+    def makeSomeData = new RunningGameData(12, new StatsReportData(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15), List(ArmyEvent("foo", 1, 2, 3, 4, 5, 110)))
   
 	"The RunningGameUpdater" should {
 	  

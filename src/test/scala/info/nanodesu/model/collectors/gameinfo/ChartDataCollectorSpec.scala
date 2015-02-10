@@ -42,9 +42,10 @@ class ChartDataCollectorSpec extends Specification with Mockito with ScalaCheck 
     metalWasted <- ix
     energyWasted <- ix
     apm <- ix
+    simspeed <- ix
   } yield ChartDataPoint(timepoint, armyCount, metalIncome, energyIncome, metalIncomeNet, energyIncomeNet,
     metalSpending, energySpending, metalStored, energyStored, metalProduced, energyProduced, metalWasted,
-    energyWasted, apm)
+    energyWasted, apm, simspeed)
 
   var playerIdSeed = 0
   val genChartDataDbResult: Gen[List[ChartDataDbResult]] = for {
