@@ -27,6 +27,7 @@ object PlayerInfo extends DispatchSnippet with Loggable {
     case "info" => doInfo
     case "listNameHistory" => doNameHistory
     case "linkLadder" => linkLadder
+    case "linkExodus" => linkExodus
   }
 
   private def selectedPlayer = PlayerPage.getPlayerId openOr -1
@@ -61,7 +62,8 @@ object PlayerInfo extends DispatchSnippet with Loggable {
   }
 
   private def linkLadder = "#ladderlink [href]" #> ("http://paladder.com/player/"+selectedPlayer)
-  
+  private def linkExodus = "#exoduslink [href]" #> ("http://exodusesports.com/?pastats_player_id="+selectedPlayer)
+
   private def doNameHistory = "#line" #> {
     val nameHistory = CookieBox withSession { db =>
       PlayerHistoryInfo(db, selectedPlayer).displayNameHistory
