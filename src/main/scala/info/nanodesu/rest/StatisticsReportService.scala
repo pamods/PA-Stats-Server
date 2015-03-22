@@ -392,6 +392,17 @@ object StatisticsReportService extends RestHelper with Loggable {
   // careful redundant code incoming...
 
   serve {
+    case "report" :: "gameIdFor" :: Nil Get _ =>
+      try {
+        for (id <- GamePage.getGameId) yield Extraction decompose Map("gameId" -> id)
+      } catch {
+        case ex: Exception =>
+          logger.error(ex, ex)
+          InternalServerErrorResponse()
+      }
+  }
+  
+  serve {
     case "report" :: "get" :: Nil Get _ =>
       try {
         CookieBox withSession { db =>
