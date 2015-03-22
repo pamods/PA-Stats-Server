@@ -394,7 +394,7 @@ object StatisticsReportService extends RestHelper with Loggable {
   serve {
     case "report" :: "gameIdFor" :: Nil Get _ =>
       try {
-        for (id <- GamePage.getGameId) yield Extraction decompose Map("gameId" -> id)
+        for (id <- GamePage.getGameId) yield Extraction decompose id
       } catch {
         case ex: Exception =>
           logger.error(ex, ex)
