@@ -27,8 +27,7 @@ object PlayerInfo extends DispatchSnippet with Loggable {
   val dispatch: DispatchIt = {
     case "info" => doInfo
     case "listNameHistory" => doNameHistory
-    case "linkLadder" => linkLadder
-    case "linkExodus" => linkExodus
+    case "linkLadder" => linkLadder & linkExodus 
   }
 
   private def selectedPlayer = PlayerPage.getPlayerId openOr -1
