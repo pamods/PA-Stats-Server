@@ -32,8 +32,7 @@ case class DailyValues(
     info: Map[String, NameValue]
 )
 
-class PlayerInfoCollector(db: DSLContext, player: Int, gameId: Option[Int])
-  extends GameAndPlayerInfoCollector(db, player, gameId) with Loggable {
+class PlayerInfoCollector(db: DSLContext, player: Int, gameId: Option[Int]) extends Loggable {
   import PlayerInfoCollector._
 
   val gamesCount = if (gameId.isEmpty) getPlayerGamesCount(db, player) else 0

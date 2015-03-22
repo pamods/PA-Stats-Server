@@ -20,6 +20,7 @@ import net.liftweb.json.Extraction
 import net.liftweb.json._
 import net.liftweb.json.JsonDSL._
 import info.nanodesu.lib.Formattings._
+import info.nanodesu.model.db.collectors.playerinfo.GameAndPlayerInfoCollector
 
 object PlayerInfo extends DispatchSnippet with Loggable {
 
@@ -48,12 +49,13 @@ object PlayerInfo extends DispatchSnippet with Loggable {
         "#gamesplayed *" #> inf.gamesCount &
         "#gametimesum *" #> inf.playerGameTime &
         "#gametimeavg *" #> inf.playerGameTimeAvg &
-        "#avgapm *" #> inf.apmAvg &
-        "#summetal *" #> formatKMBT(inf.sumMetal) &
-        "#sumenergy *" #> formatKMBT(inf.sumEnergy) &
-        "#metalusageavg *" #> formatPercent(inf.metalUseAvg) &
-        "#energyusageavg *" #> formatPercent(inf.energyUseAvg) &
-        "#avgbuildspeed *" #> formatPercent(inf.buildSpeed) &
+        "#avgapm *" #> (CookieBox withSession (GameAndPlayerInfoCollector.getAvgApm(_, selectedPlayer))) &
+        // these values are not very helpful and cost a lot of cpu time to generate
+      //  "#summetal *" #> formatKMBT(inf.sumMetal) &
+      //  "#sumenergy *" #> formatKMBT(inf.sumEnergy) &
+       // "#metalusageavg *" #> formatPercent(inf.metalUseAvg) &
+       // "#energyusageavg *" #> formatPercent(inf.energyUseAvg) &
+       // "#avgbuildspeed *" #> formatPercent(inf.buildSpeed) &
         "#timelinedatasource" #> graphData
     } else {
       "#playerName *" #> "unknown player ID!"
