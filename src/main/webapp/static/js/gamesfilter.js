@@ -11,7 +11,7 @@
 					result.push(p);
 				}
 			}
-			return result;
+			return result.sort();
 		});
 		self.playerFilter = ko.observable();
 		self.playerId = ko.computed(function() {
@@ -51,7 +51,7 @@
 		
 		self.initAutoCompleteSystems = function() {
 			$.getJSON("/report/withcache/systems", function(set) {
-				self.systems(set);
+				self.systems(set.sort());
 				$('#systemFilter').autocomplete({
 					minLength: 2,
 					source: self.systems(),
