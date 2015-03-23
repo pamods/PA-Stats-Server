@@ -389,6 +389,24 @@ object StatisticsReportService extends RestHelper with Loggable {
       }
   }
 
+  serve {
+    case "report" :: "withcache"  :: "playermap" :: Nil Get _ =>
+      CookieBox withSession { db =>
+        JsonResponse(Extraction decompose db.
+        	select(names.DISPLAY_NAME, players.ID).
+        		from(names, players).where(names.ID === players.CURRENT_DISPLAY_NAME).and(players.UBER_NAME.isNotNull())
+        	.fetch().asScala.map(x => (x.value1(), x.value2())).toMap, List(("cache-control" -> "public, max-age=300")), S.responseCookies, 200)
+      }
+  }
+  
+  serve {
+    case "report" :: "withcache" :: "systems" :: Nil Get _ =>
+      CookieBox withSession { db =>
+         JsonResponse(Extraction decompose db.selectDistinct(planets.NAME).from(planets).fetch().asScala.map(_.value1()),
+             List(("cache-control" -> "public, max-age=300")), S.responseCookies, 200)
+      }
+  }
+  
   // careful redundant code incoming...
 
   serve {

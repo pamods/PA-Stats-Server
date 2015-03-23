@@ -27,40 +27,47 @@ import info.nanodesu.model.db.collectors.gameinfo.GameTitleCollector
 import info.nanodesu.model.db.collectors.gamelist.GameListCollector
 import info.nanodesu.snippet.lib.PagedSnippet
 import info.nanodesu.model.db.collectors.gameinfo.loader.CountGamesLoader
-import info.nanodesu.model.db.collectors.playerinfo.loader.CountGamesForPlayerLoader
 import info.nanodesu.pages._
 import info.nanodesu.model.db.collectors.playerinfo.loader.IsReporterLoader
+import info.nanodesu.model.db.collectors.playerinfo.loader.PlayerNameLoader
 
 /**
- * Snippet lists games, either all of them or limited to one player.
+ * Snippet lists games, either all of them or limited to one player/system.
  * The limitation is done by the presence of an additional get parameter 
- * with the player id
+ * with the player id/system name
  */
 object ListGames extends DispatchSnippet with PagedSnippet {
   val dispatch: DispatchIt = {
     case "pages" => doPages
     case "list" => doList
+    case "playerFilterValue" => doPlayerFilterValue
+    case "systemFilterValue" => doSystemFilterValue
   }
+  
+  private def selectedPlayer = PlayerPage.getPlayerId
+  private def selectedSystem = S.param("system") match {
+    case Full("") => Empty
+    case x => x
+  }
+  
+  private def doPlayerFilterValue = "* [value]" #> (CookieBox withSession { db => new PlayerNameLoader(db).selectPlayerName(PlayerPage.getPlayerId.openOr(-1))}) 
+  private def doSystemFilterValue = "* [value]" #> selectedSystem
   
   def currentPageParameter = "listpage"
   def elementCount = CookieBox withSession { db =>
-    selectedPlayer match {
-      case Full(id) => new CountGamesForPlayerLoader(db).selectPlayerGamesCount(id)
-      case _ => new CountGamesLoader(db).selectGameCount.toInt
-    }
+    new CountGamesLoader(db).selectFilteredGamesCount(selectedPlayer, selectedSystem)
   }
   def pageMaxSize = Props.getInt("listGamesPageSize", 20)
   def selectedLinkAttr = "white"
-    
-  private def selectedPlayer = PlayerPage.getPlayerId
   
   private def doPages = ".pages *" #> renderPages
 
   private def doList = "#line" #> {
     val ourPlayer = selectedPlayer
+    val ourSystem = selectedSystem
     val games = CookieBox withSession { db =>
       if (ourPlayer.isEmpty || new IsReporterLoader().selectIsReporter(db, ourPlayer.getOrElse(-1))) {
-        GameListCollector(db).getGameList(offset, pageMaxSize, ourPlayer)
+        GameListCollector(db).getGameList(offset, pageMaxSize, ourPlayer, ourSystem)
       } else {
         Nil
       }
@@ -70,7 +77,9 @@ object ListGames extends DispatchSnippet with PagedSnippet {
       ".gamenum *" #> (<a>#{ x.id }</a> % GamePage.makeLinkAttribute(GameIdParam(x.id))) &
         ".gameplayers *" #> x.title &
         ".gamestart *" #> JSLocalTime.jsTimeSnipFor(x.startTime) &
-        ".gametime *" #> Formattings.formatGameDuration(x.startTime.getTime(), x.endTime.getTime())
+        ".gametime *" #> Formattings.formatGameDuration(x.startTime.getTime(), x.endTime.getTime()) &
+        ".gamewinner *" #> x.winner &
+        ".gamesystem *" #> x.system 
     })
   }
 }

@@ -20,8 +20,10 @@ INSERT INTO v2_settings (report_version) VALUES (19);
 
 CREATE TABLE v2_planet_json (
 	id serial PRIMARY KEY,
-	planet text NOT NULL
+	planet text NOT NULL,
+	name text default 'System'
 );
+create index on v2_planet_json (name);
 
 CREATE TABLE v2_game (
 	id serial PRIMARY KEY,

@@ -15,13 +15,13 @@ import java.math.{ BigDecimal => JBigDecimal }
 import org.jooq.util.postgres.PostgresDataType
 import java.sql.Date
 import net.liftweb.common.Empty
-import info.nanodesu.model.db.collectors.playerinfo.loader.CountGamesForPlayerLoader
 import info.nanodesu.model.db.collectors.playerinfo.loader.IsReporterLoader
 import net.liftweb.common.Loggable
 import java.math.BigInteger
 import org.apache.commons.lang.StringEscapeUtils
 import info.nanodesu.lib.Formattings
 import net.liftweb.util.StringHelpers
+import info.nanodesu.model.db.collectors.gameinfo.loader.CountGamesLoader
 
 case class DailyValue(day: Long, value: Double)
 
@@ -100,7 +100,7 @@ object PlayerInfoCollector extends GameAndPlayerInfoCollectorBase with Loggable 
       fetchInto(classOf[DailyValue]).toList
   }
 
-  private def getPlayerGamesCount(db: DSLContext, player: Int) = new CountGamesForPlayerLoader(db).selectPlayerGamesCount(player)
+  private def getPlayerGamesCount(db: DSLContext, player: Int) = new CountGamesLoader(db).selectFilteredGamesCount(Some(player), None)
   private def getPlayerGameTimeSum(db: DSLContext, player: Int) = getPlayerGameTime(db, player, _.sum).fetchOne(0, classOf[Long])
   private def getPlayerGameTimeAvg(db: DSLContext, player: Int) = getPlayerGameTime(db, player, _.avg).fetchOne(0, classOf[Long])
 }

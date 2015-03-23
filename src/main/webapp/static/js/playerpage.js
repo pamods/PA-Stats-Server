@@ -52,6 +52,6 @@ $(function() {
 	
 	var viewModel = new ChartModel();
 	chartdata.timeData = chartdata.data;
-	ko.applyBindings(viewModel.basicChart);
+	ko.applyBindings(viewModel.basicChart, $('#playerpagediv').get(0));
 	window.setTimeout(function(){viewModel.basicChart.updateData(chartdata);}, 1000);
 });

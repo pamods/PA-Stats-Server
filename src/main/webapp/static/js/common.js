@@ -1,3 +1,5 @@
+
+
 $.urlParam = function(name) {
 	var results = new RegExp('[\\?&]' + name + '=([^&#]*)')
 			.exec(window.location.href);
@@ -66,5 +68,16 @@ ko.bindingHandlers.slider = {
 
 		$(element).slider("option", allBindingsAccessor().sliderOptions());
 
+	}
+};
+
+// http://stackoverflow.com/questions/11596933/how-to-extend-knockout-observables-to-read-default-value-from-binding
+ko.bindingHandlers.initializeValue = {
+	init : function(element, valueAccessor) {
+		valueAccessor()(element.getAttribute('value'));
+	},
+	update : function(element, valueAccessor) {
+		var value = valueAccessor();
+		element.setAttribute('value', ko.utils.unwrapObservable(value))
 	}
 };

@@ -14,7 +14,7 @@ import java.sql.Timestamp
 import info.nanodesu.model.db.updaters.reporting.GenerateNewPlayer
 import info.nanodesu.model._
 import net.liftweb.common.Loggable
-
+import net.liftweb.json._
 
 
 /**
@@ -94,9 +94,9 @@ object InitialReportUpdater {
     def insertNewPlanet(planet: ReportedPlanet): Int = {
       import _root_.scala.language.implicitConversions
       implicit def s2B(s: String) = try { new java.math.BigDecimal(s) } catch { case e: Exception => java.math.BigDecimal.ZERO }
-
       
-      db.insertInto(planets, planets.PLANET).values(planet.json).returning().fetchOne().getId()
+      db.insertInto(planets, planets.PLANET, planets.NAME).values(planet.json, 
+          compact(render(parse(planet.json) \ "name"))).returning().fetchOne().getId()
     }
 
     def insertNewGame(ident: String, paVersion: String, startDate: Timestamp, reportDate: Timestamp, planetId: Int, isAutomatch: Boolean): Int = {

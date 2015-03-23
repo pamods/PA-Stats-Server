@@ -11,7 +11,7 @@ package info.nanodesu.generated.tables;
 @java.lang.SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class V2PlanetJson extends org.jooq.impl.TableImpl<info.nanodesu.generated.tables.records.V2PlanetJsonRecord> {
 
-	private static final long serialVersionUID = -480963738;
+	private static final long serialVersionUID = -1553301530;
 
 	/**
 	 * The singleton instance of <code>public.v2_planet_json</code>
@@ -35,6 +35,11 @@ public class V2PlanetJson extends org.jooq.impl.TableImpl<info.nanodesu.generate
 	 * The column <code>public.v2_planet_json.planet</code>. 
 	 */
 	public final org.jooq.TableField<info.nanodesu.generated.tables.records.V2PlanetJsonRecord, java.lang.String> PLANET = createField("planet", org.jooq.impl.SQLDataType.CLOB.nullable(false), this);
+
+	/**
+	 * The column <code>public.v2_planet_json.name</code>. 
+	 */
+	public final org.jooq.TableField<info.nanodesu.generated.tables.records.V2PlanetJsonRecord, java.lang.String> NAME = createField("name", org.jooq.impl.SQLDataType.CLOB.defaulted(true), this);
 
 	/**
 	 * Create a <code>public.v2_planet_json</code> table reference

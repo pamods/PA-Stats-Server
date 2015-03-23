@@ -2,12 +2,26 @@
 <html>
 <body data-lift-content-id="thegamelist">
 		<div id="thegamelist" class="column span-24">
+		
+			<div id="gamesfilter">
+				<form data-bind="submit: navigate">
+					<input id="playerFilter" data-lift="ListGames.playerFilterValue" data-bind="initializeValue: playerFilter, value: playerFilter" type="text" autofocus placeholder="Filter for player" />
+					<input id="systemFilter" data-lift="ListGames.systemFilterValue" data-bind="initializeValue: systemFilter, value: systemFilter" type="text" placeholder="Filter for system" />
+					<input type="submit" value="Filter"/>
+					<input data-bind="click: clear" type="submit" value="Clear" />
+				</form>
+				<script src="/static/js/gamesfilter.js"></script>
+			</div>
+			<hr />
+			
 			<div class="pages" data-lift="ListGames.pages" class="column span-24"></div>
 			<table class="clicktable" id="gametable">
 				<thead>
 					<tr>
 						<th id="gameIdColumn">Game</th>
 						<th>Players</th>
+						<th title="This field does not update when a person changes their name.">Winner</th>
+						<th>System</th>
 						<th >Game started</th>
 						<th id="gameDurationColumn">Duration</th>
 					</tr>
@@ -16,6 +30,8 @@
 					<tr id="line">
 						<td class="gamenum">#</td>
 						<td class="gameplayers">Cola_Colin</td>
+						<td class="gamewinner">Cola_Colin</td>
+						<td class="gamesystem">Amplus</td>
 						<td class="gamestart">Today, 3A</td>
 						<td class="gametime">30:12+</td>
 					</tr>

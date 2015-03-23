@@ -57,6 +57,13 @@ class Boot extends Loggable {
 	        HTTPParam("Access-Control-Allow-Headers", "WWW-Authenticate,Keep-Alive,User-Agent,X-Requested-With,Cache-Control,Content-Type")))
     } 
     
+    // to allow caching on some REST things we need to prevent the default headers from screwing us over...
+    val defaultHeaders = LiftRules.defaultHeaders
+	LiftRules.defaultHeaders = {
+	    case (_, Req("report" :: "withcache" ::_, _, _)) => Nil
+	    case any => defaultHeaders(any)
+	}
+    
     // no need for jmx access to c3p0
     System.getProperties().setProperty("com.mchange.v2.c3p0.management.ManagementCoordinator", "com.mchange.v2.c3p0.management.NullManagementCoordinator")
     
