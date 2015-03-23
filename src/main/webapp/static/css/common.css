@@ -50,7 +50,7 @@ a:hover {
 	padding: 0px;
 	white-space:nowrap;
 	overflow: hidden;
-	max-width: 600px;
+	max-width: 270px;
 	text-overflow: ellipsis; 
 }
 
