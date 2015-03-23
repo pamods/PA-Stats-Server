@@ -91,12 +91,17 @@ object InitialReportUpdater {
   private class DbLayer(dbX: DSLContext) extends InitialReportDbLayer with GenerateNewPlayer with Loggable {
     def db = dbX
     
+    private def saveGetPlanetName(jsonString: String): String = try {
+      (for { JString(n) <- parse(jsonString) \ "name" } yield n).mkString
+    } catch {
+      case e: Exception => e.printStackTrace(); "Error determining name"
+    }
+    
     def insertNewPlanet(planet: ReportedPlanet): Int = {
       import _root_.scala.language.implicitConversions
       implicit def s2B(s: String) = try { new java.math.BigDecimal(s) } catch { case e: Exception => java.math.BigDecimal.ZERO }
-      
       db.insertInto(planets, planets.PLANET, planets.NAME).values(planet.json, 
-          compact(render(parse(planet.json) \ "name"))).returning().fetchOne().getId()
+          saveGetPlanetName(planet.json)).returning().fetchOne().getId()
     }
 
     def insertNewGame(ident: String, paVersion: String, startDate: Timestamp, reportDate: Timestamp, planetId: Int, isAutomatch: Boolean): Int = {
