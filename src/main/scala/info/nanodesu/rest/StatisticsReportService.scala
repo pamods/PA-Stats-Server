@@ -402,7 +402,7 @@ object StatisticsReportService extends RestHelper with Loggable {
   serve {
     case "report" :: "withcache" :: "systems" :: Nil Get _ =>
       CookieBox withSession { db =>
-         JsonResponse(Extraction decompose db.selectDistinct(planets.NAME).from(planets).fetch().asScala.map(_.value1()),
+         JsonResponse(Extraction decompose db.selectDistinct(planets.NAME).from(planets).where(planets.NAME.isNotNull()).fetch().asScala.map(_.value1()),
              List(("cache-control" -> "public, max-age=300")), S.responseCookies, 200)
       }
   }
