@@ -9,6 +9,8 @@ import org.jooq._
 import org.jooq.impl._
 import org.jooq.impl.DSL._
 import org.jooq.scala.Conversions._
+import java.sql.Date
+import java.sql.Timestamp
 
 class MostPlaytimesCollector {
   val topPlaytime = MostPlaytimesCollector.topPlaytime
@@ -20,7 +22,7 @@ object MostPlaytimesCollector extends RefreshRunner {
 
   def apply() = new MostPlaytimesCollector()
 
-  override val firstLoadDelay = 60 * 1000 * 10
+  override val firstLoadDelay = 60 * 1000 * 1
   override val RUN_INTERVAL = 1000 * 60 * 60 * 6
   val processName = "worker: " + getClass().getName()
 
@@ -41,6 +43,7 @@ object MostPlaytimesCollector extends RefreshRunner {
             join(players).onKey().
             join(names).onKey().
             where(players.UBER_NAME.isNotNull()).
+            and(games.END_TIME.compare(Comparator.GREATER, new Timestamp(System.currentTimeMillis() - 7 * 24 * 60 * 60 * 1000))).
             groupBy(games.ID, names.DISPLAY_NAME, players.ID).asTable("foo")
        ).
        groupBy(field("name"), field("pid")).

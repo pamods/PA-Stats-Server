@@ -39,24 +39,24 @@ object PlayerInfo extends DispatchSnippet with Loggable {
       PlayerInfoCollector(db, selectedPlayer)
     }
     
-    val txt = s"var chartdata = ${compact(render(Extraction decompose inf.dailyValues))}"
-    
-    val graphData = 
-      <script type="text/javascript">{txt}</script>
+//    val txt = s"var chartdata = ${compact(render(Extraction decompose inf.dailyValues))}"
+//    
+//    val graphData = 
+//      <script type="text/javascript">{txt}</script>
     
     if (inf.isReporter) {
-      "#playerName *" #> inf.currentDisplayName &
-        "#gamesplayed *" #> inf.gamesCount &
-        "#gametimesum *" #> inf.playerGameTime &
-        "#gametimeavg *" #> inf.playerGameTimeAvg &
-        "#avgapm *" #> (CookieBox withSession (GameAndPlayerInfoCollector.getAvgApm(_, selectedPlayer))) &
+      "#playerName *" #> inf.currentDisplayName
+//        "#gamesplayed *" #> inf.gamesCount &
+//        "#gametimesum *" #> inf.playerGameTime &
+//        "#gametimeavg *" #> inf.playerGameTimeAvg &
+//        "#avgapm *" #> (CookieBox withSession (GameAndPlayerInfoCollector.getAvgApm(_, selectedPlayer))) &
         // these values are not very helpful and cost a lot of cpu time to generate
       //  "#summetal *" #> formatKMBT(inf.sumMetal) &
       //  "#sumenergy *" #> formatKMBT(inf.sumEnergy) &
        // "#metalusageavg *" #> formatPercent(inf.metalUseAvg) &
        // "#energyusageavg *" #> formatPercent(inf.energyUseAvg) &
        // "#avgbuildspeed *" #> formatPercent(inf.buildSpeed) &
-        "#timelinedatasource" #> graphData
+//        "#timelinedatasource" #> graphData
     } else {
       "#playerName *" #> "unknown player ID!"
     }

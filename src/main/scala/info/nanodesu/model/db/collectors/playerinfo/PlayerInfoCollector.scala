@@ -35,9 +35,9 @@ case class DailyValues(
 class PlayerInfoCollector(db: DSLContext, player: Int, gameId: Option[Int]) extends Loggable {
   import PlayerInfoCollector._
 
-  val gamesCount = if (gameId.isEmpty) getPlayerGamesCount(db, player) else 0
-  val playerGameTime = if (gameId.isEmpty) prettyTime(getPlayerGameTimeSum(db, player)) else ""
-  val playerGameTimeAvg = if (gameId.isEmpty) prettyTime(getPlayerGameTimeAvg(db, player)) else ""
+//  val gamesCount = if (gameId.isEmpty) getPlayerGamesCount(db, player) else 0
+//  val playerGameTime = if (gameId.isEmpty) prettyTime(getPlayerGameTimeSum(db, player)) else ""
+//  val playerGameTimeAvg = if (gameId.isEmpty) prettyTime(getPlayerGameTimeAvg(db, player)) else ""
   val currentDisplayName = selectCurrentDisplayName(db, player)
   val isReporter = selectIsReporter(db, player)
   

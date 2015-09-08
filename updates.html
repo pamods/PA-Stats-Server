@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html>
+<head>
+<link rel="stylesheet" href="/classpath/blueprint/screen.css" type="text/css" media="screen, projection">
+<link rel="stylesheet" href="/classpath/blueprint/print.css" type="text/css" media="print">
+<link rel="stylesheet" href="/classpath/blueprint/plugins/fancy-type/screen.css" type="text/css" media="screen, projection">
+</head>
+<body>
+		<h1>Changelog!</h1>
+		<div>Here I will present you with the most recent updates to PA Stats :)</div>
+		<div>Note that you can find the latest issues on Github: <a href="https://github.com/pamods/PA-Stats-Server/issues?labels=&milestone=&page=1&state=open" target="_blank"	>LINK</a></div>
+		<div>This page sometimes may look outdated due to caching, try F5</div>
+		<br/>
+		<h4>v21.0.6 - 21.6.2015</h4>
+		<ul>
+			<li>Fix Galactir war games resume function being partially broken due to PA Stats.</li>
+		</ul>
+		<h4>v21.0.5 - 26.4.2015</h4>
+		<ul>
+			<li>Add the command /live to PA Chat, it lists all streams currently running. Thanks to mikeyh for the pull request.</li>
+		</ul>
+		<h4>v21.0.4 - 7.4.2015</h4>
+		<ul>
+			<li>Fixed an issue with the chathistory that was caused by a server update on the side of Uber. Thanks mikeyh for providing the fix before I could even get out of my bed.</li>
+		</ul>
+		<h4>v21.0.3 - 23.3.2015</h4>
+		<ul>
+			<li>Remove some more rather useless parts of the per player stats to speed up loadtimes of that page. Still probably not very good though.</li>
+			<li>the list of games now shows the winner and the system that was played.</li>
+			<li>You can now filter the list of games for a player and/or a system</li>
+			<li>At the end of the game there is now a button to directly open the game on pastats.com:<br/><img src="http://i.imgur.com/O3mNlzm.png"/></li>		
+			<li>Released PA Stats Server edition. See more <a href="https://forums.uberent.com/threads/rel-pa-stats-server.68367/">here</a>	
+			<li>Updated some images. Make sure to reload the page with ctrl+F5 to clear your cache</li>
+		</ul>
+		<h4>v20.7.1 - 10.3.2015</h4>
+		<ul>
+			<li>Fix an issue that caused many many custom servers to pile up in the server browser, thanks to mikeyh</li>
+			<li>Introduce the option to use ajax for most ubernet calls. This may help you if you have often issues where you click "join" and nothing happens. Read this thread before you enable it in the settings: <a href="https://forums.uberent.com/threads/rel-possible-fix-for-not-responsive-join-button-ajax-ubernet-calls.68250/" target="_blank">LINK</a>
+		</ul>
+		<h4>New Banner!</h4>
+		<ul>
+			<li>Thanks to <a href="https://forums.uberent.com/members/h40p.1983579/" target="_blank">h40p</a>: he made the shiny new banner!</li>
+		</ul>
+		<h4>v20.6.0 - 19.2.2015</h4>
+		<ul>
+			<li>Introduce /setcolor commands. See /help setcolor</li>
+			<li>Clickable links in chat. Make sure to start them with http://</li>
+			<li>Introduce /sethistorylength Default is 500</li>
+			<li>Clickable links in the context menu to pastats.com and exodusesports.com</li>
+			<li>speed up the maximize process of chatroooms</li>
+			<li>a TON of internal improvements and bug fixes</li>
+			<li>99% of the changes in this update are thanks to mikeyh. Thanks mikeyh!!!</li>
+		</ul>
+		<h4>v20.5.0 - 10.2.2015</h4>
+		<ul>
+			<li>Minor improvements on the page.</li>
+		</ul>
+		<h4>v20.4.0 - 4.2.2015</h4>
+		<ul>
+			<li>Include the next version of PA Chat. Read the changes <a href="https://forums.uberent.com/threads/rel-pa-chat.67603/page-4#post-1065162" target="_blank">here</a></li>
+		</ul>
+		<h4>v20.3.0 - 31.1.2015</h4>
+		<ul>
+			<li>Replace the PA Stats IRC button with <a href="https://forums.uberent.com/threads/rel-pa-chat.67603" target="_blank">the PA Chat mod</a></li>
+		</ul>
+		<h4>v20.2.2 - 22.12.2014</h4>
+		<ul>
+			<li>fix the css of the irc button</li>
+			<li>add option to disable automatic pause and always disable it in ranked games as those have that feature by default anyway</li>
+			<li>fix a bug that could cause ranked games to be considered as local games and thus not report anything</li>
+			<li>fixed a bug that caused datapackages send to pa stats to be lost. This caused some games to i.e. miss out some units on the army composition view.</li>
+		</ul>
+		<h4>v20.2.1 - 18.11.2014</h4>
+		<ul>
+			<li>Support the new PTE</li>
+		</ul>
+		<h4>v20.2.0 - 5.11.2014</h4>
+		<ul>
+			<li>Remove PA Stats Matchmaking. Please use Ubers system and tell them to add better maps to it</li>
+		</ul>
+		<h4>v20.1.3 - 27.10.2014</h4>
+		<ul>
+			<li>Support reporting of PTE ranked 1vs1 matches. No changes to stable.</li>
+		</ul>
+		<h4>v20.1.2 - 26.10.2014</h4>
+		<ul>
+			<li>Fix missing alerts reporting that could happen if other client mods with broken unit jsons are loaded, even if the units in question are very rare and not build at all. @modders: PA Stats now logs warnings if you have any invalid unit json files, so check the the console of live_game to see if you have any invalid jsons in your mods.</li>
+		</ul>
+		<h4>v20.1.1 - 23.10.2014</h4>
+		<ul>
+			<li>Added missing 13th map to the mappool</li>
+		</ul>
+		<h4>v20.1.0 - 20.10.2014</h4>
+		<ul>
+			<li>Thanks to Team Genesis there are now 13 ranked maps, which all should be balanced again.</li>
+		</ul>
+		<h4>v20.0.0 - 19.10.2014</h4>
+		<ul>
+			<li>Added sim speed to the tracked statistics. You may need to ctrl+F5 to see it</li>
+		</ul>
+		<h4>v19.1.2 - 8.10.2014</h4>
+		<ul>
+			<li>Fix a bug that resulted in unfiltered alerts in the chronocam in the PTE</li>	
+			<li>Change a piece of code that handles sight and first contact alerts. If you notice anything broken please report it</li>
+		</ul>
+		<h4>v19.1.1 - 1.10.2014</h4>
+		<ul>
+			<li>Fixed bugs in the internal handling of alerts PA Stats needs to do to change the alerts behavior to the state intended by Uber. This means no more allied dox lost messages, among other things like more "enemey sighted" alerts and less "you lost a building" messages. Please report if the behavior seems different to the non modded PA.</li>
+			<li>Changed the CSS for the IRC button to work together with the ingamebrowser. Thanks to CaptainConundrum for the commit</li>
+		</ul>
+		<h4>v19.1.0 - 15.9.2014</h4>
+		<ul>
+			<li>Add a little piece of code into the UI mod that automatically pauses the game if an undefeated player disconnects.</li>
+		</ul>
+		<h4>v19.0.1 - 15.9.2014</h4>
+		<ul>
+			<li>A tiny fix that may help with some cases where matchmaking would get stuck during the phase where the host reports his lobby id to the client. If your matchmaking should get stuck anywhere, please report it and try F5 to reload the UI :)</li>
+		</ul>
+		<h4>v19.0.0 - 15.9.2014</h4>
+		<ul>
+			<li>the mappool is visible now in the System Designer. You can also access it by clicking the MAPS part in the title of the multiplayer screen</li>
+			<li>You can veto a single map of the mappool now</li>
+			<li>new mappool, thanks to elodea for helping me with it!!!</li>
+			<li>try to tell any 1vs1 interested player you may meet in custom games of the matchmaking system :)</li>
+			<li>new icon for the page, stolen from Exodus Esports :p You may need to reload this <a target='_blank' href='http://pastats.com/static/img/favicon.ico'>Link</a> or clear your cache to see it.</li>
+			<li>it is now tracked if a game was an automatch or not, so far this is only used for the number of so played automatches under Extra</li>
+			<li>added the fields "endTime" and "isAutomatch" to the /report/winners webservice</li>
+		</ul>
+		<h4>Replaced strategic icons - 12.9.2014</h4>
+		<ul>
+			<li>I finally use the new icons that PA has since a few month. This means all units should now be displayed on the globe</li>
+			<li>You probably will need to clear your cache to see them</li>
+		</ul>
+		<h4>v18.2.0 - 12.9.2014</h4>
+		<ul>
+			<li>removed gender specific language from the automatch gamesetup notifications</li>
+			<li>remove the star wars map from the mappool</li>
+			<li>added option to not play the ARE YOU READY sound once a match has been found</li>
+			<li>changed how the team composition of games is captured. This is a pretty important part of data gathering, that is the number one reason for bugs that cause games to not report at all. This should fix issues with no color being captured or completely missing reports. If you see such errors in any way please report them!</li>
+		</ul>
+		<h4>v18.1.0 - 9.9.2014</h4>
+		<ul>
+			<li>Completely rewrote the gamesetup code for 1vs1 automatches. It *should* be more reliable. If you often face resets and break downs please report them!</li>
+			<li>New maps for 1vs1 automatches</li>
+		</ul>
+		<h4>v18.0.1 - 5.9.2014</h4>
+		<ul>
+			<li>This version includes skill based 1v1 matchmaking. If the game states there is somebody close to your rating searching it should take not longer than 3 minutes to find an opponent</li>
+			<li>fixed some minor bugs</li>
+		</ul>
+		<h4>v17.5.3 - 1.9.2014</h4>
+		<ul>
+			<li>fixed a tiny bug that prevented PA Stats from sending any game data</li>
+			<li>removed the channel palookingforgames from the ingame irc, it was empty all the time anyway, now people end up in #planetaryannihilation which has some people at least</li>
+			<li>changed positioning of the IRC window to prevent some weird quirks</li>
+			<li>Version detection is a pain that never really worked, I decided to remove it. This means that in future PTE builds PA Stats may or may not work and I won't fix it for PTE builds, though I may still use them to prepare for changes. The exception to this is the matchmaking, which will still check for a known version and only offer matchmaking in that version. Can't try to match people from different builds together afterall.</li>
+			<li>removed the old main menu entry for automatches</li>
+			<li>fixed the checkboxes at the start of the game to work again and be placed inside the messages bar</li>
+			<li>fixed matchmaking, it's such an ugly piece of hackery, I am surprised it works really.</li>
+			<li>I didnt touch the definitions for matchmaking planets. Looking for suggestions to replace them, they are probably imba/broken/whatever else bad might happen</li>
+			<li>fixed the settings</li>
+			<li>fixed a bug that resulted in replays starting again and again after using a replaylink</li>
+		</ul>
+		<h4>v17.5.0 - 26.7.2014</h4>
+		<ul>
+			<li>Fixes for the recent patch</li>
+			<li>include easy access to the PA IRC on esper.net</li>
+		</ul>
+		<h4>v17.4.10 - 9.6.2014</h4>
+		<ul>
+			<li>Fix replay launch for 68568</li>
+			<li>Maybe fix the score screen a bit</li>
+			<li>Reenable automatches</li>
+		</ul>
+		<h4>v17.4.9 - 3.6.2014</h4>
+		<ul>
+			<li>Fix settings for patch 68331</li>
+		</ul>
+		<h4>v17.4.6 - 31.5.2014</h4>
+		<ul>
+			<li>Update automatches for 66830</li>
+		</ul>
+		<h4>v17.4.5 - 24.5.2014</h4>
+		<ul>
+			<li>Update to make the settings work again. Replay links also should work again.</li>
+		</ul>
+		<h4>v17.4.4 - 23.5.2014</h4>
+		<ul>
+			<li>Try to support Galactic War games. They don't show any correct armies or planet data though</li>
+		</ul>
+		<h4>v17.4.1 - 13.5.2014</h4>
+		<ul>
+			<li>Support ladder matches in 65588</li>
+		</ul>
+		<h4>v17.4.0 - 5.5.2014</h4>
+		<ul>
+			<li>Added metal spent and energy spent to the charts. You may need to ctrl F5 to reload your cache</li>
+			<li>Add a direct link to the PA Stats Ladder on player pages</li>
+			<li>Add game version to the winners webservice</li>
+			<li>The system view of games now shows the seed again</li>
+			<li>The replay redirect page now shows a few general bits of info about the game if it is on PA Stats. No spoilers of course.</li>
+		</ul>
+		<h4>v17.3.0 - 28.4.2014</h4>
+		<ul>
+			<li>The replay redirect page now is a full html page. It replaces the direct link that the (?) had and also links the game on PA Stats</li>
+		</ul>
+		<h4>v17.2.0 - 28.4.2014</h4>
+		<ul>
+			<li>Replays are now linked over a redirect service. So the links are plain http links that are easier to handle.</li>
+			<li>Some minor fixes for the new system view</li>
+		</ul>
+		<h4>v17.1.2 - 27.4.2014</h4>
+		<ul>
+			<li>Fixed an issue that prevented replayplayback if you did not have the mod Acceptance</li>
+		</ul>
+		<h4>v17.1.1 - 26.4.2014</h4>
+		<ul>
+			<li>Moved Matchmaking to the server browser due to technical difficulties in the start scene</li>
+		</ul>
+		<h4>v17.1.0 - 26.4.2014</h4>
+		<ul>
+			<li>Completely new automatch planets. Now uses the exodus tournament planets.</li>
+			<li>Fixed some minor bugs of the new system view</li>
+		</ul>
+		<h4>v17.0.1 - 25.4.2014</h4>
+		<ul>
+			<li>The last update broke the startup of the game for people who use the UberLauncher to start the game. (And possibly steam). Thanks to imboing for quickly reporting the issue. It should be fixed now.</li>
+		</ul>
+		<h4>v17.0.0 - 25.4.2014</h4>
+		<ul>
+			<li>New view of the used system. Thanks to dreuffek for implementing the frontend!</li>
+			<li>Link replays. More explanation via a click on the (?)</li>
+			<li>the ui mod know knows that there are multiple versions of PA. Automatches are only enabled in public official builds. Not in the PTE</li>
+		</ul>
+		<h4>v16.5.0 - 18.4.2014</h4>
+		<ul>
+			<li>No more lag when opening game pages, instead the globe visible speeds through the events</li>
+			<li>show ghosts of dead units and buildings in a half transparent red star</li>
+			<li>a few teaks to the globe camera, no more pole lock</li>
+			<li>check if the browser has webgl, if not show a link to find help</li>
+			<li>support to show different planets on the globe</li>
+			<li>support to show the sums of units constructed or lost in the army composition</li>
+			<li>show strategic icons in the army composition</li>
+		</ul>
+		<h4>v16.4.5 - 3.4.2014</h4>
+		<ul>
+			<li>Fixed missing ping notifications caused by the internally used AlertsManager. If you use the mod AlertsManager you need to update that mod as well!</li>
+		</ul>
+		<h4>v16.4.4 - 2.4.2014</h4>
+		<ul>
+			<li>Removed the water map from automatches as well as the most imba map A1600, put in some other maps that seem to be okay.</li>
+		</ul>
+		<h4>v16.4.3 - 30.3.2014</h4>
+		<ul>
+			<li>Try to fix randomly wrong winner reports that happend in rare cases.</li>
+			<li>There still is a bug that results in automatches to fail to launch. While the automatic retry does work in my tests it somehow can fail sometimes, it is recommended to restart PA after you had any sort of timeout!</li>
+		</ul>
+		<h4>v16.4.2 - 23.3.2014</h4>
+		<ul>
+			<li>Server and Domain are now both sponsored by <a href="http://www.goscripting.com" target="_blank">GOScripting</a></li>
+			<li>New server. Note that you should update your PA Stats mod in pamm for this. PA Stats should be able to handle even tournament loads now without lags.</li>
+			<li>Minor bugfixes</li>
+		</ul>
+		<h4>v16.4.1 - 21.3.2014</h4>
+		<ul>
+			<li>Fix automatches for PA v.63180</li>
+		</ul>
+		<h4>v16.4.0 - 17.3.2014</h4>
+		<ul>
+			<li>Added a new webservice to query for 1v1 between 2 players. See the forums for an exact explanation</li>
+			<li>Added a potential fix for units showing up twice in the army composition for live games in some cases. If you still encounter this please report it</li>
+		</ul>
+		<h4>v16.3.6 - 16.3.2014</h4>
+		<ul>
+			<li>A bunch of bugfixes for automatches, especially in situations where ubernet servers fail to do what they should do.</li>
+		</ul>
+		<h4>v16.3.3 - 14.3.2014</h4>
+		<ul>
+			<li>fixed for PA v.62857, I *think* there may be issues with games not reporting. If you encounter problems please report them!</li>
+			<li>fixed a bug that caused the wrong planet to be captured</li>
+			<li>automatches should make proper use of the loading notifications now</li>
+		</ul>
+		<h4>v16.2.0 - 13.3.2014</h4>
+		<ul>
+			<li>WebGL 3D Globe that shows structures of players by the army composition time slider.</li>
+			<li>Webservice that returns players ID by uber_name</li>
+			<li>A bunch of army composition related bug fixes</li>
+			<li>Games that have a winner are no longer deleted. This should fix issues with the ladder</li>
+		</ul>
+		<h4>v16.1.3 - 8.3.2014</h4>
+		<ul>
+			<li>Fix Automatches for PA v.62519</li>
+		</ul>
+		<h4>v16.1.2 - 5.3.2014</h4>
+		<ul>
+			<li>Fully fixed PA Stats for 62318 as far as I can tell</li>
+		</ul>
+		<h4>v16.1.1 - 3.3.2014</h4>
+		<ul>
+			<li>Fixed automatches for real this time around, sorry!</li>
+			<li>Changed the searchinfo in the mainmenu to indicate that it also shows that it knows that you are searching</li>
+			<li>Added somebody is searching info in the server list</li>
+		</ul>
+		<h4>v16.1.0 - 2.3.2014</h4>
+		<ul>
+			<li>Fix automatches for PA v.62165</li>
+			<li>The automatch planet Finn's revenge has been flooded!</li>
+		</ul>
+		<h4>v16.0.1 - 1.3.2014</h4>
+		<ul>
+			<li>Maybe this fixes issues with army/teams/full games not being correctly registered</li>
+			<li>Added "Single Desert" by stuart98 to the mappool. Removed RedD, I think it was broken from new planet generation.</li>
+		</ul>
+		<h4>v16.0.0 - 1.3.2014</h4>
+		<ul>
+			<li>Update for PA GAMMA.</li>
+		</ul>
+		<h4>v15.3.0 - 24.2.2014</h4>
+		<ul>
+			<li>The Matchmaker now uses a youtube video to warn you of starting ranked games. You can even configure which one</li>
+		</ul>
+		<h4>v15.2.5 - 21.2.2014</h4>
+		<ul>
+			<li>The most recent update broke the apm counter, it ignored most mouse clicks. Fixed this</li>
+			<li>Maybe fixed an issue that occured on blackscreen after a reconnect. Not sure. Hard to reproduce :(</li>
+		</ul>
+		<h4>v15.2.4 - 20.2.2014</h4>
+		<ul>
+			<li>Removed multi planet systems from the automatch mappool</li>
+			<li>Removed a few of the beeps, they were just too many</li>
+		</ul>
+		<h4>v15.2.3 - 19.2.2014</h4>
+		<ul>
+			<li>Fix for v.61250</li>
+			<li>automatches no longer use the uber cannon sound. A simple beep wav is used instead. Should work 100%, unlike the ubercannon</li>
+			<li>You may need to do a ctrl f5 or clear your cache to get new images for the army composition</li>
+		</ul>
+		<h4>v15.2.2 - 13.2.2014</h4>
+		<ul>
+			<li>Changed some of the automatch maps, so most of them do not have multiple planets anymore</li>
+			<li>Fixed a bug that prevented reports from automatches in some cases</li>
+		</ul>
+		<h4>v15.2.1 - 31.1.2014</h4>
+		<ul>
+			<li>Fixed a possible cause for timeouts that occured when the ubernet takes longer than expected to create a server.</li>
+		</ul>
+		<h4>v15.2.0 - 30.1.2014</h4>
+		<ul>
+			<li>The automatches now play the uber cannon sound twice once they found an opponent. So it is possible to minimize the game while searching</li>
+		</ul>
+		<h4>v15.1.0 - 28.1.2014</h4>
+		<ul>
+			<li>Introduced a mappool with 8 constant maps for the automatches.</li>
+			<li>There is a notification about available 1vs1 automatches in the server browser now.</li>
+		</ul>
+		<h4>v15.0.1 - 28.1.2014</h4>
+		<ul>
+			<li>Some people had issues with the automatches not launching. This update might fix that</li>
+			<li>The planets in automatches are a bit randomized now. Better planets to follow</li>
+		</ul>
+		<h4>v15.0.0 - 27.1.2014</h4>
+		<ul>
+			<li>PA Stats Matchmaking introduced. Be patient with it, I am not 100% sure it works perfect. <a href="https://forums.uberent.com/threads/wip-pa-stats-matchmaking.56040/"  target="_blank">See here.</a></li>
+			<li>It is possible to hide your live stats again</li>
+			<li>Some bugfixes that should improve the reliability of the display of live games</li>
+		</ul>
+		<h4>v14.3.0 - 25.1.2014</h4>
+		<ul>
+			<li>Some internal changes. If you notice bugs, tell me.</li>
+			<li>Some little visual improvements on the page. Try ctrl+F5 if something looks broken to you.</li>
+		</ul>
+		<h4>v14.2.0</h4>
+		<ul>
+			<li>Small bugfixes, internal changes and better logging to hunt down another bug once it occures again</li>
+			<li>PA Stats tries to detect draws now</li>
+			<li>The winner-webservice now contains a starttime and can show winner = -1 for draws</li>
+		</ul>
+		<h4>v14.1.1</h4>
+		<ul>
+			<li>The units in the Army composition display now link to the PA Matches <a href="http://pamatches.com/wiki/" target="_blank">Wiki</a>.</li>
+		</ul>
+		<h4>v14.1.0</h4>
+		<ul>
+			<li>Fixed APM Charts</li>
+			<li>Fixed lots of things about the army composition display. It should no longer lag any browser</li>
+			<li>Changed army composition layout a bit to prevent lots of scrolling</li>
+			<li>The units in the army composition can now be click to open pa-db.com. This will hopefully soon be replaced with links to the pamatches.com wiki, which is better maintained</li>
+			<li>Added PA Stats options to the PA-settings</li>
+		</ul>
+		<h4>v14.0.0</h4>
+		<ul>
+			<li>Added capturing of unit constructed and destroyed events</li>
+			<li>Show army composition of players based on those events</li>
+		</ul>
+		<h4>v13.2.0</h4>
+		<ul>
+			<li>Added link to the -under construction- ladder page</li>
+			<li>Fixed an internal bug</li>
+		</ul>
+		<h4>v13.1.0</h4>
+		<ul>
+			<li>Fixed a bug in the mod that caused the ingame-checkboxes to appear next to the controls for Planet smashing</li>
+			<li>Added an ingame-explanation of what PA Stats does, so everyone knows their data is being collected</li>
+			<li>Improved the seachbox for the player-search</li>
+			<li>Link Github issues in the changelog</li>
+			<li>changed a few colors and made the vs between teams white so it is easier to see</li>
+			<li>added a graph on the player-pages. More features will be added to this in a future version</li>
+			<li>Fixed a few internal bugs that probably went unnoticed so far</li>
+		</ul>
+		<h4>v13.0.1</h4>
+		<ul>
+			<li>Fixed a bug that prevented new users from using PA Stats. Sorry. :(</li>
+			<li>Added Updates section</li>
+		</ul>
+		<h4>v13.0.0</h4>
+		<ul>
+			<li>PA Stats is now on Github, feel free to contribute: <a href="https://github.com/pamods/PA-Stats-Server" target="_blank">HERE</a> I am especially looking for people with webdesign knowledge</li>
+			<li>Teamcolors are now used in the graphs. The redundant legend was removed.</li>
+			<li>Players are grouped by teams.</li>
+			<li>The backend has been rewritten for the most part. If you spot new bugs please report them.</li>
+			<li>Old data still uses the old colors, however for old teamgames the list of players is a bit broken. The old data is just too... well it doesn't know of teams.</li>
+		</ul>
+</body>
+</html>

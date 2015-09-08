@@ -87,11 +87,11 @@ class Boot extends Loggable {
     CookieBox.init()
     StatisticsReportService.init()
     SmallGamesCleaner.init()
-    PlayerHighscoreCollector.init()
+//    PlayerHighscoreCollector.init()
     MostPlaytimesCollector.init()
     ExtraNumbersCollector.init()
-    LadderServiceV2.initService()
-    RatingsMachine.init()
+//    LadderServiceV2.initService()
+//    RatingsMachine.init()
     GamesListing.initService();
     
     // Build SiteMap

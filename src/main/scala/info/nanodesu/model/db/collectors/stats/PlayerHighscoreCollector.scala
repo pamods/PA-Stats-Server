@@ -10,6 +10,7 @@ import org.jooq.impl.DSL._
 import org.jooq.scala.Conversions._
 import info.nanodesu.lib.db.CookieFunc._
 
+// not used atm
 class PlayerHighscoreCollector {
   val maxUnitsPlayer = PlayerHighscoreCollector.maxUnitsPlayer
   //val maxMetalPlayer = PlayerHighscoreCollector.maxMetalPlayer
